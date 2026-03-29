@@ -24,9 +24,13 @@
                 <a href="{{ route('recipient.request') }}" class="{{ request()->routeIs('recipient.request') ? 'active' : '' }}">Request Hair</a>
                 <a href="{{ route('recipient.tracking') }}" class="{{ request()->routeIs('recipient.tracking*') ? 'active' : '' }}">Tracking</a>
                 <a href="{{ route('recipient.profile') }}" class="{{ request()->routeIs('recipient.profile') ? 'active' : '' }}">Profile</a>
+            @elseif(request()->routeIs('wigmaker.*'))
+                <a href="{{ route('wigmaker.dashboard') }}" class="{{ request()->routeIs('wigmaker.dashboard') ? 'active' : '' }}">Overview</a>
+                <a href="{{ route('wigmaker.dashboard') }}#tasksBoard" class="{{ request()->routeIs('wigmaker.task.*') ? 'active' : '' }}">Production Tasks</a>
             @else
                 <a href="{{ route('donor.dashboard') }}">Donate Hair</a>
                 <a href="{{ route('recipient.dashboard') }}">Request Hair</a>
+                <a href="{{ route('wigmaker.dashboard') }}">Wigmaker</a>
             @endif
             <a href="{{ route('login') }}">Logout</a>
         </div>

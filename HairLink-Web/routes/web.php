@@ -38,3 +38,8 @@ Route::get('/donor/monetary-donation', function () {
 Route::get('/recipient/monetary-donation', function () {
     return view('pages.monetary-donation', ['userRole' => 'recipient']);
 })->name('recipient.monetary');
+
+Route::view('/wigmaker/dashboard', 'pages.wigmaker-dashboard')->name('wigmaker.dashboard');
+Route::get('/wigmaker/tasks/{taskCode}', function (string $taskCode) {
+    return view('pages.wigmaker-task-detail', compact('taskCode'));
+})->name('wigmaker.task.detail');
