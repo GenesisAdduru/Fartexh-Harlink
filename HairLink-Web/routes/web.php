@@ -30,3 +30,11 @@ Route::view('/recipient/confirmation', 'pages.recipient-confirmation')->name('re
 Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
 Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
 Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
+
+Route::get('/donor/monetary-donation', function () {
+    return view('pages.monetary-donation', ['userRole' => 'donor']);
+})->name('donor.monetary');
+
+Route::get('/recipient/monetary-donation', function () {
+    return view('pages.monetary-donation', ['userRole' => 'recipient']);
+})->name('recipient.monetary');
