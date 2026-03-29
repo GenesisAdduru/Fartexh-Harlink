@@ -44,8 +44,8 @@ function redirectByUserType(userType) {
     }
 
     if (userType === 'admin') {
-        alert('Login successful. Redirecting to staff dashboard.');
-        window.location.href = '/staff/dashboard';
+        alert('Login successful. Redirecting to admin dashboard.');
+        window.location.href = '/admin/dashboard';
         return;
     }
 
@@ -254,8 +254,8 @@ function setupLoginFlow() {
         const accounts = getDemoAccounts();
 
         if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
-            alert('Admin demo login successful. Redirecting to staff dashboard.');
-            window.location.href = '/staff/dashboard';
+            alert('Admin demo login successful. Redirecting to admin dashboard.');
+            window.location.href = '/admin/dashboard';
             return;
         }
 

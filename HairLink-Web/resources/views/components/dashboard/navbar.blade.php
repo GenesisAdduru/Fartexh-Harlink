@@ -11,7 +11,7 @@
             <span></span>
         </button>
 
-        <div class="dash-links {{ request()->routeIs('staff.*') ? 'dash-links-staff' : '' }}" data-dash-links>
+        <div class="dash-links {{ request()->routeIs('staff.*') ? 'dash-links-staff' : '' }} {{ request()->routeIs('admin.*') ? 'dash-links-staff' : '' }}" data-dash-links>
             <a href="{{ url('/') }}">Home</a>
             @if(request()->routeIs('donor.*'))
                 <a href="{{ route('donor.dashboard') }}" class="{{ request()->routeIs('donor.dashboard') ? 'active' : '' }}">Overview</a>
@@ -34,6 +34,14 @@
                 <a href="{{ route('staff.realtime-tracking') }}" class="{{ request()->routeIs('staff.realtime-tracking') ? 'active' : '' }}">Tracking</a>
                 <a href="{{ route('staff.wig-stock') }}" class="{{ request()->routeIs('staff.hair-stock') || request()->routeIs('staff.wig-stock') ? 'active' : '' }}">Stock</a>
                 <a href="{{ route('staff.rule-matching') }}" class="{{ request()->routeIs('staff.rule-matching') || request()->routeIs('staff.recipient-matching-list') ? 'active' : '' }}">Matching</a>
+            @elseif(request()->routeIs('admin.*'))
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Overview</a>
+                <a href="{{ route('admin.verification') }}" class="{{ request()->routeIs('admin.verification') ? 'active' : '' }}">Verify</a>
+                <a href="{{ route('admin.matching') }}" class="{{ request()->routeIs('admin.matching') ? 'active' : '' }}">Matching</a>
+                <a href="{{ route('admin.operations') }}" class="{{ request()->routeIs('admin.operations') ? 'active' : '' }}">Ops</a>
+                <a href="{{ route('admin.inventory') }}" class="{{ request()->routeIs('admin.inventory') ? 'active' : '' }}">Inventory</a>
+                <a href="{{ route('admin.users') }}" class="{{ request()->routeIs('admin.users') ? 'active' : '' }}">Users</a>
+                <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}">Reports</a>
             @else
                 <a href="{{ route('donor.dashboard') }}">Donate Hair</a>
                 <a href="{{ route('recipient.dashboard') }}">Request Hair</a>

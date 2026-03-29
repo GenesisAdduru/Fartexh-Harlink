@@ -56,3 +56,13 @@ Route::view('/staff/hair-stock', 'pages.staff-hair-stock')->name('staff.hair-sto
 Route::view('/staff/wig-stock', 'pages.staff-wig-stock')->name('staff.wig-stock');
 Route::view('/staff/recipient-matching-list', 'pages.staff-recipient-matching-list')->name('staff.recipient-matching-list');
 Route::view('/staff/rule-matching', 'pages.staff-rule-matching')->name('staff.rule-matching');
+
+Route::view('/admin/dashboard', 'pages.admin-dashboard')->name('admin.dashboard');
+Route::view('/admin/verification', 'pages.admin-verification')->name('admin.verification');
+Route::view('/admin/matching', 'pages.admin-matching')->name('admin.matching');
+Route::view('/admin/operations', 'pages.admin-operations')->name('admin.operations');
+Route::view('/admin/inventory', 'pages.admin-inventory')->name('admin.inventory');
+Route::view('/admin/users', 'pages.admin-users')->name('admin.users');
+Route::view('/admin/events', 'pages.admin-events')->name('admin.events');
+Route::view('/admin/community', 'pages.admin-community')->name('admin.community');
+Route::view('/admin/reports', 'pages.admin-reports')->name('admin.reports');
