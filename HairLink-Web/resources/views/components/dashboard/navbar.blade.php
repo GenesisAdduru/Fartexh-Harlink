@@ -11,7 +11,7 @@
             <span></span>
         </button>
 
-        <div class="dash-links" data-dash-links>
+        <div class="dash-links {{ request()->routeIs('staff.*') ? 'dash-links-staff' : '' }}" data-dash-links>
             <a href="{{ url('/') }}">Home</a>
             @if(request()->routeIs('donor.*'))
                 <a href="{{ route('donor.dashboard') }}" class="{{ request()->routeIs('donor.dashboard') ? 'active' : '' }}">Overview</a>
@@ -27,10 +27,18 @@
             @elseif(request()->routeIs('wigmaker.*'))
                 <a href="{{ route('wigmaker.dashboard') }}" class="{{ request()->routeIs('wigmaker.dashboard') ? 'active' : '' }}">Overview</a>
                 <a href="{{ route('wigmaker.dashboard') }}#tasksBoard" class="{{ request()->routeIs('wigmaker.task.*') ? 'active' : '' }}">Production Tasks</a>
+            @elseif(request()->routeIs('staff.*'))
+                <a href="{{ route('staff.dashboard') }}" class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">Overview</a>
+                <a href="{{ route('staff.donor-verification') }}" class="{{ request()->routeIs('staff.donor-verification') ? 'active' : '' }}">Donor</a>
+                <a href="{{ route('staff.recipient-verification') }}" class="{{ request()->routeIs('staff.recipient-verification') ? 'active' : '' }}">Recipient</a>
+                <a href="{{ route('staff.realtime-tracking') }}" class="{{ request()->routeIs('staff.realtime-tracking') ? 'active' : '' }}">Tracking</a>
+                <a href="{{ route('staff.wig-stock') }}" class="{{ request()->routeIs('staff.hair-stock') || request()->routeIs('staff.wig-stock') ? 'active' : '' }}">Stock</a>
+                <a href="{{ route('staff.rule-matching') }}" class="{{ request()->routeIs('staff.rule-matching') || request()->routeIs('staff.recipient-matching-list') ? 'active' : '' }}">Matching</a>
             @else
                 <a href="{{ route('donor.dashboard') }}">Donate Hair</a>
                 <a href="{{ route('recipient.dashboard') }}">Request Hair</a>
                 <a href="{{ route('wigmaker.dashboard') }}">Wigmaker</a>
+                <a href="{{ route('staff.dashboard') }}">Staff</a>
             @endif
             <a href="{{ route('login') }}">Logout</a>
         </div>

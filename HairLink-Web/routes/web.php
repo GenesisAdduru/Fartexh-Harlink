@@ -43,3 +43,16 @@ Route::view('/wigmaker/dashboard', 'pages.wigmaker-dashboard')->name('wigmaker.d
 Route::get('/wigmaker/tasks/{taskCode}', function (string $taskCode) {
     return view('pages.wigmaker-task-detail', compact('taskCode'));
 })->name('wigmaker.task.detail');
+
+Route::view('/staff/dashboard', 'pages.staff-dashboard')->name('staff.dashboard');
+Route::view('/staff/donor-verification', 'pages.staff-donor-verification')->name('staff.donor-verification');
+Route::view('/staff/recipient-verification', 'pages.staff-recipient-verification')->name('staff.recipient-verification');
+Route::get('/staff/verification/{type}/{reference}', function (string $type, string $reference) {
+    return view('pages.staff-verification-detail', compact('type', 'reference'));
+})->whereIn('type', ['donor', 'recipient'])->name('staff.verification.detail');
+Route::view('/staff/realtime-tracking', 'pages.staff-realtime-tracking')->name('staff.realtime-tracking');
+Route::view('/staff/delivery-batches', 'pages.staff-delivery-batches')->name('staff.delivery-batches');
+Route::view('/staff/hair-stock', 'pages.staff-hair-stock')->name('staff.hair-stock');
+Route::view('/staff/wig-stock', 'pages.staff-wig-stock')->name('staff.wig-stock');
+Route::view('/staff/recipient-matching-list', 'pages.staff-recipient-matching-list')->name('staff.recipient-matching-list');
+Route::view('/staff/rule-matching', 'pages.staff-rule-matching')->name('staff.rule-matching');

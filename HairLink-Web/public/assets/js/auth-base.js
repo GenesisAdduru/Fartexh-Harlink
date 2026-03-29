@@ -4,6 +4,8 @@ const loginBtn = document.querySelector('.login-btn');
 const adminDemoButton = document.getElementById('fillAdminDemo');
 const donorDemoButton = document.getElementById('fillDonorDemo');
 const recipientDemoButton = document.getElementById('fillRecipientDemo');
+const staffDemoButton = document.getElementById('fillStaffDemo');
+const wigmakerDemoButton = document.getElementById('fillWigmakerDemo');
 const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
@@ -29,6 +31,24 @@ function setCurrentUser(account) {
 }
 
 function redirectByUserType(userType) {
+    if (userType === 'staff') {
+        alert('Login successful. Redirecting to staff dashboard.');
+        window.location.href = '/staff/dashboard';
+        return;
+    }
+
+    if (userType === 'wigmaker') {
+        alert('Login successful. Redirecting to wigmaker dashboard.');
+        window.location.href = '/wigmaker/dashboard';
+        return;
+    }
+
+    if (userType === 'admin') {
+        alert('Login successful. Redirecting to staff dashboard.');
+        window.location.href = '/staff/dashboard';
+        return;
+    }
+
     if (userType === 'recipient') {
         alert('Login successful. Redirecting to recipient dashboard.');
         window.location.href = '/recipient/dashboard';
@@ -41,13 +61,37 @@ function redirectByUserType(userType) {
 
 function runRoleDemo(userType) {
     const account = {
-        email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
+        email: userType === 'recipient'
+            ? 'recipient.demo@hairlink.local'
+            : userType === 'staff'
+                ? 'staff.demo@hairlink.local'
+                : userType === 'wigmaker'
+                    ? 'wigmaker.demo@hairlink.local'
+                    : 'donor.demo@hairlink.local',
         userType,
         profile: {
-            firstName: userType === 'recipient' ? 'Recipient' : 'Donor',
+            firstName: userType === 'recipient'
+                ? 'Recipient'
+                : userType === 'staff'
+                    ? 'Staff'
+                    : userType === 'wigmaker'
+                        ? 'Wigmaker'
+                        : 'Donor',
             lastName: 'Demo',
-            fullName: userType === 'recipient' ? 'Recipient Demo' : 'Donor Demo',
-            email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
+            fullName: userType === 'recipient'
+                ? 'Recipient Demo'
+                : userType === 'staff'
+                    ? 'Staff Demo'
+                    : userType === 'wigmaker'
+                        ? 'Wigmaker Demo'
+                        : 'Donor Demo',
+            email: userType === 'recipient'
+                ? 'recipient.demo@hairlink.local'
+                : userType === 'staff'
+                    ? 'staff.demo@hairlink.local'
+                    : userType === 'wigmaker'
+                        ? 'wigmaker.demo@hairlink.local'
+                        : 'donor.demo@hairlink.local',
             phone: '0917-000-0000',
             age: '22',
             country: 'ph',
@@ -189,6 +233,18 @@ function setupLoginFlow() {
         });
     }
 
+    if (staffDemoButton) {
+        staffDemoButton.addEventListener('click', () => {
+            runRoleDemo('staff');
+        });
+    }
+
+    if (wigmakerDemoButton) {
+        wigmakerDemoButton.addEventListener('click', () => {
+            runRoleDemo('wigmaker');
+        });
+    }
+
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -198,8 +254,8 @@ function setupLoginFlow() {
         const accounts = getDemoAccounts();
 
         if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
-            alert('Admin demo login successful. Redirecting to admin dashboard.');
-            window.location.href = '/admin';
+            alert('Admin demo login successful. Redirecting to staff dashboard.');
+            window.location.href = '/staff/dashboard';
             return;
         }
 
