@@ -21,7 +21,11 @@
     </div>
 
     <div class="auth-actions">
-        <a class="btn btn-outline" href="{{ route('login') }}">Login</a>
-        <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
+        @if (Route::has('login'))
+            <a class="btn btn-outline" href="{{ route('login') }}">Login</a>
+        @endif
+        @if (Route::has('register'))
+            <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
+        @endif
     </div>
 </nav>
