@@ -105,6 +105,13 @@
     gap: 0.5rem;
 }
 
+.action-buttons .ghost-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+}
+
 .rewards-shell {
     margin-top: 0.8rem;
 }

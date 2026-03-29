@@ -2,8 +2,74 @@ const container = document.getElementById('authContainer');
 const registerBtn = document.querySelector('.register-btn');
 const loginBtn = document.querySelector('.login-btn');
 const adminDemoButton = document.getElementById('fillAdminDemo');
+const donorDemoButton = document.getElementById('fillDonorDemo');
+const recipientDemoButton = document.getElementById('fillRecipientDemo');
 const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
+const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
+
+function getDemoAccounts() {
+    try {
+        return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
+    } catch (_error) {
+        return [];
+    }
+}
+
+function saveDemoAccounts(accounts) {
+    localStorage.setItem(DEMO_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function setCurrentUser(account) {
+    if (!account) return;
+
+    localStorage.setItem('hairlinkUserType', account.userType || 'donor');
+    localStorage.setItem('hairlinkUserEmail', account.email || '');
+    localStorage.setItem('hairlinkUserProfile', JSON.stringify(account.profile || {}));
+}
+
+function redirectByUserType(userType) {
+    if (userType === 'recipient') {
+        alert('Login successful. Redirecting to recipient dashboard.');
+        window.location.href = '/recipient/dashboard';
+        return;
+    }
+
+    alert('Login successful. Redirecting to donor dashboard.');
+    window.location.href = '/donor/dashboard';
+}
+
+function runRoleDemo(userType) {
+    const account = {
+        email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
+        userType,
+        profile: {
+            firstName: userType === 'recipient' ? 'Recipient' : 'Donor',
+            lastName: 'Demo',
+            fullName: userType === 'recipient' ? 'Recipient Demo' : 'Donor Demo',
+            email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
+            phone: '0917-000-0000',
+            age: '22',
+            country: 'ph',
+            region: 'Metro Manila',
+            postalCode: '1000',
+            gender: 'prefer_not_say',
+            userType
+        }
+    };
+
+    const accounts = getDemoAccounts();
+    const existingIndex = accounts.findIndex((item) => item.email === account.email);
+    if (existingIndex >= 0) {
+        accounts[existingIndex] = account;
+    } else {
+        accounts.push(account);
+    }
+
+    saveDemoAccounts(accounts);
+    setCurrentUser(account);
+    redirectByUserType(userType);
+}
 
 function setMode(mode) {
     if (!container) return;
@@ -34,6 +100,16 @@ function setupRegisterFlow() {
         const email = document.getElementById('registerEmail')?.value || '';
         const password = document.getElementById('registerPassword')?.value || '';
         const confirmPassword = document.getElementById('registerConfirmPassword')?.value || '';
+        const textInputs = registerForm.querySelectorAll('input[type="text"]');
+        const firstName = textInputs[0]?.value?.trim() || '';
+        const lastName = textInputs[1]?.value?.trim() || '';
+        const region = textInputs[2]?.value?.trim() || '';
+        const postalCode = textInputs[3]?.value?.trim() || '';
+        const age = registerForm.querySelector('input[type="number"]')?.value || '';
+        const phone = registerForm.querySelector('input[type="tel"]')?.value?.trim() || '';
+        const selects = registerForm.querySelectorAll('select');
+        const country = selects[0]?.value || '';
+        const gender = selects[1]?.value || '';
 
         if (password !== confirmPassword) {
             alert('Passwords do not match.');
@@ -41,8 +117,32 @@ function setupRegisterFlow() {
         }
 
         if (userType && email) {
-            localStorage.setItem('hairlinkUserType', userType);
-            localStorage.setItem('hairlinkUserEmail', email);
+            const profile = {
+                firstName,
+                lastName,
+                fullName: `${firstName} ${lastName}`.trim(),
+                email,
+                phone,
+                age,
+                country,
+                region,
+                postalCode,
+                gender,
+                userType
+            };
+
+            const account = { email, userType, profile };
+            const accounts = getDemoAccounts();
+            const existingIndex = accounts.findIndex((item) => item.email === email);
+
+            if (existingIndex >= 0) {
+                accounts[existingIndex] = account;
+            } else {
+                accounts.push(account);
+            }
+
+            saveDemoAccounts(accounts);
+            setCurrentUser(account);
         }
 
         registerForm.classList.add('register-success');
@@ -77,13 +177,25 @@ function setupLoginFlow() {
         });
     }
 
+    if (donorDemoButton) {
+        donorDemoButton.addEventListener('click', () => {
+            runRoleDemo('donor');
+        });
+    }
+
+    if (recipientDemoButton) {
+        recipientDemoButton.addEventListener('click', () => {
+            runRoleDemo('recipient');
+        });
+    }
+
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
 
         const email = document.getElementById('loginEmail')?.value || '';
         const password = document.getElementById('loginPassword')?.value || '';
-        const storedEmail = localStorage.getItem('hairlinkUserEmail');
-        const storedType = localStorage.getItem('hairlinkUserType');
+        const storedType = localStorage.getItem('hairlinkUserType') || 'donor';
+        const accounts = getDemoAccounts();
 
         if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
             alert('Admin demo login successful. Redirecting to admin dashboard.');
@@ -91,18 +203,21 @@ function setupLoginFlow() {
             return;
         }
 
-        if (storedEmail && email && storedEmail !== email) {
-            alert('Email not found in local demo account. Please register first.');
+        if (!email) {
+            redirectByUserType(storedType);
             return;
         }
 
-        if (storedType === 'recipient') {
-            alert('Login successful. Recipient dashboard UI will be added next.');
-            window.location.href = '/dashboard';
-        } else {
-            alert('Login successful. Redirecting to donor dashboard.');
-            window.location.href = '/donor/dashboard';
+        const matchedAccount = accounts.find((item) => item.email === email);
+
+        if (matchedAccount) {
+            setCurrentUser(matchedAccount);
+            redirectByUserType(matchedAccount.userType);
+            return;
         }
+
+        // Fallback for quick frontend checks: keep using last selected role.
+        redirectByUserType(storedType);
     });
 }
 

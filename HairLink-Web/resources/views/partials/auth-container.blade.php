@@ -13,6 +13,10 @@
                 <p class="demo-account-credentials">Email: admin@hairlink.local</p>
                 <p class="demo-account-credentials">Password: admin12345</p>
                 <button type="button" class="demo-fill-btn" id="fillAdminDemo">Use Admin Demo</button>
+                <div class="demo-switch-row">
+                    <button type="button" class="demo-fill-btn" id="fillDonorDemo">Open Donor Demo</button>
+                    <button type="button" class="demo-fill-btn" id="fillRecipientDemo">Open Recipient Demo</button>
+                </div>
             </div>
 
             <div class="input-box">

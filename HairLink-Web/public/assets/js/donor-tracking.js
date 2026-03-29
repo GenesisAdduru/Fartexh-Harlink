@@ -46,7 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><span class="status-pill ${statusClass}">${escapeHtml(donation.currentStatus)}</span></td>
                 <td>${escapeHtml(donation.hairLength)}</td>
                 <td>${escapeHtml(certText)}</td>
-                <td><a class="soft-btn" href="/donor/tracking/${encodeURIComponent(donation.reference)}">View</a></td>
+                <td>
+                    <a class="action-link" href="/donor/tracking/${encodeURIComponent(donation.reference)}">
+                        View Details
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
+                </td>
             `;
             tableBody.appendChild(row);
         });

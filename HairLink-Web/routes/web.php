@@ -17,3 +17,16 @@ Route::get('/donor/tracking/{reference}', function (string $reference) {
 })->name('donor.tracking.detail');
 Route::view('/donor/confirmation', 'pages.donor-confirmation')->name('donor.confirmation');
 Route::view('/donor/certificate', 'pages.donor-certificate')->name('donor.certificate');
+Route::view('/donor/profile', 'pages.donor-profile')->name('donor.profile');
+Route::view('/donor/community', 'pages.donor-community')->name('donor.community');
+
+Route::view('/recipient/dashboard', 'pages.recipient-dashboard')->name('recipient.dashboard');
+Route::view('/recipient/request', 'pages.recipient-request')->name('recipient.request');
+Route::view('/recipient/tracking', 'pages.recipient-tracking')->name('recipient.tracking');
+Route::get('/recipient/tracking/{reference}', function (string $reference) {
+    return view('pages.recipient-tracking-detail', compact('reference'));
+})->name('recipient.tracking.detail');
+Route::view('/recipient/confirmation', 'pages.recipient-confirmation')->name('recipient.confirmation');
+Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
+Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
+Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');

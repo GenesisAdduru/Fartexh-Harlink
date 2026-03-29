@@ -43,8 +43,39 @@
             </div>
 
             <div class="action-buttons">
-                <a class="ghost-btn" href="{{ route('donor.tracking') }}">Track Donations</a>
-                <a class="ghost-btn" href="{{ route('donor.certificate') }}">My Certificate</a>
+                <a class="ghost-btn" href="{{ route('donor.tracking') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    Track Donations
+                </a>
+                <a class="ghost-btn" href="{{ route('donor.certificate') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="14" rx="2" ry="2"></rect>
+                        <path d="M7 8h10"></path>
+                        <path d="M7 12h6"></path>
+                        <path d="M8 18l2 4 2-4"></path>
+                        <path d="M14 18l2 4 2-4"></path>
+                    </svg>
+                    My Certificate
+                </a>
+                <a class="ghost-btn" href="{{ route('donor.community') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Community Support
+                </a>
+                <a class="ghost-btn" href="{{ route('donor.profile') }}">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21a8 8 0 0 0-16 0"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    My Profile
+                </a>
             </div>
         </section>
 

@@ -217,6 +217,19 @@ body {
     background: #ffe7f3;
 }
 
+.demo-switch-row {
+    margin-top: 0.45rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+
+.demo-switch-row .demo-fill-btn {
+    margin-top: 0;
+    width: 100%;
+    text-align: center;
+}
+
 .input-box {
     position: relative;
     margin: 0.2rem 0;

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="{{ asset('assets/css/dashboard-base.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/recipient-module.css') }}">
     @stack('styles')
 </head>
 <body>
@@ -19,6 +20,7 @@
     </main>
 
     <script src="{{ asset('assets/js/dashboard.js') }}" defer></script>
+    <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
     @stack('scripts')
 </body>
 </html>

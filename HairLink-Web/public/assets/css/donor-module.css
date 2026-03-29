@@ -151,6 +151,23 @@
     background: #fff;
 }
 
+.action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #cf2f84;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.action-link:hover {
+    background-color: rgba(207, 47, 132, 0.1);
+}
+
 .timeline {
     list-style: none;
     margin-top: 0.4rem;
