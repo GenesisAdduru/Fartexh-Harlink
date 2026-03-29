@@ -1,0 +1,263 @@
+.donor-module-page {
+    max-width: 980px;
+    margin-inline: auto;
+    display: grid;
+    gap: 0.8rem;
+}
+
+.module-head {
+    background: #fff;
+    border: 1px solid #ead7e8;
+    border-radius: 16px;
+    padding: 0.8rem;
+    box-shadow: 0 12px 26px rgba(73, 20, 52, 0.08);
+}
+
+.module-head h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.35rem, 2.8vw, 2rem);
+    line-height: 1.1;
+}
+
+.module-head p {
+    color: #665772;
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.module-card {
+    background: #fff;
+    border: 1px solid #ead7e8;
+    border-radius: 16px;
+    padding: 0.8rem;
+    box-shadow: 0 12px 26px rgba(73, 20, 52, 0.08);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+}
+
+.summary-item {
+    background: #fcf8fc;
+    border: 1px solid #eddce9;
+    border-radius: 10px;
+    padding: 0.62rem;
+}
+
+.summary-item small {
+    display: block;
+    color: #7a6a84;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+    font-size: 0.78rem;
+}
+
+.summary-item strong {
+    font-size: 0.95rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 0.28rem 0.56rem;
+    font-weight: 800;
+    font-size: 0.76rem;
+}
+
+.status-submitted {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-received,
+.status-validated,
+.status-processing {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.action-row {
+    margin-top: 0.75rem;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.note-box {
+    margin-top: 0.7rem;
+    border-left: 4px solid #cf2f84;
+    background: #fff3fa;
+    border-radius: 8px;
+    padding: 0.62rem;
+    color: #614f68;
+    font-size: 0.88rem;
+}
+
+.tracking-tools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 0.6rem;
+}
+
+.tracking-tools input {
+    border: 1px solid #e7d5e5;
+    border-radius: 8px;
+    padding: 0.52rem 0.62rem;
+    width: min(360px, 80vw);
+    font: inherit;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.tracking-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+}
+
+.tracking-table th,
+.tracking-table td {
+    text-align: left;
+    padding: 0.66rem 0.52rem;
+}
+
+.tracking-table th {
+    font-size: 0.82rem;
+    color: #6c5e75;
+}
+
+.tracking-table tbody tr:nth-child(odd) {
+    background: #fdf6fb;
+}
+
+.tracking-table tbody tr:nth-child(even) {
+    background: #fff;
+}
+
+.timeline {
+    list-style: none;
+    margin-top: 0.4rem;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.timeline li {
+    border: 1px solid #ebd9e8;
+    border-radius: 10px;
+    padding: 0.58rem;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.timeline strong {
+    color: #3b2e43;
+}
+
+.timeline time {
+    color: #796a83;
+    font-size: 0.8rem;
+}
+
+.empty-state {
+    text-align: center;
+    color: #6f607a;
+    padding: 1rem;
+    border: 1px dashed #e3d1e1;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.certificate-shell {
+    border: 2px solid #ebb4d5;
+    border-radius: 16px;
+    background: #fff;
+    padding: 0.9rem;
+}
+
+.certificate-paper {
+    border: 8px double #d572aa;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    background: linear-gradient(150deg, #fffdfd 0%, #fff5fb 100%);
+}
+
+.certificate-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.35rem, 2.7vw, 2rem);
+    color: #97225e;
+}
+
+.certificate-copy {
+    color: #57495f;
+    margin-top: 0.45rem;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+.certificate-name {
+    margin-top: 0.6rem;
+    font-size: clamp(1.05rem, 2.2vw, 1.55rem);
+    font-weight: 800;
+    color: #3f3047;
+}
+
+.certificate-meta {
+    margin-top: 0.7rem;
+    display: grid;
+    gap: 0.28rem;
+    color: #5d4f66;
+    font-weight: 600;
+    font-size: 0.84rem;
+}
+
+.demo-row {
+    margin-top: 0.65rem;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .dash-header,
+    .module-head,
+    .action-row,
+    .note-box,
+    .demo-row {
+        display: none !important;
+    }
+
+    .donor-module-page,
+    .module-card,
+    .certificate-shell,
+    .certificate-paper {
+        box-shadow: none;
+        border-color: #333;
+    }
+}
