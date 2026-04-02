@@ -21,11 +21,19 @@
     </div>
 
     <div class="auth-actions">
-        @if (Route::has('login'))
-            <a class="btn btn-outline" href="{{ route('login') }}">Login</a>
-        @endif
-        @if (Route::has('register'))
-            <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
-        @endif
+        @auth
+            <a class="btn btn-outline" href="{{ Auth::user()->role === 'recipient' ? route('recipient.dashboard') : route('donor.dashboard') }}">Dashboard</a>
+            <form action="{{ route('logout') }}" method="POST" style="display:inline">
+                @csrf
+                <button type="submit" class="btn btn-primary">Logout</button>
+            </form>
+        @else
+            @if (Route::has('login'))
+                <a class="btn btn-outline" href="{{ route('login') }}">Login</a>
+            @endif
+            @if (Route::has('register'))
+                <a class="btn btn-primary" href="{{ route('register') }}">Register</a>
+            @endif
+        @endauth
     </div>
 </nav>

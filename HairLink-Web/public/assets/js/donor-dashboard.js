@@ -1,11 +1,27 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    const greetingText = document.getElementById('greetingText');
+    const userName = greetingText ? greetingText.dataset.name : 'Donor';
+    
+    const goal = 100;
+    let points = 0;
+
+    // Calculate points from actual donation count (10 pts per donation)
+    try {
+        const moduleApi = window.hairlinkDonorModule;
+        if (moduleApi) {
+            const donations = await moduleApi.getAllDonations();
+            points = donations.length * 10;
+        }
+    } catch (error) {
+        console.warn('Could not load donation points:', error);
+    }
+
     const user = {
-        name: 'Fiona Can',
-        points: 38,
-        goal: 100,
+        name: userName,
+        points,
+        goal,
     };
 
-    const greetingText = document.getElementById('greetingText');
     const progressFill = document.getElementById('progressFill');
     const progressStar = document.getElementById('progressStar');
     const pointValue = document.getElementById('pointValue');

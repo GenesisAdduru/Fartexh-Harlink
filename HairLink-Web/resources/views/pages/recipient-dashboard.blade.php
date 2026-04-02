@@ -5,7 +5,7 @@
 @section('content')
 <div class="section-wrap">
     <div class="module-head">
-        <h1>Welcome, <span id="greeting-name">Friend</span>!</h1>
+        <h1 id="greeting-title" data-name="{{ auth()->user()->first_name ?? auth()->user()->name }}">Welcome, <span id="greeting-name">{{ auth()->user()->first_name ?? auth()->user()->name }}</span>!</h1>
         <p>Your journey to confidence and self-expression starts here.</p>
     </div>
 
