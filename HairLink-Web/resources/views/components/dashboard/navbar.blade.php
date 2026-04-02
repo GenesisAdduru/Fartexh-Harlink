@@ -11,13 +11,8 @@
             <span></span>
         </button>
 
-<<<<<<< HEAD
-        <div class="dash-links" data-dash-links>
-            <a href="{{ Auth::user()->role === 'recipient' ? route('recipient.dashboard') : route('donor.dashboard') }}">Home</a>
-=======
         <div class="dash-links {{ request()->routeIs('staff.*') ? 'dash-links-staff' : '' }} {{ request()->routeIs('admin.*') ? 'dash-links-staff' : '' }}" data-dash-links>
             <a href="{{ url('/') }}">Home</a>
->>>>>>> origin/main
             @if(request()->routeIs('donor.*'))
                 <a href="{{ route('donor.dashboard') }}" class="{{ request()->routeIs('donor.dashboard') ? 'active' : '' }}">Overview</a>
                 <a href="{{ route('donor.donate') }}" class="{{ request()->routeIs('donor.donate') ? 'active' : '' }}">Donate Hair</a>

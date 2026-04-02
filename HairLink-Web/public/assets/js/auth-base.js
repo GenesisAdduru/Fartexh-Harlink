@@ -10,7 +10,6 @@ const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
 
-<<<<<<< HEAD
 function buildAppUrl(path) {
     const appBase = document
         .querySelector('meta[name="app-base-url"]')
@@ -24,15 +23,13 @@ function redirectTo(path) {
     window.location.href = buildAppUrl(path);
 }
 
-=======
-<<<<<<< HEAD
 function fillDemo(userType) {
     const emailField = document.getElementById('loginEmail');
     const passwordField = document.getElementById('loginPassword');
     if (emailField) emailField.value = userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local';
-    if (passwordField) passwordField.value = 'password123'; // assuming standard password for demo accounts
-=======
->>>>>>> d2bbf6d75baffef7ffe60137c02114cb465cea0e
+    if (passwordField) passwordField.value = 'password123';
+}
+
 function getDemoAccounts() {
     try {
         return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
@@ -136,7 +133,6 @@ function runRoleDemo(userType) {
     saveDemoAccounts(accounts);
     setCurrentUser(account);
     redirectByUserType(userType);
->>>>>>> origin/main
 }
 
 function setMode(mode) {
@@ -301,8 +297,6 @@ function setupLoginFlow() {
             fillDemo('recipient');
         });
     }
-<<<<<<< HEAD
-=======
 
     if (staffDemoButton) {
         staffDemoButton.addEventListener('click', () => {
@@ -346,7 +340,6 @@ function setupLoginFlow() {
         // Fallback for quick frontend checks: keep using last selected role.
         redirectByUserType(storedType);
     });
->>>>>>> origin/main
 }
 
 document.addEventListener('DOMContentLoaded', () => {
