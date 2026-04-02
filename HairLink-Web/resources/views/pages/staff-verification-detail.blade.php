@@ -25,19 +25,19 @@
                 <h2>Submission Summary</h2>
                 @if($isDonor)
                     <ul class="verification-list">
-                        <li><strong>Name:</strong> Fiona Can</li>
-                        <li><strong>Hair Length:</strong> Long</li>
-                        <li><strong>Hair Color:</strong> Black</li>
-                        <li><strong>Hair Condition:</strong> Untreated</li>
-                        <li><strong>Submitted:</strong> 2026-03-25 09:14</li>
+                        <li><strong>Name:</strong> {{ $record->user->first_name ?? 'Unknown' }} {{ $record->user->last_name ?? '' }}</li>
+                        <li><strong>Hair Length:</strong> {{ $record->hair_length }}</li>
+                        <li><strong>Hair Color:</strong> {{ $record->hair_color }}</li>
+                        <li><strong>Hair Condition:</strong> {{ $record->hair_condition }}</li>
+                        <li><strong>Submitted:</strong> {{ $record->created_at->format('Y-m-d H:i') }}</li>
                     </ul>
                 @else
                     <ul class="verification-list">
-                        <li><strong>Name:</strong> Maria Santos</li>
-                        <li><strong>Medical Need:</strong> Chemotherapy</li>
-                        <li><strong>Preferred Wig Size:</strong> Long</li>
-                        <li><strong>Preferred Color:</strong> Black</li>
-                        <li><strong>Submitted:</strong> 2026-03-26 14:08</li>
+                        <li><strong>Name:</strong> {{ $record->user->first_name ?? 'Unknown' }} {{ $record->user->last_name ?? '' }}</li>
+                        <li><strong>Medical Need:</strong> {{ $record->medical_condition }}</li>
+                        <li><strong>Preferred Wig Size:</strong> {{ $record->preferred_length }}</li>
+                        <li><strong>Preferred Color:</strong> {{ $record->preferred_color }}</li>
+                        <li><strong>Submitted:</strong> {{ $record->created_at->format('Y-m-d H:i') }}</li>
                     </ul>
                 @endif
             </section>
@@ -46,22 +46,21 @@
                 <h2>Attached Files</h2>
                 <ul class="verification-list">
                     @if($isDonor)
-                        <li>hair-photo-front.jpg</li>
-                        <li>hair-photo-side.jpg</li>
+                        @if($record->photo_front) <li><a href="{{ Storage::url($record->photo_front) }}" target="_blank">hair-photo-front.jpg</a></li> @endif
+                        @if($record->photo_side) <li><a href="{{ Storage::url($record->photo_side) }}" target="_blank">hair-photo-side.jpg</a></li> @endif
                     @else
-                        <li>medical-certificate.pdf</li>
-                        <li>doctor-diagnosis.jpg</li>
-                        <li>recipient-photo.jpg</li>
+                        @if($record->medical_certificate) <li><a href="{{ Storage::url($record->medical_certificate) }}" target="_blank">medical-certificate.pdf</a></li> @endif
+                        @if($record->diagnosis_photo) <li><a href="{{ Storage::url($record->diagnosis_photo) }}" target="_blank">doctor-diagnosis.jpg</a></li> @endif
+                        @if($record->recipient_photo) <li><a href="{{ Storage::url($record->recipient_photo) }}" target="_blank">recipient-photo.jpg</a></li> @endif
                     @endif
                 </ul>
-                <div class="empty-note">Preview placeholders only for frontend demo.</div>
             </section>
         </div>
     </article>
 
     <article class="staff-block">
         <h2>Verification Decision</h2>
-        <form class="verification-form" data-verification-form novalidate>
+        <form class="verification-form" data-verification-form data-action-url="{{ route('staff.verification.status', ['type' => $type, 'reference' => $reference]) }}" novalidate>
             <div class="form-group">
                 <label for="decisionRemarks">Remarks <span class="required">*</span></label>
                 <textarea id="decisionRemarks" rows="4" placeholder="Add validation remarks and rationale..." required></textarea>

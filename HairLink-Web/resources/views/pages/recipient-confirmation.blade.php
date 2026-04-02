@@ -68,6 +68,9 @@
         <a href="{{ route('recipient.dashboard') }}" class="ghost-btn">Back to Dashboard</a>
     </div>
 </div>
-
-<script src="{{ asset('assets/js/recipient-confirmation.js') }}"></script>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
+    <script src="{{ asset('assets/js/recipient-confirmation.js') }}" defer></script>
+@endpush

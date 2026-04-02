@@ -54,21 +54,58 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.currentStatus = status;
         };
 
+        const updateBackend = async (newStatus, reason) => {
+            const url = `/api/donations/${cardId}/status`;
+            const capitalizedStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1).replace('-', ' ');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: capitalizedStatus,
+                        remarks: reason
+                    })
+                });
+
+                if (response.ok) {
+                    paint(newStatus);
+                    stampUpdate(reason);
+                    return true;
+                } else {
+                    const data = await response.json();
+                    alert(data.message || 'Error updating status');
+                    return false;
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Network error updating status');
+                return false;
+            }
+        };
+
         if (actionBtn) {
-            actionBtn.addEventListener('click', () => {
+            actionBtn.addEventListener('click', async () => {
                 const current = card.dataset.currentStatus;
                 const idx = steps.indexOf(current);
                 if (idx >= 0 && idx < steps.length - 1) {
                     const nextStatus = steps[idx + 1];
                     const proceed = window.confirm(`Confirm move of Donation # ${cardId} from ${labels[current]} to ${labels[nextStatus]}?`);
-                    if (!proceed) {
-                        return;
+                    if (!proceed) return;
+
+                    actionBtn.disabled = true;
+                    const success = await updateBackend(nextStatus, `Quick move to ${labels[nextStatus]}`);
+                    actionBtn.disabled = false;
+                    
+                    if (success) {
+                        card.dataset.issue = 'false';
+                        if (issueToggle) issueToggle.checked = false;
+                        if (issueWrap) issueWrap.hidden = true;
                     }
-                    card.dataset.issue = 'false';
-                    if (issueToggle) issueToggle.checked = false;
-                    if (issueWrap) issueWrap.hidden = true;
-                    paint(nextStatus);
-                    stampUpdate(`quick move to ${labels[nextStatus]}`);
                 }
             });
         }
@@ -82,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (saveEdit) {
-            saveEdit.addEventListener('click', () => {
+            saveEdit.addEventListener('click', async () => {
                 const nextStatus = manualStatus ? manualStatus.value : card.dataset.currentStatus;
                 const flaggedIssue = issueToggle ? issueToggle.checked : false;
 
@@ -91,25 +128,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                card.dataset.issue = flaggedIssue ? 'true' : 'false';
-                card.dataset.currentStatus = nextStatus;
-
                 const changeNote = flaggedIssue
                     ? `${labels[nextStatus]} with issue flag`
                     : labels[nextStatus];
                 const proceed = window.confirm(`Save edit for Donation # ${cardId}: set status to ${changeNote}?`);
-                if (!proceed) {
-                    return;
-                }
+                if (!proceed) return;
 
-                paint(nextStatus);
-                stampUpdate(`manual edit to ${changeNote}`);
+                saveEdit.disabled = true;
+                const success = await updateBackend(nextStatus, `Manual edit to ${changeNote}`);
+                saveEdit.disabled = false;
 
-                if (editBanner) {
-                    editBanner.hidden = false;
-                    editBanner.textContent = flaggedIssue
-                        ? 'Progress edited and issue flagged for follow-up.'
-                        : 'Progress edited successfully.';
+                if (success) {
+                    card.dataset.issue = flaggedIssue ? 'true' : 'false';
+                    if (editBanner) {
+                        editBanner.hidden = false;
+                        editBanner.textContent = flaggedIssue
+                            ? 'Progress edited and issue flagged for follow-up.'
+                            : 'Progress edited successfully.';
+                    }
                 }
             });
         }
@@ -320,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const remarks = document.getElementById('decisionRemarks');
 
     decisionButtons.forEach((button) => {
-        button.addEventListener('click', () => {
+        button.addEventListener('click', async () => {
             if (!verificationForm || !remarks || !decisionBanner) return;
 
             const text = remarks.value.trim();
@@ -330,15 +366,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const decision = button.dataset.decision;
-            decisionBanner.hidden = false;
-            decisionBanner.classList.remove('approved', 'rejected');
+            const status = decision === 'approved' ? (verificationForm.dataset.actionUrl.includes('/donor/') ? 'Received' : 'Validated') : 'Rejected';
+            const url = verificationForm.dataset.actionUrl;
+            
+            button.disabled = true;
+            button.innerText = 'Processing...';
 
-            if (decision === 'approved') {
-                decisionBanner.classList.add('approved');
-                decisionBanner.textContent = 'Submission approved. Notification queued and workflow updated.';
-            } else {
-                decisionBanner.classList.add('rejected');
-                decisionBanner.textContent = 'Submission rejected. Remarks saved and user notification queued.';
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        remarks: text
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    decisionBanner.hidden = false;
+                    decisionBanner.classList.remove('approved', 'rejected');
+                    decisionBanner.classList.add(decision);
+                    decisionBanner.textContent = decision === 'approved' 
+                        ? 'Submission approved. Notification queued and workflow updated.' 
+                        : 'Submission rejected. Remarks saved and user notification queued.';
+                    
+                    setTimeout(() => {
+                        window.location.href = verificationForm.dataset.actionUrl.includes('/donor/') 
+                            ? '/staff/donor-verification' 
+                            : '/staff/recipient-verification';
+                    }, 1500);
+                } else {
+                    alert(data.message || 'Error updating status');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('A network error occurred.');
+            } finally {
+                button.disabled = false;
+                button.innerText = decision.charAt(0).toUpperCase() + decision.slice(1);
             }
         });
     });

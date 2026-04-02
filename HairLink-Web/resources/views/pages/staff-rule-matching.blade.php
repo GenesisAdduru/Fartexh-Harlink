@@ -12,19 +12,30 @@
         <section class="match-left">
             <h2>Select Recipient</h2>
 
+            @php
+                $first = $recipients->first();
+            @endphp
+
             <div class="recipient-facts">
-                <strong data-recipient-name>Maria Santos</strong>
-                <span>Medical Need: <span data-recipient-need>Chemotherapy</span></span>
-                <span>Preferred Wig Size: <span data-recipient-length>Long</span></span>
-                <span>Preferred Color: <span data-recipient-color>Black</span></span>
+                <strong data-recipient-name>{{ $first->user->first_name ?? 'Select' }} {{ $first->user->last_name ?? 'Recipient' }}</strong>
+                <span>Medical Need: <span data-recipient-need>{{ $first->medical_condition ?? 'N/A' }}</span></span>
+                <span>Preferred Wig Size: <span data-recipient-length>{{ $first->preferred_length ?? 'N/A' }}</span></span>
+                <span>Preferred Color: <span data-recipient-color>{{ $first->preferred_color ?? 'N/A' }}</span></span>
             </div>
 
             <div class="recipient-list">
-                <button type="button" class="recipient-btn active" data-recipient-btn data-name="Maria Santos" data-need="Chemotherapy" data-length="Long" data-color="Black">Maria Santos <b>Open</b></button>
-                <button type="button" class="recipient-btn" data-recipient-btn data-name="Patrixia Lopez" data-need="Alopecia" data-length="Short" data-color="Brown">Patrixia Lopez <b>Open</b></button>
-                <button type="button" class="recipient-btn" data-recipient-btn data-name="Grace Dela Fuente" data-need="Chemo Recovery" data-length="Long" data-color="Brown">Grace Dela Fuente <b>Open</b></button>
-                <button type="button" class="recipient-btn" data-recipient-btn data-name="Xyliana Nogrado" data-need="Medical Hair Loss" data-length="Medium" data-color="Black">Xyliana Nogrado <b>Open</b></button>
-                <button type="button" class="recipient-btn" data-recipient-btn data-name="Chanell Alonzo" data-need="Chemotherapy" data-length="Long" data-color="Light">Chanell Alonzo <b>Open</b></button>
+                @forelse($recipients as $idx => $rec)
+                    <button type="button" class="recipient-btn {{ $idx === 0 ? 'active' : '' }}" 
+                        data-recipient-btn 
+                        data-name="{{ $rec->user->first_name }} {{ $rec->user->last_name }}" 
+                        data-need="{{ $rec->medical_condition }}" 
+                        data-length="{{ $rec->preferred_length }}" 
+                        data-color="{{ $rec->preferred_color }}">
+                        {{ $rec->user->first_name }} {{ $rec->user->last_name }} <b>{{ $rec->status }}</b>
+                    </button>
+                @empty
+                    <p>No recipients pending matching.</p>
+                @endforelse
             </div>
         </section>
 
@@ -40,65 +51,19 @@
             </div>
             <p class="match-rule-note">Ranking rule: highest compatibility score first. Tie-breaker: oldest in-stock wig first (FIFO).</p>
             <div class="wig-options">
-                <article class="wig-option" data-wig-card data-length="Long" data-color="Black" data-available="true" data-stock-date="2026-01-12">
-                    <h4>Donor Wig #A102</h4>
-                    <p>Wig Size: Long</p>
-                    <p>Color: Black</p>
-                    <p>Availability: In Stock</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button">Choose this wig</button>
-                </article>
-
-                <article class="wig-option" data-wig-card data-length="Long" data-color="Brown" data-available="true" data-stock-date="2026-01-18">
-                    <h4>Donor Wig #B087</h4>
-                    <p>Wig Size: Long</p>
-                    <p>Color: Dark Brown</p>
-                    <p>Availability: In Stock</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button">Choose this wig</button>
-                </article>
-
-                <article class="wig-option" data-wig-card data-length="Medium" data-color="Brown" data-available="true" data-stock-date="2026-02-02">
-                    <h4>Donor Wig #C014</h4>
-                    <p>Wig Size: Medium</p>
-                    <p>Color: Brown</p>
-                    <p>Availability: In Stock</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button">Choose this wig</button>
-                </article>
-
-                <article class="wig-option" data-wig-card data-length="Short" data-color="Brown" data-available="true" data-stock-date="2025-12-09">
-                    <h4>Donor Wig #D221</h4>
-                    <p>Wig Size: Short</p>
-                    <p>Color: Brown</p>
-                    <p>Availability: In Stock</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button">Choose this wig</button>
-                </article>
-
-                <article class="wig-option" data-wig-card data-length="Medium" data-color="Black" data-available="true" data-stock-date="2026-01-05">
-                    <h4>Donor Wig #E199</h4>
-                    <p>Wig Size: Medium</p>
-                    <p>Color: Black</p>
-                    <p>Availability: In Stock</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button">Choose this wig</button>
-                </article>
-
-                <article class="wig-option" data-wig-card data-length="Long" data-color="Light" data-available="false" data-stock-date="2026-02-10">
-                    <h4>Donor Wig #F041</h4>
-                    <p>Wig Size: Long</p>
-                    <p>Color: Light</p>
-                    <p>Availability: Reserved</p>
-                    <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
-                    <p class="score-breakdown" data-score-breakdown>Size 0 + Color 0 + Availability 0 = 0</p>
-                    <button class="soft-btn" type="button" disabled>Not Available</button>
-                </article>
+                @forelse($wigs as $wig)
+                    <article class="wig-option" data-wig-card data-length="{{ $wig->target_length }}" data-color="{{ $wig->target_color }}" data-available="true" data-stock-date="{{ $wig->updated_at->format('Y-m-d') }}">
+                        <h4>Stock #{{ $wig->task_code }}</h4>
+                        <p>Wig Size: {{ $wig->target_length }}</p>
+                        <p>Color: {{ $wig->target_color }}</p>
+                        <p>Availability: In Stock</p>
+                        <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
+                        <p class="score-breakdown" data-score-breakdown>Calculating...</p>
+                        <button class="soft-btn" type="button">Choose this wig</button>
+                    </article>
+                @empty
+                    <p>No wigs currently in stock.</p>
+                @endforelse
             </div>
             <p class="empty-note" data-match-empty hidden>No high-match wig found for the current recipient. Switch to "All Available Wigs" to review more options.</p>
         </section>

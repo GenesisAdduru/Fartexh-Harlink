@@ -41,7 +41,7 @@
                 <i class='bx bx-transfer-alt'></i>
                 <span>Donor Submissions</span>
             </div>
-            <h2>79</h2>
+            <h2>{{ $donationsCount }}</h2>
             <p>Total hair donations recorded</p>
         </article>
 
@@ -49,10 +49,10 @@
             <span class="admin-stat-accent"></span>
             <div class="admin-stat-label">
                 <i class='bx bx-check-circle'></i>
-                <span>Approved Donors</span>
+                <span>Registered Users</span>
             </div>
-            <h2>68</h2>
-            <p>Verified and ready for stock intake</p>
+            <h2>{{ $usersCount }}</h2>
+            <p>Total users in the system</p>
         </article>
 
         <article class="admin-stat admin-stat-recipient">
@@ -61,7 +61,7 @@
                 <i class='bx bx-user-check'></i>
                 <span>Recipient Requests</span>
             </div>
-            <h2>31</h2>
+            <h2>{{ $requestsCount }}</h2>
             <p>Requests submitted through the portal</p>
         </article>
 
@@ -71,7 +71,7 @@
                 <i class='bx bx-time-five'></i>
                 <span>Pending Review</span>
             </div>
-            <h2>5</h2>
+            <h2>{{ $pendingVerifications }}</h2>
             <p>Requires immediate admin decision</p>
         </article>
     </section>

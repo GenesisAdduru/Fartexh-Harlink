@@ -36,30 +36,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-search-row>
-                        <td>REC-2026-0448</td>
-                        <td>Maria Santos</td>
-                        <td>Long / Black</td>
-                        <td>Chemotherapy</td>
-                        <td><span class="status-chip">Under Review</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => 'REC-2026-0448']) }}">Review</a></td>
-                    </tr>
-                    <tr data-search-row>
-                        <td>REC-2026-0451</td>
-                        <td>Patrixia Lopez</td>
-                        <td>Short / Brown</td>
-                        <td>Alopecia</td>
-                        <td><span class="status-chip">Under Review</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => 'REC-2026-0451']) }}">Review</a></td>
-                    </tr>
-                    <tr data-search-row>
-                        <td>REC-2026-0453</td>
-                        <td>Grace Dela Fuente</td>
-                        <td>Medium / Brown</td>
-                        <td>Chemo Recovery</td>
-                        <td><span class="status-chip">Submitted</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => 'REC-2026-0453']) }}">Review</a></td>
-                    </tr>
+                    @forelse($requests as $req)
+                        <tr data-search-row>
+                            <td>{{ $req->reference_number }}</td>
+                            <td>{{ $req->user->first_name ?? 'Unknown' }} {{ $req->user->last_name ?? '' }}</td>
+                            <td>{{ $req->preferred_length }} / {{ $req->preferred_color }}</td>
+                            <td>{{ $req->medical_condition }}</td>
+                            <td><span class="status-chip">{{ $req->status }}</span></td>
+                            <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => $req->reference_number]) }}">Review</a></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No recipient requests pending.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -11,7 +11,7 @@ class HairRequestController extends Controller
 {
     public function index()
     {
-        $requests = Auth::user()->hairRequests()->orderBy('created_at', 'desc')->get();
+        $requests = Auth::user()->hairRequests()->with('user')->orderBy('created_at', 'desc')->get();
         return response()->json($requests);
     }
 
@@ -60,7 +60,7 @@ class HairRequestController extends Controller
     {
         $hairRequest = Auth::user()->hairRequests()
             ->where('reference', $reference)
-            ->with('statusHistories')
+            ->with(['statusHistories', 'user'])
             ->first();
 
         if (!$hairRequest) {
@@ -83,6 +83,6 @@ class HairRequestController extends Controller
             $hairRequest->statusHistories()->create(['status' => $validated['status']]);
         }
 
-        return response()->json($hairRequest->load('statusHistories'));
+        return response()->json($hairRequest->load(['statusHistories', 'user']));
     }
 }

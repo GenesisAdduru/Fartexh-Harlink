@@ -12,24 +12,17 @@
         <h2>Hair Stock</h2>
 
         <div class="stock-columns">
-            <section class="stock-col">
-                <h3>Short</h3>
-                <div class="stock-row"><span>Black</span><strong>13</strong></div>
-                <div class="stock-row"><span>Brown</span><strong>10</strong></div>
-                <div class="stock-row"><span>Light</span><strong>8</strong></div>
-            </section>
-            <section class="stock-col">
-                <h3>Medium</h3>
-                <div class="stock-row"><span>Black</span><strong>7</strong></div>
-                <div class="stock-row"><span>Brown</span><strong>11</strong></div>
-                <div class="stock-row"><span>Light</span><strong>6</strong></div>
-            </section>
-            <section class="stock-col">
-                <h3>Long</h3>
-                <div class="stock-row"><span>Black</span><strong>9</strong></div>
-                <div class="stock-row"><span>Brown</span><strong>12</strong></div>
-                <div class="stock-row"><span>Light</span><strong>5</strong></div>
-            </section>
+            @foreach(['Short', 'Medium', 'Long'] as $len)
+                <section class="stock-col">
+                    <h3>{{ $len }}</h3>
+                    @foreach(['Black', 'Brown', 'Light'] as $col)
+                        <div class="stock-row">
+                            <span>{{ $col }}</span>
+                            <strong>{{ $stock[$len][$col] ?? 0 }}</strong>
+                        </div>
+                    @endforeach
+                </section>
+            @endforeach
         </div>
 
         <p class="empty-note">Stock values are digital inventory summaries from approved and categorized hair donations.</p>

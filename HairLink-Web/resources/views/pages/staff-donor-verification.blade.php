@@ -35,30 +35,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-search-row>
-                        <td>DON-2026-1102</td>
-                        <td>Fiona Can</td>
-                        <td>Long / Black / Untreated</td>
-                        <td>03/25/26</td>
-                        <td><span class="status-chip">Submitted</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'donor', 'reference' => 'DON-2026-1102']) }}">Review</a></td>
-                    </tr>
-                    <tr data-search-row>
-                        <td>DON-2026-1114</td>
-                        <td>Lara Mendiola</td>
-                        <td>Medium / Brown / Treated</td>
-                        <td>03/26/26</td>
-                        <td><span class="status-chip">Submitted</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'donor', 'reference' => 'DON-2026-1114']) }}">Review</a></td>
-                    </tr>
-                    <tr data-search-row>
-                        <td>DON-2026-1119</td>
-                        <td>May Delos Reyes</td>
-                        <td>Short / Light / Untreated</td>
-                        <td>03/27/26</td>
-                        <td><span class="status-chip">Submitted</span></td>
-                        <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'donor', 'reference' => 'DON-2026-1119']) }}">Review</a></td>
-                    </tr>
+                    @forelse($donations as $donation)
+                        <tr data-search-row>
+                            <td>{{ $donation->reference }}</td>
+                            <td>{{ $donation->user->first_name ?? 'Unknown' }} {{ $donation->user->last_name ?? '' }}</td>
+                            <td>{{ $donation->hair_length }} / {{ $donation->hair_color }} / {{ $donation->hair_condition }}</td>
+                            <td>{{ $donation->created_at->format('m/d/y') }}</td>
+                            <td><span class="status-chip">{{ $donation->status }}</span></td>
+                            <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'donor', 'reference' => $donation->reference]) }}">Review</a></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No donations pending verification.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

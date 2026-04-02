@@ -20,7 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (customInput) {
+        customInput.setAttribute('inputmode', 'numeric');
+        
+        customInput.addEventListener('keydown', (e) => {
+            const allowedKeys = ['.', 'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab', 'Home', 'End'];
+            if (!allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
         customInput.addEventListener('input', () => {
+            // Strip any non-numeric/non-dot characters that bypassed keydown
+            customInput.value = customInput.value.replace(/[^0-9.]/g, '');
+            
             pills.forEach(p => p.classList.remove('active'));
             if (amountNumber && customInput.value) {
                 amountNumber.value = Number(customInput.value).toLocaleString('en-PH', {
@@ -29,6 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+    }
+
+    if (amountNumber) {
+        amountNumber.setAttribute('inputmode', 'numeric');
     }
 
     // ── Payment tabs ──

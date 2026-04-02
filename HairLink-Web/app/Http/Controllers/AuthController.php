@@ -26,12 +26,13 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            $redirectUrl = '/donor/dashboard';
-            if ($user->role === 'recipient') {
-                $redirectUrl = '/recipient/dashboard';
-            } elseif ($user->role === 'admin') {
-                $redirectUrl = '/admin';
-            }
+            $redirectUrl = match ($user->role) {
+                'recipient' => '/recipient/dashboard',
+                'admin'     => '/admin/dashboard',
+                'staff'     => '/staff/dashboard',
+                'wigmaker'  => '/wigmaker/dashboard',
+                default     => '/donor/dashboard',
+            };
 
             if ($request->expectsJson()) {
                 return response()->json(['redirect' => $redirectUrl]);

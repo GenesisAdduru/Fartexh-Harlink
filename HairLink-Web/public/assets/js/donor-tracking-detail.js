@@ -6,9 +6,7 @@ function timelineItemHtml(entry, formatDateTime) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const moduleApi = window.hairlinkDonorModule;
-    if (!moduleApi) {
-        return;
-    }
+    if (!moduleApi) return;
 
     const root = document.getElementById('trackingDetailRoot');
     const refFromRoute = root?.dataset?.reference || '';
@@ -68,12 +66,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 detailCertificateBtn.style.display = 'inline-flex';
             }
         }
+
+        // Update simulate button text based on current status
+        if (simulateStatusBtn) {
+            const currentIndex = moduleApi.statusFlow.indexOf(donation.currentStatus);
+            if (currentIndex >= 0 && currentIndex < moduleApi.statusFlow.length - 1) {
+                const nextStatus = moduleApi.statusFlow[currentIndex + 1];
+                simulateStatusBtn.textContent = `Advance to: ${nextStatus}`;
+                simulateStatusBtn.disabled = false;
+            } else {
+                simulateStatusBtn.textContent = 'Status Complete';
+                simulateStatusBtn.disabled = true;
+            }
+        }
     }
 
     render(ref);
 
     if (simulateStatusBtn) {
         simulateStatusBtn.addEventListener('click', async () => {
+            simulateStatusBtn.disabled = true;
+            simulateStatusBtn.textContent = 'Updating...';
             try {
                 const updated = await moduleApi.nextStatus(ref);
                 if (updated) {
@@ -81,6 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error('Error advancing status:', error);
+                alert('Failed to advance status. Please try again.');
+                simulateStatusBtn.disabled = false;
             }
         });
     }

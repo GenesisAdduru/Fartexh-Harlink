@@ -1,73 +1,96 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const greetingText = document.getElementById('greetingText');
     const userName = greetingText ? greetingText.dataset.name : 'Donor';
-    
+
     const goal = 100;
     let points = 0;
 
-    // Calculate points from actual donation count (10 pts per donation)
-    try {
-        const moduleApi = window.hairlinkDonorModule;
-        if (moduleApi) {
-            const donations = await moduleApi.getAllDonations();
-            points = donations.length * 10;
-        }
-    } catch (error) {
-        console.warn('Could not load donation points:', error);
-    }
-
-    const user = {
-        name: userName,
-        points,
-        goal,
-    };
-
     const progressFill = document.getElementById('progressFill');
     const progressStar = document.getElementById('progressStar');
-    const pointValue = document.getElementById('pointValue');
-    const rewardLine = document.getElementById('rewardLine');
+    const pointValue   = document.getElementById('pointValue');
+    const rewardLine   = document.getElementById('rewardLine');
     const submitCodeBtn = document.getElementById('submitCodeBtn');
-    const referralCode = document.getElementById('referralCode');
+    const referralCode  = document.getElementById('referralCode');
 
+    // Set greeting immediately (no flash)
     function getGreeting() {
         const hour = new Date().getHours();
         if (hour < 12) return 'Good Morning';
         if (hour < 18) return 'Good Afternoon';
         return 'Good Evening';
     }
-
-    function renderPoints() {
-        const percent = Math.min((user.points / user.goal) * 100, 100);
-        progressFill.style.width = `${percent}%`;
-        progressStar.style.left = `${percent}%`;
-        pointValue.textContent = String(user.points);
-        rewardLine.textContent = user.points >= user.goal
-            ? 'Congratulations! You can now claim your free wig reward.'
-            : `Free wig for every ${user.goal} star points`;
-    }
-
     if (greetingText) {
-        greetingText.textContent = `${getGreeting()}, ${user.name}!`;
+        greetingText.textContent = `${getGreeting()}, ${userName}!`;
     }
 
-    renderPoints();
+    // Initial render at 0 so bar animates in
+    renderPoints(0);
 
-    if (progressStar) {
-        progressStar.addEventListener('click', () => {
-            user.points = Math.min(user.points + 10, user.goal);
-            renderPoints();
+    // Load real points from DB then animate bar
+    try {
+        const moduleApi = window.hairlinkDonorModule;
+        if (moduleApi) {
+            const donations = await moduleApi.getAllDonations();
+            // 10 pts per hair donation
+            points = donations.length * 10;
+        }
+    } catch (error) {
+        console.warn('Could not load donation points:', error);
+    }
+
+    // Small delay so CSS transition is visible
+    requestAnimationFrame(() => {
+        setTimeout(() => renderPoints(points), 80);
+    });
+
+    function renderPoints(pts) {
+        const percent = Math.min((pts / goal) * 100, 100);
+        if (progressFill) {
+            progressFill.style.width = `${percent}%`;
+            progressFill.style.transition = 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+        }
+        if (progressStar) {
+            progressStar.style.left = `calc(${percent}% - 12px)`;
+            progressStar.style.transition = 'left 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+            // Light up star when at goal
+            progressStar.style.color = pts >= goal ? '#f59e0b' : '';
+        }
+        if (pointValue) pointValue.textContent = String(pts);
+        if (rewardLine) {
+            rewardLine.textContent = pts >= goal
+                ? '🎉 Congratulations! You can now claim your free wig reward.'
+                : `Earn ${goal - pts} more points for a free wig`;
+        }
+
+        // Highlight filled stars in the star-row
+        const starRow = document.querySelectorAll('.star-row span');
+        const filledCount = Math.round((pts / goal) * starRow.length);
+        starRow.forEach((star, i) => {
+            star.style.color = i < filledCount ? '#f59e0b' : '';
+            star.style.transition = 'color 0.3s ease';
         });
     }
 
+    // Referral code submit
     if (submitCodeBtn && referralCode) {
         submitCodeBtn.addEventListener('click', () => {
             const code = referralCode.value.trim();
             if (!code) {
-                alert('Please enter a referral code.');
+                referralCode.focus();
+                referralCode.style.outline = '2px solid #e74c3c';
+                setTimeout(() => { referralCode.style.outline = ''; }, 1500);
                 return;
             }
-            alert('Referral code submitted successfully.');
+            // 3 pts for referral — just a visual reward for now
+            points = Math.min(points + 3, goal);
+            renderPoints(points);
             referralCode.value = '';
+            submitCodeBtn.textContent = '✓ Code Applied';
+            submitCodeBtn.disabled = true;
+            setTimeout(() => {
+                submitCodeBtn.textContent = 'Submit Code';
+                submitCodeBtn.disabled = false;
+            }, 2500);
         });
     }
 });

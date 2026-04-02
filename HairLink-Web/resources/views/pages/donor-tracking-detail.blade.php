@@ -13,7 +13,6 @@
             <p>Reference: <strong id="detailReference">{{ $reference }}</strong></p>
             <div class="action-row">
                 <a class="ghost-btn" href="{{ route('donor.tracking') }}">Back to Tracking List</a>
-                <button id="simulateStatusBtn" class="soft-btn" type="button">Simulate Next Status</button>
             </div>
         </header>
 

@@ -32,21 +32,26 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-search-row><td>A101</td><td>001</td><td>Long</td><td>Brown</td><td>04/13/24</td><td>Arrived</td></tr>
-                    <tr data-search-row><td>A102</td><td>001</td><td>Short</td><td>Black</td><td>04/13/24</td><td>Arrived</td></tr>
-                    <tr data-search-row><td>A103</td><td>001</td><td>Long</td><td>Black</td><td>04/13/24</td><td>Arrived</td></tr>
-                    <tr data-search-row><td>A104</td><td>001</td><td>Long</td><td>Light</td><td>04/18/24</td><td>Arrived</td></tr>
-                    <tr data-search-row><td>A105</td><td>002</td><td>Short</td><td>Brown</td><td>05/18/24</td><td>In Transit</td></tr>
-                    <tr data-search-row><td>A106</td><td>002</td><td>Long</td><td>Brown</td><td>05/18/25</td><td>In Transit</td></tr>
+                    @forelse($wigs as $wig)
+                        <tr data-search-row>
+                            <td><strong>{{ $wig->task_code }}</strong></td>
+                            <td>{{ $wig->donation ? $wig->donation->reference : 'N/A' }}</td>
+                            <td>{{ $wig->target_length }}</td>
+                            <td>{{ $wig->target_color }}</td>
+                            <td>{{ $wig->updated_at->format('m/d/y') }}</td>
+                            <td><span class="status-chip" style="background:#d4edda;color:#155724;border:none;">Arrived</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" style="text-align: center; padding: 2rem;">No wigs currently in stock.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
         <div class="pager">
-            <button class="active" type="button">1</button>
-            <button type="button">2</button>
-            <button type="button">3</button>
-            <button type="button">4</button>
+            {{ $wigs->links() }}
         </div>
     </article>
 </section>

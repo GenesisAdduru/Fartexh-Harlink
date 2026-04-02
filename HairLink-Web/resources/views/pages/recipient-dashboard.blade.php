@@ -104,6 +104,8 @@
         </div>
     </div>
 </div>
-
-<script src="{{ asset('assets/js/recipient-dashboard.js') }}"></script>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/recipient-dashboard.js') }}" defer></script>
+@endpush

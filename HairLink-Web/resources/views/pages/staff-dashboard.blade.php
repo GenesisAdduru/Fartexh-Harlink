@@ -21,10 +21,10 @@
     </header>
 
     <div class="quick-stat-grid">
-        <article class="quick-stat"><small>Inventory</small><h2>56</h2><p>Hair Inventory Records</p></article>
-        <article class="quick-stat"><small>Production</small><h2>14</h2><p>Wig Builds In Progress</p></article>
-        <article class="quick-stat"><small>Stock</small><h2>39</h2><p>Completed Wig Stock</p></article>
-        <article class="quick-stat"><small>Requests</small><h2>22</h2><p>Approved Recipient Requests</p></article>
+        <article class="quick-stat"><small>Inventory</small><h2>{{ $totalStock ?? 0 }}</h2><p>Hair Inventory Records</p></article>
+        <article class="quick-stat"><small>Production</small><h2>0</h2><p>Wig Builds In Progress</p></article>
+        <article class="quick-stat"><small>Stock</small><h2>0</h2><p>Completed Wig Stock</p></article>
+        <article class="quick-stat"><small>Requests</small><h2>{{ $pendingRequests ?? 0 }}</h2><p>Pending Recipient Requests</p></article>
     </div>
 
     <article class="staff-card">

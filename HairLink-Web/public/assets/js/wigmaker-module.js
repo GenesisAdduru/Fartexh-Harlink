@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updatedAtInput.value = localNow;
         }
 
-        taskUpdateForm.addEventListener('submit', (event) => {
+        taskUpdateForm.addEventListener('submit', async (event) => {
             event.preventDefault();
 
             if (!taskUpdateForm.checkValidity()) {
@@ -73,8 +73,49 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            if (updateBanner) {
-                updateBanner.hidden = false;
+            const btn = taskUpdateForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = 'Saving...';
+
+            const formData = new FormData(taskUpdateForm);
+            const data = {
+                status: formData.get('status'),
+                notes: formData.get('progressNotes')
+            };
+
+            const url = taskUpdateForm.dataset.actionUrl;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    if (updateBanner) {
+                        updateBanner.hidden = false;
+                        updateBanner.textContent = result.message || 'Status saved successfully.';
+                    }
+                    setTimeout(() => {
+                        window.location.href = '/wigmaker/dashboard';
+                    }, 1500);
+                } else {
+                    alert(result.message || 'Error saving update.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('A network error occurred.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
             }
         });
     }

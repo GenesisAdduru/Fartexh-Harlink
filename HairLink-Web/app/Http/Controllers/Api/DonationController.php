@@ -11,7 +11,7 @@ class DonationController extends Controller
 {
     public function index()
     {
-        $donations = Auth::user()->donations()->orderBy('created_at', 'desc')->get();
+        $donations = Auth::user()->donations()->with('user')->orderBy('created_at', 'desc')->get();
         return response()->json($donations);
     }
 
@@ -42,7 +42,7 @@ class DonationController extends Controller
     {
         $donation = Auth::user()->donations()
             ->where('reference', $reference)
-            ->with('statusHistories')
+            ->with(['statusHistories', 'user'])
             ->first();
 
         if (!$donation) {
@@ -54,10 +54,19 @@ class DonationController extends Controller
 
     public function updateStatus(Request $request, $reference)
     {
-        $donation = Auth::user()->donations()->where('reference', $reference)->firstOrFail();
+        $user = Auth::user();
+        $query = Donation::where('reference_number', $reference);
+        
+        // If not staff/admin, they can only update their own (for legacy simulation, though we removed those buttons)
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $donation = $query->firstOrFail();
         
         $validated = $request->validate([
-            'status' => 'required|string'
+            'status' => 'required|string',
+            'remarks' => 'nullable|string',
         ]);
 
         if ($donation->status !== $validated['status']) {
@@ -71,6 +80,6 @@ class DonationController extends Controller
             }
         }
 
-        return response()->json($donation->load('statusHistories'));
+        return response()->json($donation->load(['statusHistories', 'user']));
     }
 }

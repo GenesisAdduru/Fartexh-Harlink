@@ -181,5 +181,9 @@
     </form>
 </div>
 
-<script src="{{ asset('assets/js/recipient-request.js') }}"></script>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
+    <script src="{{ asset('assets/js/recipient-request.js') }}" defer></script>
+@endpush

@@ -8,28 +8,35 @@ document.addEventListener('DOMContentLoaded', function() {
     const requestDetails = document.getElementById('request-details');
     const simulateBtn = document.getElementById('simulate-status-btn');
 
+    const recipientModule = window.hairlinkRecipientModule;
+    if (!recipientModule) {
+        console.error('Recipient module not loaded');
+        return;
+    }
+
     /**
-     * Get reference from URL
+     * Get reference from URL path
      */
     function getRequestReference() {
         const pathParts = window.location.pathname.split('/');
-        return pathParts[pathParts.length - 1];
+        return decodeURIComponent(pathParts[pathParts.length - 1]);
     }
 
     /**
      * Render timeline
      */
     function renderTimeline(request) {
+        if (!timeline) return;
         timeline.innerHTML = '';
 
-        const statusHistory = [...request.statusHistory].reverse();
+        const statusHistory = [...(request.statusHistory || [])].reverse();
 
         statusHistory.forEach((historyItem, index) => {
             const item = document.createElement('div');
             const isCompleted = index === 0;
             item.className = `timeline-item ${isCompleted ? 'completed' : 'pending'}`;
 
-            const date = window.hairlinkRecipientModule.formatDateTime(historyItem.timestamp);
+            const date = recipientModule.formatDateTime(historyItem.timestamp);
 
             item.innerHTML = `
                 <div class="timeline-date">${date}</div>
@@ -41,33 +48,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     /**
-     * Render request details
+     * Render request details — only fields that exist in the API
      */
     function renderDetails(request) {
+        if (!requestDetails) return;
+
+        const userName = (request.user && request.user.name) ? request.user.name : 'Recipient';
+        const contactNumber = request.contactNumber || request.contact_number || '-';
+        const gender = request.gender
+            ? request.gender.charAt(0).toUpperCase() + request.gender.slice(1)
+            : '-';
+        const story = request.story || '-';
+        const appointment = request.appointmentAt || request.appointment_at;
+
         requestDetails.innerHTML = `
             <div class="detail-item">
                 <span class="detail-label">Full Name</span>
-                <span class="detail-value">${request.fullName}</span>
+                <span class="detail-value">${userName}</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Contact Number</span>
-                <span class="detail-value">${request.contactNumber}</span>
+                <span class="detail-value">${contactNumber}</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Gender</span>
-                <span class="detail-value">${request.gender.charAt(0).toUpperCase() + request.gender.slice(1)}</span>
-            </div>
-            <div class="detail-item">
-                <span class="detail-label">Email</span>
-                <span class="detail-value">${request.email}</span>
+                <span class="detail-value">${gender}</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Story</span>
-                <span class="detail-value">${request.story}</span>
+                <span class="detail-value">${story}</span>
             </div>
             <div class="detail-item">
                 <span class="detail-label">Appointment</span>
-                <span class="detail-value">${window.hairlinkRecipientModule.formatDateTime(request.appointmentAt)}</span>
+                <span class="detail-value">${appointment ? recipientModule.formatDateTime(appointment) : '-'}</span>
             </div>
         `;
     }
@@ -79,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const reference = getRequestReference();
         let request;
         try {
-            request = await window.hairlinkRecipientModule.getRequest(reference);
+            request = await recipientModule.getRequest(reference);
         } catch (error) {
             console.error('Error loading request:', error);
         }
@@ -89,14 +102,29 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        const userName = (request.user && request.user.name) ? request.user.name : 'Recipient';
+
         if (requestReferenceDisplay) requestReferenceDisplay.textContent = `Reference #${request.reference}`;
         if (summaryReference) summaryReference.textContent = request.reference;
         if (summaryStatus) summaryStatus.textContent = request.status;
-        if (summarySubmitted) summarySubmitted.textContent = window.hairlinkRecipientModule.formatDate(request.createdAt);
-        if (summaryName) summaryName.textContent = request.fullName || (request.user ? request.user.name : 'Recipient');
+        if (summarySubmitted) summarySubmitted.textContent = recipientModule.formatDate(request.createdAt || request.created_at);
+        if (summaryName) summaryName.textContent = userName;
 
         renderTimeline(request);
         renderDetails(request);
+
+        // Update simulate button text based on current status
+        if (simulateBtn) {
+            const currentIndex = recipientModule.STATUS_FLOW.indexOf(request.status);
+            if (currentIndex >= 0 && currentIndex < recipientModule.STATUS_FLOW.length - 1) {
+                const nextStatus = recipientModule.STATUS_FLOW[currentIndex + 1];
+                simulateBtn.textContent = `Advance to: ${nextStatus}`;
+                simulateBtn.disabled = false;
+            } else {
+                simulateBtn.textContent = 'Status Complete';
+                simulateBtn.disabled = true;
+            }
+        }
     }
 
     // Initial load
@@ -105,12 +133,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Simulate status button
     if (simulateBtn) {
         simulateBtn.addEventListener('click', async () => {
+            simulateBtn.disabled = true;
+            simulateBtn.textContent = 'Updating...';
             const reference = getRequestReference();
             try {
-                await window.hairlinkRecipientModule.nextStatus(reference);
-                await loadRequest(); // Reload to show updated status
+                await recipientModule.nextStatus(reference);
+                await loadRequest();
             } catch (error) {
                 console.error('Error updating status:', error);
+                alert('Failed to advance status. Please try again.');
+                simulateBtn.disabled = false;
             }
         });
     }

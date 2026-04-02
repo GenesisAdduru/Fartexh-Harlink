@@ -8,41 +8,8 @@
 
 @section('content')
     @php
-        $tasks = [
-            [
-                'code' => 'WG-24031',
-                'hair_ref' => 'DON-2026-1102',
-                'recipient_ref' => 'REC-2026-0448',
-                'length' => 'Medium',
-                'color' => 'Dark Brown',
-                'status' => 'queued',
-                'start_date' => '2026-03-30',
-                'target_date' => '2026-04-10',
-            ],
-            [
-                'code' => 'WG-24032',
-                'hair_ref' => 'DON-2026-1114',
-                'recipient_ref' => 'REC-2026-0451',
-                'length' => 'Long',
-                'color' => 'Black',
-                'status' => 'in-progress',
-                'start_date' => '2026-03-25',
-                'target_date' => '2026-04-07',
-            ],
-            [
-                'code' => 'WG-24033',
-                'hair_ref' => 'DON-2026-1090',
-                'recipient_ref' => 'REC-2026-0432',
-                'length' => 'Short',
-                'color' => 'Light Brown',
-                'status' => 'completed',
-                'start_date' => '2026-03-18',
-                'target_date' => '2026-03-29',
-            ],
-        ];
-
-        $queuedCount = collect($tasks)->where('status', 'queued')->count();
-        $inProgressCount = collect($tasks)->where('status', 'in-progress')->count();
+        $queuedCount = collect($tasks)->where('status', 'assigned')->count();
+        $inProgressCount = collect($tasks)->where('status', 'processing')->count();
         $completedCount = collect($tasks)->where('status', 'completed')->count();
     @endphp
 
@@ -99,27 +66,27 @@
                     </thead>
                     <tbody>
                         @foreach($tasks as $task)
-                            <tr data-task-row data-task-status="{{ $task['status'] }}">
+                            <tr data-task-row data-task-status="{{ $task->status }}">
                                 <td>
-                                    <strong>{{ $task['code'] }}</strong>
+                                    <strong>{{ $task->task_code }}</strong>
                                 </td>
-                                <td>{{ $task['hair_ref'] }}</td>
-                                <td>{{ $task['recipient_ref'] }}</td>
-                                <td>{{ $task['length'] }} / {{ $task['color'] }}</td>
+                                <td>{{ $task->donation ? $task->donation->reference_number : 'N/A' }}</td>
+                                <td>N/A</td>
+                                <td>{{ $task->target_length }} / {{ $task->target_color }}</td>
                                 <td>
-                                    <span class="status-pill status-{{ $task['status'] }}" data-status-pill>{{ str_replace('-', ' ', ucfirst($task['status'])) }}</span>
+                                    <span class="status-pill status-{{ $task->status }}" data-status-pill>{{ str_replace('-', ' ', ucfirst($task->status)) }}</span>
                                     <select class="status-select" data-status-select>
-                                        <option value="queued" @selected($task['status'] === 'queued')>Queued</option>
-                                        <option value="in-progress" @selected($task['status'] === 'in-progress')>In Progress</option>
-                                        <option value="completed" @selected($task['status'] === 'completed')>Completed</option>
+                                        <option value="assigned" @selected($task->status === 'assigned')>Assigned</option>
+                                        <option value="processing" @selected($task->status === 'processing')>Processing</option>
+                                        <option value="completed" @selected($task->status === 'completed')>Completed</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <small>Start: {{ $task['start_date'] }}</small>
-                                    <small>Target: {{ $task['target_date'] }}</small>
+                                    <small>Start: {{ $task->created_at->format('Y-m-d') }}</small>
+                                    <small>Target: {{ $task->due_date ?? 'TBD' }}</small>
                                 </td>
                                 <td>
-                                    <a class="ghost-btn" href="{{ route('wigmaker.task.detail', $task['code']) }}">Open Task</a>
+                                    <a class="ghost-btn" href="{{ route('wigmaker.task.detail', $task->task_code) }}">Open Task</a>
                                 </td>
                             </tr>
                         @endforeach

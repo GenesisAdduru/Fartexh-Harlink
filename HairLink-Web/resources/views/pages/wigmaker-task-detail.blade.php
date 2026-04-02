@@ -13,7 +13,7 @@
 
     <section class="section-wrap reveal wigmaker-page">
         <div class="section-title-block">
-            <h1>Task {{ $taskCode }}</h1>
+            <h1>Task {{ $task->task_code }}</h1>
             <p>Update production progress and notes for this assigned wig build.</p>
         </div>
 
@@ -22,20 +22,20 @@
                 <div>
                     <h2>Assignment Snapshot</h2>
                     <ul class="task-meta-list">
-                        <li><strong>Hair Inventory Ref:</strong> DON-2026-1102</li>
-                        <li><strong>Recipient Request Ref:</strong> REC-2026-0448</li>
-                        <li><strong>Wig Specification:</strong> Medium / Dark Brown / Straight</li>
-                        <li><strong>Assigned By:</strong> Staff User - Maria D.</li>
-                        <li><strong>Production Window:</strong> 2026-03-30 to 2026-04-10</li>
+                        <li><strong>Hair Inventory Ref:</strong> {{ $task->donation ? $task->donation->reference_number : 'N/A' }}</li>
+                        <li><strong>Recipient Request Ref:</strong> N/A</li>
+                        <li><strong>Wig Specification:</strong> {{ $task->target_length }} / {{ $task->target_color }}</li>
+                        <li><strong>Assigned By:</strong> Staff User</li>
+                        <li><strong>Production Window:</strong> {{ $task->created_at->format('Y-m-d') }} to {{ $task->due_date ?? 'TBD' }}</li>
                     </ul>
                 </div>
 
                 <div>
                     <h2>Progress Timeline</h2>
                     <ol class="timeline-list">
-                        <li class="done">Queued</li>
-                        <li class="active">In Progress</li>
-                        <li>Completed</li>
+                        <li class="{{ $task->status === 'assigned' ? 'active' : 'done' }}">Assigned</li>
+                        <li class="{{ $task->status === 'processing' ? 'active' : ($task->status === 'completed' ? 'done' : '') }}">Processing</li>
+                        <li class="{{ $task->status === 'completed' ? 'active' : '' }}">Completed</li>
                     </ol>
                 </div>
             </div>
@@ -47,14 +47,14 @@
 
         <article class="task-update-shell">
             <h2>Update Production Status</h2>
-            <form id="taskUpdateForm" class="task-update-form" novalidate>
+            <form id="taskUpdateForm" class="task-update-form" data-action-url="{{ route('wigmaker.task.update', $task->task_code) }}" novalidate>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="task-status">Current Stage <span class="required">*</span></label>
-                        <select id="task-status" name="taskStatus" required>
-                            <option value="queued">Queued</option>
-                            <option value="in-progress" selected>In Progress</option>
-                            <option value="completed">Completed</option>
+                        <select id="task-status" name="status" required>
+                            <option value="assigned" @selected($task->status === 'assigned')>Assigned</option>
+                            <option value="processing" @selected($task->status === 'processing')>Processing</option>
+                            <option value="completed" @selected($task->status === 'completed')>Completed</option>
                         </select>
                     </div>
                     <div class="form-group">

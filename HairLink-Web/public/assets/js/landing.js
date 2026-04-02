@@ -155,4 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderCountdown();
     setInterval(renderCountdown, 1000);
+
+    const contactForm = document.querySelector('.contact-form');
+    if (contactForm) {
+        contactForm.removeAttribute('onsubmit'); // Remove the inline return false;
+        
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = contactForm.querySelector('button[type="submit"]');
+            const originalText = btn.innerText;
+            btn.innerText = 'Submitting...';
+            btn.disabled = true;
+
+            const formData = new FormData(contactForm);
+            
+            try {
+                const url = '/api/partnership';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message || 'Thank you for your interest! We will contact you soon.');
+                    contactForm.reset();
+                } else {
+                    alert(data.message || 'Error saving request. Please verify fields.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('A network error occurred. Please try again.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
 });

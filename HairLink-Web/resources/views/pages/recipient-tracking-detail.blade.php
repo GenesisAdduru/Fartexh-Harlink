@@ -45,12 +45,13 @@
         </div>
     </div>
 
-    <!-- Simulate Status (Testing) -->
     <div class="form-actions">
-        <button id="simulate-status-btn" class="ghost-btn">Simulate Next Status</button>
         <a href="{{ route('recipient.tracking') }}" class="soft-btn">Back to Requests</a>
     </div>
 </div>
-
-<script src="{{ asset('assets/js/recipient-tracking-detail.js') }}"></script>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
+    <script src="{{ asset('assets/js/recipient-tracking-detail.js') }}" defer></script>
+@endpush

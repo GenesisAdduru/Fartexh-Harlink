@@ -48,9 +48,9 @@
                 <a href="{{ route('wigmaker.dashboard') }}">Wigmaker</a>
                 <a href="{{ route('staff.dashboard') }}">Staff</a>
             @endif
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
+            <a href="{{ route('logout') }}" class="logout-btn" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
-                <button type="submit" class="logout-btn">Logout</button>
             </form>
         </div>
     </nav>
