@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const moduleApi = window.hairlinkDonorModule;
     if (!moduleApi) {
         return;
@@ -6,7 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
-    const donation = ref ? moduleApi.getDonation(ref) : moduleApi.getLatestDonation();
+    let donation;
+    try {
+        donation = ref ? await moduleApi.getDonation(ref) : await moduleApi.getLatestDonation();
+    } catch (error) {
+        console.error('Error fetching donation:', error);
+    }
 
     const certName = document.getElementById('certName');
     const certReference = document.getElementById('certReference');

@@ -1,126 +1,91 @@
 // Community Module - Manages posts, comments, and community interactions
 
 const CommunityModule = {
-    STORAGE_KEY: 'hairlinkCommunityPostsV1',
-    
-    // Initialize community data with sample posts
-    initializeStorage() {
-        if (!localStorage.getItem(this.STORAGE_KEY)) {
-            const samplePosts = [
-                {
-                    id: 'post_001',
-                    author: 'Maria Santos',
-                    userType: 'recipient',
-                    avatar: 'MS',
-                    content: 'Just received my wig today and I\'m feeling so confident! Thank you to all the donors who made this possible.',
-                    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                    likes: 12,
-                    comments: [
-                        {
-                            id: 'comment_001',
-                            author: 'Sarah Johnson',
-                            userType: 'donor',
-                            avatar: 'SJ',
-                            content: 'This is so inspiring! Wishing you all the best on your journey.',
-                            timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-                        }
-                    ]
-                },
-                {
-                    id: 'post_002',
-                    author: 'John Doe',
-                    userType: 'donor',
-                    avatar: 'JD',
-                    content: 'I donated my hair yesterday! It was a wonderful experience knowing it will help someone regain their confidence.',
-                    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-                    likes: 8,
-                    comments: []
-                }
-            ];
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(samplePosts));
+    /**
+     * Helper to get CSRF token
+     */
+    getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    },
+
+    /**
+     * Generic API call wrapper
+     */
+    async apiCall(url, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': this.getCsrfToken()
+            }
+        };
+
+        if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
         }
+
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
+    },
+
+    /**
+     * Map backend post to frontend expectations
+     */
+    mapPost(post) {
+        return {
+            ...post,
+            author: post.user?.name || 'Anonymous',
+            userType: post.user?.role || 'user',
+            avatar: this.generateAvatar(post.user?.name || 'Anonymous'),
+            timestamp: post.created_at,
+            comments: (post.comments || []).map(comment => ({
+                ...comment,
+                author: comment.user?.name || 'Anonymous',
+                userType: comment.user?.role || 'user',
+                avatar: this.generateAvatar(comment.user?.name || 'Anonymous'),
+                timestamp: comment.created_at
+            }))
+        };
     },
 
     // Get all posts
-    getPosts() {
-        const posts = localStorage.getItem(this.STORAGE_KEY);
-        return posts ? JSON.parse(posts) : [];
+    async getPosts() {
+        const data = await this.apiCall('/api/community/posts');
+        return data.map(post => this.mapPost(post));
     },
 
-    // Get single post by ID
-    getPost(postId) {
-        const posts = this.getPosts();
+    // Get single post
+    async getPost(postId) {
+        const posts = await this.getPosts();
         return posts.find(p => p.id === postId);
     },
 
     // Create new post
-    createPost(content, author, userType) {
-        const posts = this.getPosts();
-        const newPost = {
-            id: `post_${Date.now()}`,
-            author: author,
-            userType: userType,
-            avatar: this.generateAvatar(author),
-            content: content,
-            timestamp: new Date().toISOString(),
-            likes: 0,
-            comments: []
-        };
-        posts.unshift(newPost);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
-        return newPost;
+    async createPost(content) {
+        const data = await this.apiCall('/api/community/posts', 'POST', { content });
+        return this.mapPost(data);
     },
 
     // Add comment to post
-    addComment(postId, content, author, userType) {
-        const posts = this.getPosts();
-        const post = posts.find(p => p.id === postId);
-        
-        if (post) {
-            const newComment = {
-                id: `comment_${Date.now()}`,
-                author: author,
-                userType: userType,
-                avatar: this.generateAvatar(author),
-                content: content,
-                timestamp: new Date().toISOString()
-            };
-            post.comments.push(newComment);
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
-            return newComment;
-        }
-        return null;
+    async addComment(postId, content) {
+        const data = await this.apiCall(`/api/community/posts/${postId}/comments`, 'POST', { content });
+        return {
+            ...data,
+            author: data.user?.name || 'Anonymous',
+            userType: data.user?.role || 'user',
+            avatar: this.generateAvatar(data.user?.name || 'Anonymous'),
+            timestamp: data.created_at
+        };
     },
 
-    // Like/unlike post
-    toggleLike(postId) {
-        const posts = this.getPosts();
-        const post = posts.find(p => p.id === postId);
-        
-        if (post) {
-            post.likes = post.likes > 0 ? post.likes - 1 : post.likes + 1;
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
-            return post.likes;
-        }
-        return 0;
-    },
-
-    // Delete post
-    deletePost(postId) {
-        let posts = this.getPosts();
-        posts = posts.filter(p => p.id !== postId);
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
-    },
-
-    // Delete comment
-    deleteComment(postId, commentId) {
-        const posts = this.getPosts();
-        const post = posts.find(p => p.id === postId);
-        
-        if (post) {
-            post.comments = post.comments.filter(c => c.id !== commentId);
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
-        }
+    // Like post
+    async toggleLike(postId) {
+        const data = await this.apiCall(`/api/community/posts/${postId}/like`, 'POST');
+        return data.likes;
     },
 
     // Generate avatar from name
@@ -151,7 +116,5 @@ const CommunityModule = {
     }
 };
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-    CommunityModule.initializeStorage();
-});
+// Expose to window
+window.CommunityModule = CommunityModule;

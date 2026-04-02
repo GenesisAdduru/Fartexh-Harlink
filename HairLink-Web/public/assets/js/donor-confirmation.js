@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const moduleApi = window.hairlinkDonorModule;
     if (!moduleApi) {
         return;
@@ -6,7 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const params = new URLSearchParams(window.location.search);
     const reference = params.get('ref');
-    const donation = reference ? moduleApi.getDonation(reference) : moduleApi.getLatestDonation();
+    
+    let donation;
+    try {
+        donation = reference ? await moduleApi.getDonation(reference) : await moduleApi.getLatestDonation();
+    } catch (error) {
+        console.error('Error fetching donation:', error);
+    }
 
     const refText = document.getElementById('confirmRef');
     const statusText = document.getElementById('confirmStatus');
@@ -51,7 +57,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (openCertificate) {
         openCertificate.setAttribute('href', `/donor/certificate?ref=${encodeURIComponent(donation.reference)}`);
         if (!donation.certificate) {
-            openCertificate.classList.add('ghost-btn');
+            openCertificate.style.display = 'none';
+        } else {
+            openCertificate.style.display = 'inline-flex';
         }
     }
 });

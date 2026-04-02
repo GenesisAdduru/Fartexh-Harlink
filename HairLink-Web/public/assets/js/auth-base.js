@@ -8,67 +8,11 @@ const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
 
-function getDemoAccounts() {
-    try {
-        return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
-    } catch (_error) {
-        return [];
-    }
-}
-
-function saveDemoAccounts(accounts) {
-    localStorage.setItem(DEMO_ACCOUNTS_KEY, JSON.stringify(accounts));
-}
-
-function setCurrentUser(account) {
-    if (!account) return;
-
-    localStorage.setItem('hairlinkUserType', account.userType || 'donor');
-    localStorage.setItem('hairlinkUserEmail', account.email || '');
-    localStorage.setItem('hairlinkUserProfile', JSON.stringify(account.profile || {}));
-}
-
-function redirectByUserType(userType) {
-    if (userType === 'recipient') {
-        alert('Login successful. Redirecting to recipient dashboard.');
-        window.location.href = '/recipient/dashboard';
-        return;
-    }
-
-    alert('Login successful. Redirecting to donor dashboard.');
-    window.location.href = '/donor/dashboard';
-}
-
-function runRoleDemo(userType) {
-    const account = {
-        email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
-        userType,
-        profile: {
-            firstName: userType === 'recipient' ? 'Recipient' : 'Donor',
-            lastName: 'Demo',
-            fullName: userType === 'recipient' ? 'Recipient Demo' : 'Donor Demo',
-            email: userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local',
-            phone: '0917-000-0000',
-            age: '22',
-            country: 'ph',
-            region: 'Metro Manila',
-            postalCode: '1000',
-            gender: 'prefer_not_say',
-            userType
-        }
-    };
-
-    const accounts = getDemoAccounts();
-    const existingIndex = accounts.findIndex((item) => item.email === account.email);
-    if (existingIndex >= 0) {
-        accounts[existingIndex] = account;
-    } else {
-        accounts.push(account);
-    }
-
-    saveDemoAccounts(accounts);
-    setCurrentUser(account);
-    redirectByUserType(userType);
+function fillDemo(userType) {
+    const emailField = document.getElementById('loginEmail');
+    const passwordField = document.getElementById('loginPassword');
+    if (emailField) emailField.value = userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local';
+    if (passwordField) passwordField.value = 'password123'; // assuming standard password for demo accounts
 }
 
 function setMode(mode) {
@@ -89,78 +33,123 @@ if (loginBtn) {
     loginBtn.addEventListener('click', () => setMode('login'));
 }
 
+function clearErrors(formType) {
+    document.querySelectorAll(`[id^="error-${formType}-"]`).forEach(el => {
+        el.innerText = '';
+        el.style.display = 'none';
+    });
+}
+
+function showErrors(formType, errors) {
+    for (const [field, messages] of Object.entries(errors)) {
+        const errorEl = document.getElementById(`error-${formType}-${field}`);
+        if (errorEl) {
+            errorEl.innerText = messages[0];
+            errorEl.style.display = 'block';
+        }
+    }
+}
+
+function handleAjaxSubmit(form, formType) {
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors(formType);
+        
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = 'Processing...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const url = form.getAttribute('action');
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.redirect) {
+                window.location.href = data.redirect;
+            } else if (response.status === 422 && data.errors) {
+                showErrors(formType, data.errors);
+            } else {
+                alert(data.message || 'Something went wrong, please try again later.');
+            }
+        } catch (error) {
+            console.error('Submission error', error);
+            alert('A network error occurred.');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
+}
+
 function setupRegisterFlow() {
     const registerForm = document.getElementById('registerForm');
-    if (!registerForm) return;
+    handleAjaxSubmit(registerForm, 'register');
 
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // Real-time validation loops for instant feedback
+    const passwordInput = document.getElementById('registerPassword');
+    const confirmInput = document.getElementById('registerConfirmPassword');
+    const emailInput = document.getElementById('registerEmail');
 
-        const userType = registerForm.querySelector('input[name="userType"]:checked')?.value;
-        const email = document.getElementById('registerEmail')?.value || '';
-        const password = document.getElementById('registerPassword')?.value || '';
-        const confirmPassword = document.getElementById('registerConfirmPassword')?.value || '';
-        const textInputs = registerForm.querySelectorAll('input[type="text"]');
-        const firstName = textInputs[0]?.value?.trim() || '';
-        const lastName = textInputs[1]?.value?.trim() || '';
-        const region = textInputs[2]?.value?.trim() || '';
-        const postalCode = textInputs[3]?.value?.trim() || '';
-        const age = registerForm.querySelector('input[type="number"]')?.value || '';
-        const phone = registerForm.querySelector('input[type="tel"]')?.value?.trim() || '';
-        const selects = registerForm.querySelectorAll('select');
-        const country = selects[0]?.value || '';
-        const gender = selects[1]?.value || '';
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match.');
-            return;
-        }
-
-        if (userType && email) {
-            const profile = {
-                firstName,
-                lastName,
-                fullName: `${firstName} ${lastName}`.trim(),
-                email,
-                phone,
-                age,
-                country,
-                region,
-                postalCode,
-                gender,
-                userType
-            };
-
-            const account = { email, userType, profile };
-            const accounts = getDemoAccounts();
-            const existingIndex = accounts.findIndex((item) => item.email === email);
-
-            if (existingIndex >= 0) {
-                accounts[existingIndex] = account;
+    if (passwordInput && confirmInput) {
+        const validatePassword = () => {
+            const val = passwordInput.value;
+            const errorEl = document.getElementById('error-register-password');
+            if (val.length > 0 && val.length < 8) {
+                errorEl.innerText = 'Password must be at least 8 characters.';
+                errorEl.style.display = 'block';
             } else {
-                accounts.push(account);
+                errorEl.style.display = 'none';
             }
+            validateMatch();
+        };
 
-            saveDemoAccounts(accounts);
-            setCurrentUser(account);
-        }
-
-        registerForm.classList.add('register-success');
-
-        setTimeout(() => {
-            setMode('login');
-            const loginEmail = document.getElementById('loginEmail');
-            if (loginEmail && email) {
-                loginEmail.value = email;
+        const validateMatch = () => {
+            const errorEl = document.getElementById('error-register-password_confirmation');
+            if (confirmInput.value.length > 0 && confirmInput.value !== passwordInput.value) {
+                errorEl.innerText = 'The password confirmation does not match.';
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
             }
-            registerForm.classList.remove('register-success');
-        }, 700);
-    });
+        };
+
+        passwordInput.addEventListener('input', validatePassword);
+        confirmInput.addEventListener('input', validateMatch);
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('input', () => {
+            const val = emailInput.value;
+            const errorEl = document.getElementById('error-register-email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (val.length > 0 && !emailRegex.test(val)) {
+                errorEl.innerText = 'Please enter a valid email address.';
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        });
+    }
 }
 
 function setupLoginFlow() {
     const loginForm = document.getElementById('loginForm');
-    if (!loginForm) return;
+    handleAjaxSubmit(loginForm, 'login');
+
+    const adminDemoButton = document.getElementById('fillAdminDemo');
+    const donorDemoButton = document.getElementById('fillDonorDemo');
+    const recipientDemoButton = document.getElementById('fillRecipientDemo');
 
     if (adminDemoButton) {
         adminDemoButton.addEventListener('click', () => {
@@ -168,57 +157,26 @@ function setupLoginFlow() {
             const passwordField = document.getElementById('loginPassword');
 
             if (emailField) {
-                emailField.value = ADMIN_DEMO_EMAIL;
+                emailField.value = 'admin@hairlink.local';
             }
 
             if (passwordField) {
-                passwordField.value = ADMIN_DEMO_PASSWORD;
+                passwordField.value = 'admin12345';
             }
         });
     }
 
     if (donorDemoButton) {
         donorDemoButton.addEventListener('click', () => {
-            runRoleDemo('donor');
+            fillDemo('donor');
         });
     }
 
     if (recipientDemoButton) {
         recipientDemoButton.addEventListener('click', () => {
-            runRoleDemo('recipient');
+            fillDemo('recipient');
         });
     }
-
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const email = document.getElementById('loginEmail')?.value || '';
-        const password = document.getElementById('loginPassword')?.value || '';
-        const storedType = localStorage.getItem('hairlinkUserType') || 'donor';
-        const accounts = getDemoAccounts();
-
-        if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
-            alert('Admin demo login successful. Redirecting to admin dashboard.');
-            window.location.href = '/admin';
-            return;
-        }
-
-        if (!email) {
-            redirectByUserType(storedType);
-            return;
-        }
-
-        const matchedAccount = accounts.find((item) => item.email === email);
-
-        if (matchedAccount) {
-            setCurrentUser(matchedAccount);
-            redirectByUserType(matchedAccount.userType);
-            return;
-        }
-
-        // Fallback for quick frontend checks: keep using last selected role.
-        redirectByUserType(storedType);
-    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

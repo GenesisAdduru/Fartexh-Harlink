@@ -9,7 +9,7 @@
 @section('content')
     <section class="section-wrap reveal">
         <div class="section-title-block">
-            <h1 id="greetingText">Welcome Back, Fiona Can!</h1>
+            <h1 id="greetingText" data-name="{{ auth()->user()->first_name ?? auth()->user()->name }}">Welcome Back!</h1>
             <p>Your impact snapshots and reward progress are shown below.</p>
         </div>
 
@@ -109,5 +109,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/js/donor-module.js') }}" defer></script>
     <script src="{{ asset('assets/js/donor-dashboard.js') }}" defer></script>
 @endpush

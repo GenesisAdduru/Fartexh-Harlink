@@ -27,39 +27,39 @@ document.addEventListener('DOMContentLoaded', () => {
         fileName.textContent = file.name;
     });
 
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         if (!form.checkValidity()) {
-            alert('Please complete all required fields.');
+            const invalidFields = [...form.querySelectorAll(':invalid')];
+            invalidFields[0]?.focus();
             return;
         }
 
-        if (!hairPhoto.files?.[0]) {
-            alert('Please upload a hair photo.');
-            return;
-        }
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-        if (!moduleApi) {
-            alert('Donation form submitted successfully.');
+        try {
+            const payload = {
+                fullName: (document.getElementById('fullName')?.value || '').trim(),
+                email: (document.getElementById('email')?.value || '').trim(),
+                phone: (document.getElementById('phone')?.value || '').trim(),
+                hairLength: (document.getElementById('hairLength')?.value || '').trim(),
+                hairColor: (document.getElementById('hairColor')?.value || '').trim(),
+                treatedHair: Boolean(document.getElementById('treatedHair')?.checked),
+                address: (document.getElementById('address')?.value || '').trim(),
+                reason: (document.getElementById('reason')?.value || '').trim()
+            };
+
+            const donation = await moduleApi.createDonation(payload);
+
             form.reset();
-            fileName.textContent = 'No file selected';
-            return;
+            if (fileName) fileName.textContent = 'No file selected';
+            window.location.href = `/donor/confirmation?ref=${encodeURIComponent(donation.reference)}`;
+        } catch (error) {
+            console.error('Donation error:', error);
+            alert('There was an error submitting your donation. Please try again.');
+            if (submitBtn) submitBtn.disabled = false;
         }
-
-        const donation = moduleApi.createDonation({
-            fullName: (document.getElementById('fullName')?.value || '').trim(),
-            email: (document.getElementById('email')?.value || '').trim(),
-            phone: (document.getElementById('phone')?.value || '').trim(),
-            hairLength: (document.getElementById('hairLength')?.value || '').trim(),
-            hairColor: (document.getElementById('hairColor')?.value || '').trim(),
-            treatedHair: Boolean(document.getElementById('treatedHair')?.checked),
-            address: (document.getElementById('address')?.value || '').trim(),
-            reason: (document.getElementById('reason')?.value || '').trim()
-        });
-
-        form.reset();
-        fileName.textContent = 'No file selected';
-        window.location.href = `/donor/confirmation?ref=${encodeURIComponent(donation.reference)}`;
     });
 });

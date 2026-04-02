@@ -2,9 +2,28 @@
     $initialMode = $initialMode ?? 'register';
 @endphp
 
+<style>
+    .input-wrapper {
+        width: 100%;
+        margin-bottom: 5px;
+        position: relative;
+    }
+    .ajax-error {
+        display: none;
+        color: #e74c3c;
+        font-size: 11px;
+        text-align: left;
+        margin-top: 4px;
+        line-height: 1.2;
+        width: 100%;
+        padding-left: 20px;
+    }
+</style>
+
 <div class="container {{ $initialMode === 'register' ? 'active' : '' }}" id="authContainer" data-initial-mode="{{ $initialMode }}">
     <div class="form-box login">
-        <form id="loginForm" action="#">
+        <form id="loginForm" action="{{ route('login.post') }}" method="POST">
+            @csrf
             <h1>Login</h1>
             <p class="form-subtitle">We've missed you. Log in to continue your HairLink journey.</p>
             <div class="demo-account-card">
@@ -19,14 +38,20 @@
                 </div>
             </div>
 
-            <div class="input-box">
-                <input id="loginEmail" type="email" placeholder="Email" required>
-                <i class='bx bxs-envelope'></i>
+            <div class="input-wrapper">
+                <div class="input-box" style="margin-bottom: 0;">
+                    <input id="loginEmail" name="email" type="email" placeholder="Email" required>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+                <div class="ajax-error" id="error-login-email"></div>
             </div>
 
-            <div class="input-box">
-                <input id="loginPassword" type="password" placeholder="Password" required>
-                <i class='bx bxs-lock-alt'></i>
+            <div class="input-wrapper">
+                <div class="input-box" style="margin-bottom: 0;">
+                    <input id="loginPassword" name="password" type="password" placeholder="Password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <div class="ajax-error" id="error-login-password"></div>
             </div>
 
             <div class="forgot-link">
@@ -38,7 +63,8 @@
     </div>
 
     <div class="form-box register">
-        <form id="registerForm" action="#">
+        <form id="registerForm" action="{{ route('register.post') }}" method="POST">
+            @csrf
             <h1>Create Your Account</h1>
             <p class="form-subtitle">Sign up as a donor or recipient to join the mission.</p>
 
@@ -55,83 +81,117 @@
                         <span>Recipient</span>
                     </label>
                 </div>
+                <div class="ajax-error" id="error-register-userType" style="padding-left: 0;"></div>
             </div>
 
             <div class="grid-two-cols">
-                <div class="input-box input-box--medium">
-                    <input type="text" placeholder="First Name" required>
-                    <i class='bx bxs-user'></i>
+                <div class="input-wrapper">
+                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
+                        <input type="text" name="first_name" placeholder="First Name" required>
+                        <i class='bx bxs-user'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-first_name"></div>
                 </div>
 
-                <div class="input-box input-box--medium">
-                    <input type="text" placeholder="Last Name" required>
-                    <i class='bx bxs-user'></i>
-                </div>
-            </div>
-
-            <div class="grid-two-cols">
-                <div class="input-box select-wrapper">
-                    <select required>
-                        <option value="" disabled selected>Country</option>
-                        <option value="ph">Philippines</option>
-                        <option value="us">United States</option>
-                        <option value="ca">Canada</option>
-                        <option value="gb">United Kingdom</option>
-                        <option value="au">Australia</option>
-                    </select>
-                    <i class='bx bx-world'></i>
-                </div>
-
-                <div class="input-box">
-                    <input type="text" placeholder="Region / Province" required>
-                    <i class='bx bxs-map'></i>
+                <div class="input-wrapper">
+                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
+                        <input type="text" name="last_name" placeholder="Last Name" required>
+                        <i class='bx bxs-user'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-last_name"></div>
                 </div>
             </div>
 
             <div class="grid-two-cols">
-                <div class="input-box input-box--short">
-                    <input type="text" placeholder="Postal Code" required>
-                    <i class='bx bxs-home'></i>
+                <div class="input-wrapper">
+                    <div class="input-box select-wrapper" style="margin-bottom: 0;">
+                        <select name="country" required>
+                            <option value="" disabled selected>Country</option>
+                            <option value="ph">Philippines</option>
+                            <option value="us">United States</option>
+                            <option value="ca">Canada</option>
+                            <option value="gb">United Kingdom</option>
+                            <option value="au">Australia</option>
+                        </select>
+                        <i class='bx bx-world'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-country"></div>
                 </div>
 
-                <div class="input-box input-box--short">
-                    <input type="number" min="1" max="120" placeholder="Age" required>
-                    <i class='bx bx-calendar'></i>
+                <div class="input-wrapper">
+                    <div class="input-box" style="margin-bottom: 0;">
+                        <input type="text" name="region" placeholder="Region / Province" required>
+                        <i class='bx bxs-map'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-region"></div>
                 </div>
             </div>
 
             <div class="grid-two-cols">
-                <div class="input-box select-wrapper input-box--medium">
-                    <select required>
-                        <option value="" disabled selected>Gender</option>
-                        <option value="female">Female</option>
-                        <option value="male">Male</option>
-                        <option value="nonbinary">Non-binary</option>
-                        <option value="prefer_not_say">Prefer not to say</option>
-                    </select>
-                    <i class='bx bx-user-circle'></i>
+                <div class="input-wrapper">
+                    <div class="input-box input-box--short" style="margin-bottom: 0;">
+                        <input type="text" name="postal_code" placeholder="Postal Code" required>
+                        <i class='bx bxs-home'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-postal_code"></div>
                 </div>
 
-                <div class="input-box input-box--medium">
-                    <input type="tel" placeholder="Phone Number" required>
-                    <i class='bx bxs-phone'></i>
+                <div class="input-wrapper">
+                    <div class="input-box input-box--short" style="margin-bottom: 0;">
+                        <input type="number" name="age" min="1" max="120" placeholder="Age" required>
+                        <i class='bx bx-calendar'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-age"></div>
                 </div>
-            </div>
-
-            <div class="input-box input-box--long">
-                <input id="registerEmail" type="email" name="email" placeholder="Email Address" autocomplete="email" inputmode="email" required>
-                <i class='bx bxs-envelope'></i>
             </div>
 
             <div class="grid-two-cols">
-                <div class="input-box input-box--medium">
-                    <input id="registerPassword" type="password" placeholder="Password" required>
-                    <i class='bx bxs-lock-alt'></i>
+                <div class="input-wrapper">
+                    <div class="input-box select-wrapper input-box--medium" style="margin-bottom: 0;">
+                        <select name="gender" required>
+                            <option value="" disabled selected>Gender</option>
+                            <option value="female">Female</option>
+                            <option value="male">Male</option>
+                            <option value="nonbinary">Non-binary</option>
+                            <option value="prefer_not_say">Prefer not to say</option>
+                        </select>
+                        <i class='bx bx-user-circle'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-gender"></div>
                 </div>
 
-                <div class="input-box input-box--medium">
-                    <input id="registerConfirmPassword" type="password" placeholder="Confirm Password" required>
-                    <i class='bx bxs-lock-alt'></i>
+                <div class="input-wrapper">
+                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
+                        <input type="tel" name="phone" placeholder="Phone Number" required>
+                        <i class='bx bxs-phone'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-phone"></div>
+                </div>
+            </div>
+
+            <div class="input-wrapper">
+                <div class="input-box input-box--long" style="margin-bottom: 0;">
+                    <input id="registerEmail" type="email" name="email" placeholder="Email Address" autocomplete="email" inputmode="email" required>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+                <div class="ajax-error" id="error-register-email"></div>
+            </div>
+
+            <div class="grid-two-cols">
+                <div class="input-wrapper">
+                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
+                        <input id="registerPassword" name="password" type="password" placeholder="Password" required>
+                        <i class='bx bxs-lock-alt'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-password"></div>
+                </div>
+
+                <div class="input-wrapper">
+                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
+                        <input id="registerConfirmPassword" name="password_confirmation" type="password" placeholder="Confirm Password" required>
+                        <i class='bx bxs-lock-alt'></i>
+                    </div>
+                    <div class="ajax-error" id="error-register-password_confirmation"></div>
                 </div>
             </div>
 

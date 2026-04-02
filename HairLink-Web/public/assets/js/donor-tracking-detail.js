@@ -24,8 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const simulateStatusBtn = document.getElementById('simulateStatusBtn');
     const detailCertificateBtn = document.getElementById('detailCertificateBtn');
 
-    function render(reference) {
-        const donation = moduleApi.getDonation(reference);
+    async function render(reference) {
+        let donation;
+        try {
+            donation = await moduleApi.getDonation(reference);
+        } catch (error) {
+            console.error('Error fetching donation:', error);
+        }
+
         if (!donation) {
             if (detailTimeline) {
                 detailTimeline.innerHTML = '<li><strong>Record not found</strong><time>-</time></li>';
@@ -57,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (detailCertificateBtn) {
             detailCertificateBtn.setAttribute('href', `/donor/certificate?ref=${encodeURIComponent(donation.reference)}`);
             if (!donation.certificate) {
-                detailCertificateBtn.classList.add('ghost-btn');
+                detailCertificateBtn.style.display = 'none';
             } else {
-                detailCertificateBtn.classList.remove('ghost-btn');
+                detailCertificateBtn.style.display = 'inline-flex';
             }
         }
     }
@@ -67,12 +73,15 @@ document.addEventListener('DOMContentLoaded', () => {
     render(ref);
 
     if (simulateStatusBtn) {
-        simulateStatusBtn.addEventListener('click', () => {
-            const updated = moduleApi.nextStatus(ref);
-            if (!updated) {
-                return;
+        simulateStatusBtn.addEventListener('click', async () => {
+            try {
+                const updated = await moduleApi.nextStatus(ref);
+                if (updated) {
+                    await render(ref);
+                }
+            } catch (error) {
+                console.error('Error advancing status:', error);
             }
-            render(ref);
         });
     }
 });
