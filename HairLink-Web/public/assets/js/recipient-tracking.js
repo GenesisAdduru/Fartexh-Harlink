@@ -19,16 +19,21 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Render requests table
      */
-    function renderRequests(filter = '') {
-        const requests = window.hairlinkRecipientModule.getRequests();
-        
+    async function renderRequests(filter = '') {
+        let requests = [];
+        try {
+            requests = await window.hairlinkRecipientModule.getRequests();
+        } catch (error) {
+            console.error('Error fetching requests:', error);
+        }
+
         let filteredRequests = requests;
         if (filter) {
             const lowerFilter = filter.toLowerCase();
             filteredRequests = requests.filter(r => 
                 r.reference.toLowerCase().includes(lowerFilter) ||
                 r.status.toLowerCase().includes(lowerFilter) ||
-                r.fullName.toLowerCase().includes(lowerFilter)
+                (r.fullName && r.fullName.toLowerCase().includes(lowerFilter))
             );
         }
 
@@ -50,12 +55,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const row = document.createElement('tr');
             const submittedDate = window.hairlinkRecipientModule.formatDate(request.createdAt);
             const statusClass = getStatusClass(request.status);
+            const userName = request.fullName || (request.user ? request.user.name : 'Recipient');
 
             row.innerHTML = `
                 <td><strong>${request.reference}</strong></td>
                 <td>${submittedDate}</td>
                 <td><span class="status-pill ${statusClass}">${request.status}</span></td>
-                <td>${request.fullName}</td>
+                <td>${userName}</td>
                 <td>
                     <a href="/recipient/tracking/${request.reference}" class="action-link">
                         View Details

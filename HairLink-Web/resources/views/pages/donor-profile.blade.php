@@ -13,43 +13,49 @@
             <p>View your donor account details and contact information.</p>
         </header>
 
+    @php
+        $user = auth()->user();
+        $initials = strtoupper(substr($user->first_name ?? $user->name, 0, 1) . substr($user->last_name ?? '', 0, 1));
+        $fullName = $user->first_name ? "{$user->first_name} {$user->last_name}" : $user->name;
+    @endphp
+
         <article class="profile-card">
             <div class="profile-hero">
-                <div class="profile-avatar" id="profileInitials">HL</div>
+                <div class="profile-avatar" id="profileInitials">{{ $initials }}</div>
                 <div>
-                    <p class="profile-name" id="profileName">HairLink User</p>
-                    <span class="profile-role" id="profileRole">Donor</span>
+                    <p class="profile-name" id="profileName">{{ $fullName }}</p>
+                    <span class="profile-role status-donor" id="profileRole">{{ ucfirst($user->role ?? 'Donor') }}</span>
                 </div>
             </div>
 
             <div class="profile-grid">
                 <div class="profile-item">
                     <small>Email</small>
-                    <strong id="profileEmail">Not set</strong>
+                    <strong id="profileEmail">{{ $user->email }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Phone Number</small>
-                    <strong id="profilePhone">Not set</strong>
+                    <strong id="profilePhone">{{ $user->phone ?? 'Not set' }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Age</small>
-                    <strong id="profileAge">Not set</strong>
+                    <strong id="profileAge">{{ $user->age ?? 'Not set' }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Gender</small>
-                    <strong id="profileGender">Not set</strong>
+                    <strong id="profileGender">{{ ucfirst($user->gender ?? 'Not set') }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Country</small>
-                    <strong id="profileCountry">Not set</strong>
+                    <strong id="profileCountry">{{ strtoupper($user->country ?? 'Not set') }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Region / Province</small>
-                    <strong id="profileRegion">Not set</strong>
+                    <strong id="profileRegion">{{ $user->region ?? 'Not set' }}</strong>
                 </div>
                 <div class="profile-item">
                     <small>Postal Code</small>
-                    <strong id="profilePostalCode">Not set</strong>
+                    <strong id="profilePostalCode">{{ $user->postal_code ?? 'Not set' }}</strong>
                 </div>
             </div>
 
@@ -62,11 +68,11 @@
         <article class="profile-stats">
             <div class="profile-stat">
                 <small>Account Type</small>
-                <strong>Donor</strong>
+                <strong>{{ ucfirst($user->role ?? 'Donor') }}</strong>
             </div>
             <div class="profile-stat">
                 <small>Member Since</small>
-                <strong id="profileJoined">-</strong>
+                <strong id="profileJoined">{{ $user->created_at ? $user->created_at->format('M d, Y') : '-' }}</strong>
             </div>
             <div class="profile-stat">
                 <small>Quick Tip</small>

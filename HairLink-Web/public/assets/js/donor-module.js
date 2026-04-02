@@ -1,194 +1,119 @@
-(() => {
-    const STORAGE_KEY = 'hairlinkDonationsV1';
-    const LATEST_KEY = 'hairlinkLatestDonationRef';
+(function(window) {
+    'use strict';
+
     const STATUS_FLOW = ['Submitted', 'Received', 'Validated', 'Processing', 'Completed'];
 
-    function parse(raw) {
-        try {
-            const value = JSON.parse(raw);
-            return Array.isArray(value) ? value : [];
-        } catch {
-            return [];
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    }
+
+    async function apiCall(url, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken()
+            }
+        };
+
+        if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
         }
+
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
     }
 
-    function readAll() {
-        return parse(localStorage.getItem(STORAGE_KEY));
-    }
-
-    function writeAll(items) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    }
-
-    function buildReference() {
-        const stamp = Date.now().toString().slice(-6);
-        const rand = Math.floor(Math.random() * 900 + 100);
-        return `HD-${stamp}${rand}`;
+    /**
+     * Map backend snake_case model to frontend camelCase expectations
+     */
+    function mapDonation(data) {
+        if (!data) return null;
+        return {
+            ...data,
+            fullName: data.user?.name || 'Donor',
+            hairLength: data.hair_length,
+            hairColor: data.hair_color,
+            treatedHair: data.treated_hair,
+            submittedAt: data.created_at,
+            currentStatus: data.status,
+            statusHistory: (data.status_histories || []).map(sh => ({
+                status: sh.status,
+                at: sh.created_at
+            })),
+            certificate: data.certificate_no ? {
+                certificateNo: data.certificate_no,
+                issuedAt: data.updated_at
+            } : null,
+            dropOff: {
+                location: data.dropoff_location,
+                appointmentAt: data.appointment_at
+            }
+        };
     }
 
     function formatDateTime(value) {
+        if (!value) return '';
         const date = new Date(value);
         return date.toLocaleString();
     }
 
-    function buildDefaultAppointment() {
-        const date = new Date();
-        date.setDate(date.getDate() + 3);
-        date.setHours(10, 0, 0, 0);
-        return date.toISOString();
-    }
-
-    function ensureSeedData() {
-        const items = readAll();
-        if (items.length > 0) {
-            return;
-        }
-
-        const now = Date.now();
-        const sampleCompletedRef = 'HD-240001001';
-        const samplePendingRef = 'HD-240001002';
-
-        const sample = [
-            {
-                reference: sampleCompletedRef,
-                fullName: 'Fiona Can',
-                email: 'fiona@example.com',
-                hairLength: '15 to 20 inches',
-                hairColor: 'Black',
-                submittedAt: new Date(now - 1000 * 60 * 60 * 24 * 10).toISOString(),
-                currentStatus: 'Completed',
-                statusHistory: [
-                    { status: 'Submitted', at: new Date(now - 1000 * 60 * 60 * 24 * 10).toISOString() },
-                    { status: 'Received', at: new Date(now - 1000 * 60 * 60 * 24 * 9).toISOString() },
-                    { status: 'Validated', at: new Date(now - 1000 * 60 * 60 * 24 * 8).toISOString() },
-                    { status: 'Processing', at: new Date(now - 1000 * 60 * 60 * 24 * 7).toISOString() },
-                    { status: 'Completed', at: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString() }
-                ],
-                certificate: {
-                    certificateNo: 'CERT-2026-0001',
-                    issuedAt: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString()
-                }
-            },
-            {
-                reference: samplePendingRef,
-                fullName: 'Fiona Can',
-                email: 'fiona@example.com',
-                hairLength: '10 to 14 inches',
-                hairColor: 'Brown',
-                submittedAt: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(),
-                currentStatus: 'Received',
-                statusHistory: [
-                    { status: 'Submitted', at: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString() },
-                    { status: 'Received', at: new Date(now - 1000 * 60 * 60 * 24).toISOString() }
-                ],
-                certificate: null
-            }
-        ];
-
-        writeAll(sample);
-        localStorage.setItem(LATEST_KEY, samplePendingRef);
-    }
-
-    function createDonation(payload) {
-        const items = readAll();
-        const nowIso = new Date().toISOString();
-        const donation = {
-            reference: buildReference(),
-            fullName: payload.fullName,
-            email: payload.email,
-            phone: payload.phone || '',
-            hairLength: payload.hairLength,
-            hairColor: payload.hairColor,
-            treatedHair: Boolean(payload.treatedHair),
-            address: payload.address || '',
-            reason: payload.reason || '',
-            submittedAt: nowIso,
-            dropOff: {
-                location: 'Manila Downtown YMCA, 945 Sabino Padilla St, Binondo, Manila',
-                appointmentAt: buildDefaultAppointment()
-            },
-            currentStatus: 'Submitted',
-            statusHistory: [{ status: 'Submitted', at: nowIso }],
-            certificate: null
-        };
-
-        items.unshift(donation);
-        writeAll(items);
-        localStorage.setItem(LATEST_KEY, donation.reference);
-        return donation;
-    }
-
-    function getAllDonations() {
-        return readAll().sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-    }
-
-    function getDonation(reference) {
-        return getAllDonations().find((item) => item.reference === reference) || null;
-    }
-
-    function getLatestDonation() {
-        const latestRef = localStorage.getItem(LATEST_KEY);
-        if (latestRef) {
-            const donation = getDonation(latestRef);
-            if (donation) {
-                return donation;
-            }
-        }
-        return getAllDonations()[0] || null;
-    }
-
-    function setStatus(reference, status) {
-        if (!STATUS_FLOW.includes(status)) {
-            return null;
-        }
-
-        const items = getAllDonations();
-        const donation = items.find((item) => item.reference === reference);
-        if (!donation) {
-            return null;
-        }
-
-        donation.currentStatus = status;
-        const lastStatus = donation.statusHistory[donation.statusHistory.length - 1]?.status;
-        if (lastStatus !== status) {
-            donation.statusHistory.push({ status, at: new Date().toISOString() });
-        }
-
-        if (status === 'Completed' && !donation.certificate) {
-            donation.certificate = {
-                certificateNo: `CERT-${new Date().getFullYear()}-${donation.reference.slice(-6)}`,
-                issuedAt: new Date().toISOString()
-            };
-        }
-
-        writeAll(items);
-        return donation;
-    }
-
-    function nextStatus(reference) {
-        const donation = getDonation(reference);
-        if (!donation) {
-            return null;
-        }
-
-        const index = STATUS_FLOW.indexOf(donation.currentStatus);
-        if (index < 0 || index >= STATUS_FLOW.length - 1) {
-            return donation;
-        }
-
-        return setStatus(reference, STATUS_FLOW[index + 1]);
-    }
-
-    ensureSeedData();
-
-    window.hairlinkDonorModule = {
+    const donorModule = {
         statusFlow: STATUS_FLOW,
         formatDateTime,
-        createDonation,
-        getAllDonations,
-        getDonation,
-        getLatestDonation,
-        setStatus,
-        nextStatus
+
+        async getAllDonations() {
+            const data = await apiCall('/api/donations');
+            return data.map(mapDonation);
+        },
+
+        async getDonation(reference) {
+            const data = await apiCall(`/api/donations/${reference}`);
+            return mapDonation(data);
+        },
+
+        async createDonation(payload) {
+            const backendPayload = {
+                reference: payload.reference || `HD-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 900 + 100)}`,
+                hair_length: payload.hairLength,
+                hair_color: payload.hairColor,
+                treated_hair: Boolean(payload.treatedHair),
+                address: payload.address,
+                reason: payload.reason,
+                dropoff_location: 'Manila Downtown YMCA, 945 Sabino Padilla St, Binondo, Manila',
+                appointment_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+            };
+            const data = await apiCall('/api/donations', 'POST', backendPayload);
+            return mapDonation(data);
+        },
+
+        async getLatestDonation() {
+            const donations = await this.getAllDonations();
+            return donations[0] || null;
+        },
+
+        async setStatus(reference, status) {
+            if (!STATUS_FLOW.includes(status)) return null;
+            const data = await apiCall(`/api/donations/${reference}/status`, 'POST', { status });
+            return mapDonation(data);
+        },
+
+        async nextStatus(reference) {
+            const donation = await this.getDonation(reference);
+            if (!donation) return null;
+
+            const currentIndex = STATUS_FLOW.indexOf(donation.currentStatus);
+            if (currentIndex >= 0 && currentIndex < STATUS_FLOW.length - 1) {
+                return await this.setStatus(reference, STATUS_FLOW[currentIndex + 1]);
+            }
+            return donation;
+        }
     };
-})();
+
+    window.hairlinkDonorModule = donorModule;
+
+})(window);

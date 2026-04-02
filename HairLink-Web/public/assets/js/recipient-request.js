@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Handle form submission
      */
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
 
         // Validate files
@@ -136,28 +136,29 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Create request data
-        const requestData = {
-            fullName: document.getElementById('full-name').value,
-            contactNumber: document.getElementById('contact-number').value,
-            gender: document.getElementById('gender').value,
-            email: document.getElementById('email').value,
-            story: document.getElementById('story').value,
-            documents: selectedDocuments.map(f => ({
-                name: f.name,
-                size: f.size,
-                type: f.type
-            })),
-            additionalPhoto: {
-                name: selectedPhoto.name,
-                size: selectedPhoto.size,
-                type: selectedPhoto.type
-            }
-        };
+        const submitBtn = requestForm.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
 
-        // Create request and redirect to confirmation
-        const newRequest = window.hairlinkRecipientModule.createRequest(requestData);
-        window.location.href = `/recipient/confirmation?ref=${newRequest.reference}`;
+        try {
+            // Create request data
+            const requestData = {
+                fullName: document.getElementById('full-name').value,
+                contactNumber: document.getElementById('contact-number').value,
+                gender: document.getElementById('gender').value,
+                email: document.getElementById('email').value,
+                story: document.getElementById('story').value,
+                fileDocuments: selectedDocuments,
+                filePhoto: selectedPhoto
+            };
+
+            // Create request and redirect to confirmation
+            const newRequest = await window.hairlinkRecipientModule.createRequest(requestData);
+            window.location.href = `/recipient/confirmation?ref=${newRequest.reference}`;
+        } catch (error) {
+            console.error('Request submission error:', error);
+            alert('There was an error submitting your request. Please try again.');
+            if (submitBtn) submitBtn.disabled = false;
+        }
     }
 
     // Event listeners

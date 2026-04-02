@@ -1,9 +1,6 @@
 (function(window) {
     'use strict';
 
-    const STORAGE_KEY = 'hairlinkRequestsV1';
-    
-    // Status flow for recipient requests
     const STATUS_FLOW = [
         'Submitted',
         'Under Review',
@@ -12,162 +9,59 @@
         'Completed'
     ];
 
-    /**
-     * Generate unique reference number for requests
-     */
-    function generateReference() {
-        const timestamp = Date.now().toString().slice(-6);
-        const random = Math.random().toString(36).substr(2, 5).toUpperCase();
-        return `REQ-${random}-${timestamp}`;
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     }
 
-    /**
-     * Generate default appointment for pickup (3 days from submission)
-     */
-    function buildDefaultAppointment() {
-        const date = new Date();
-        date.setDate(date.getDate() + 3);
-        return date.toISOString();
-    }
-
-    /**
-     * Initialize localStorage with seed data if empty
-     */
-    function initializeStorage() {
-        const existing = localStorage.getItem(STORAGE_KEY);
-        if (!existing) {
-            const seedData = [
-                {
-                    id: 'REQ-ABC12-234567',
-                    reference: 'REQ-ABC12-234567',
-                    fullName: 'Maria Santos',
-                    contactNumber: '0917-234-5678',
-                    gender: 'female',
-                    email: 'maria.santos@email.com',
-                    story: 'I started experiencing hair loss 2 years ago due to alopecia. This has affected my confidence significantly...',
-                    status: 'Matched',
-                    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-                    statusHistory: [
-                        { status: 'Submitted', timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
-                        { status: 'Under Review', timestamp: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString() },
-                        { status: 'Matched', timestamp: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() }
-                    ],
-                    appointmentAt: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
-                },
-                {
-                    id: 'REQ-XYZ78-891234',
-                    reference: 'REQ-XYZ78-891234',
-                    fullName: 'Juan Dela Cruz',
-                    contactNumber: '0916-123-4567',
-                    gender: 'male',
-                    email: 'juan.delacruz@email.com',
-                    story: 'Hair loss started after medical treatment. Looking forward to regaining my confidence...',
-                    status: 'Under Review',
-                    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    statusHistory: [
-                        { status: 'Submitted', timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-                        { status: 'Under Review', timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString() }
-                    ],
-                    appointmentAt: buildDefaultAppointment()
-                }
-            ];
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
-        }
-    }
-
-    /**
-     * Get all requests
-     */
-    function getRequests() {
-        initializeStorage();
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-    }
-
-    /**
-     * Get single request by reference
-     */
-    function getRequest(reference) {
-        const requests = getRequests();
-        return requests.find(r => r.reference === reference);
-    }
-
-    /**
-     * Create new request
-     */
-    function createRequest(data) {
-        const requests = getRequests();
-        const reference = generateReference();
-        const appointment = buildDefaultAppointment();
-        
-        const newRequest = {
-            id: reference,
-            reference: reference,
-            fullName: data.fullName,
-            contactNumber: data.contactNumber,
-            gender: data.gender,
-            email: data.email,
-            story: data.story,
-            documents: data.documents || [],
-            additionalPhoto: data.additionalPhoto || null,
-            status: 'Submitted',
-            createdAt: new Date().toISOString(),
-            statusHistory: [
-                {
-                    status: 'Submitted',
-                    timestamp: new Date().toISOString()
-                }
-            ],
-            appointmentAt: appointment,
-            notes: ''
+    async function apiCall(url, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': getCsrfToken()
+            }
         };
 
-        requests.push(newRequest);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-        
-        return newRequest;
-    }
-
-    /**
-     * Update request status
-     */
-    function updateRequestStatus(reference, newStatus) {
-        const requests = getRequests();
-        const request = requests.find(r => r.reference === reference);
-        
-        if (request) {
-            request.status = newStatus;
-            request.statusHistory.push({
-                status: newStatus,
-                timestamp: new Date().toISOString()
-            });
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(requests));
-            return request;
-        }
-        
-        return null;
-    }
-
-    /**
-     * Move to next status in flow
-     */
-    function nextStatus(reference) {
-        const request = getRequest(reference);
-        if (!request) return null;
-
-        const currentIndex = STATUS_FLOW.indexOf(request.status);
-        if (currentIndex < STATUS_FLOW.length - 1) {
-            const nextStatusValue = STATUS_FLOW[currentIndex + 1];
-            return updateRequestStatus(reference, nextStatusValue);
+        if (body instanceof FormData) {
+            options.body = body;
+            // Fetch will set correct Content-Type with boundary automatically 
+        } else if (body) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(body);
         }
 
-        return request;
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.message || `API Error: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
     }
 
     /**
-     * Format date for display
+     * Map backend snake_case model to frontend camelCase expectations
      */
+    function mapRequest(data) {
+        if (!data) return null;
+        return {
+            ...data,
+            id: data.reference,
+            contactNumber: data.contact_number,
+            gender: data.gender,
+            story: data.story,
+            additionalPhoto: data.additional_photo,
+            documents: data.documents || [],
+            createdAt: data.created_at,
+            appointmentAt: data.appointment_at,
+            statusHistory: (data.status_histories || []).map(sh => ({
+                status: sh.status,
+                timestamp: sh.created_at
+            }))
+        };
+    }
+
     function formatDate(dateString) {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
@@ -176,10 +70,8 @@
         });
     }
 
-    /**
-     * Format date and time
-     */
     function formatDateTime(dateString) {
+        if (!dateString) return '';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
@@ -190,16 +82,66 @@
         });
     }
 
-    // Public API
-    window.hairlinkRecipientModule = {
-        getRequests,
-        getRequest,
-        createRequest,
-        updateRequestStatus,
-        nextStatus,
+    const recipientModule = {
+        STATUS_FLOW,
         formatDate,
         formatDateTime,
-        STATUS_FLOW
+
+        async getRequests() {
+            const data = await apiCall('/api/requests');
+            return data.map(mapRequest);
+        },
+
+        async getRequest(reference) {
+            const data = await apiCall(`/api/requests/${reference}`);
+            return mapRequest(data);
+        },
+
+        async createRequest(payload) {
+            const formData = new FormData();
+            formData.append('reference', `REQ-${Math.random().toString(36).substr(2, 5).toUpperCase()}-${Date.now().toString().slice(-6)}`);
+            formData.append('contact_number', payload.contactNumber);
+            formData.append('gender', payload.gender);
+            formData.append('story', payload.story);
+            
+            if (payload.appointmentAt) {
+                formData.append('appointment_at', payload.appointmentAt);
+            } else {
+                formData.append('appointment_at', new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString());
+            }
+
+            if (payload.filePhoto) {
+                formData.append('additional_photo', payload.filePhoto);
+            }
+
+            if (payload.fileDocuments && payload.fileDocuments.length > 0) {
+                payload.fileDocuments.forEach(file => {
+                    formData.append('documents[]', file);
+                });
+            }
+
+            const data = await apiCall('/api/requests', 'POST', formData);
+            return mapRequest(data);
+        },
+
+        async updateRequestStatus(reference, status) {
+            if (!STATUS_FLOW.includes(status)) return null;
+            const data = await apiCall(`/api/requests/${reference}/status`, 'POST', { status });
+            return mapRequest(data);
+        },
+
+        async nextStatus(reference) {
+            const request = await this.getRequest(reference);
+            if (!request) return null;
+
+            const currentIndex = STATUS_FLOW.indexOf(request.status);
+            if (currentIndex >= 0 && currentIndex < STATUS_FLOW.length - 1) {
+                return await this.updateRequestStatus(reference, STATUS_FLOW[currentIndex + 1]);
+            }
+            return request;
+        }
     };
+
+    window.hairlinkRecipientModule = recipientModule;
 
 })(window);

@@ -10,6 +10,7 @@ const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
 
+<<<<<<< HEAD
 function buildAppUrl(path) {
     const appBase = document
         .querySelector('meta[name="app-base-url"]')
@@ -23,6 +24,15 @@ function redirectTo(path) {
     window.location.href = buildAppUrl(path);
 }
 
+=======
+<<<<<<< HEAD
+function fillDemo(userType) {
+    const emailField = document.getElementById('loginEmail');
+    const passwordField = document.getElementById('loginPassword');
+    if (emailField) emailField.value = userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local';
+    if (passwordField) passwordField.value = 'password123'; // assuming standard password for demo accounts
+=======
+>>>>>>> d2bbf6d75baffef7ffe60137c02114cb465cea0e
 function getDemoAccounts() {
     try {
         return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
@@ -126,6 +136,7 @@ function runRoleDemo(userType) {
     saveDemoAccounts(accounts);
     setCurrentUser(account);
     redirectByUserType(userType);
+>>>>>>> origin/main
 }
 
 function setMode(mode) {
@@ -146,78 +157,123 @@ if (loginBtn) {
     loginBtn.addEventListener('click', () => setMode('login'));
 }
 
+function clearErrors(formType) {
+    document.querySelectorAll(`[id^="error-${formType}-"]`).forEach(el => {
+        el.innerText = '';
+        el.style.display = 'none';
+    });
+}
+
+function showErrors(formType, errors) {
+    for (const [field, messages] of Object.entries(errors)) {
+        const errorEl = document.getElementById(`error-${formType}-${field}`);
+        if (errorEl) {
+            errorEl.innerText = messages[0];
+            errorEl.style.display = 'block';
+        }
+    }
+}
+
+function handleAjaxSubmit(form, formType) {
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors(formType);
+        
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.innerText;
+        btn.innerText = 'Processing...';
+        btn.disabled = true;
+
+        const formData = new FormData(form);
+        const url = form.getAttribute('action');
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.redirect) {
+                window.location.href = data.redirect;
+            } else if (response.status === 422 && data.errors) {
+                showErrors(formType, data.errors);
+            } else {
+                alert(data.message || 'Something went wrong, please try again later.');
+            }
+        } catch (error) {
+            console.error('Submission error', error);
+            alert('A network error occurred.');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
+}
+
 function setupRegisterFlow() {
     const registerForm = document.getElementById('registerForm');
-    if (!registerForm) return;
+    handleAjaxSubmit(registerForm, 'register');
 
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // Real-time validation loops for instant feedback
+    const passwordInput = document.getElementById('registerPassword');
+    const confirmInput = document.getElementById('registerConfirmPassword');
+    const emailInput = document.getElementById('registerEmail');
 
-        const userType = registerForm.querySelector('input[name="userType"]:checked')?.value;
-        const email = document.getElementById('registerEmail')?.value || '';
-        const password = document.getElementById('registerPassword')?.value || '';
-        const confirmPassword = document.getElementById('registerConfirmPassword')?.value || '';
-        const textInputs = registerForm.querySelectorAll('input[type="text"]');
-        const firstName = textInputs[0]?.value?.trim() || '';
-        const lastName = textInputs[1]?.value?.trim() || '';
-        const region = textInputs[2]?.value?.trim() || '';
-        const postalCode = textInputs[3]?.value?.trim() || '';
-        const age = registerForm.querySelector('input[type="number"]')?.value || '';
-        const phone = registerForm.querySelector('input[type="tel"]')?.value?.trim() || '';
-        const selects = registerForm.querySelectorAll('select');
-        const country = selects[0]?.value || '';
-        const gender = selects[1]?.value || '';
-
-        if (password !== confirmPassword) {
-            alert('Passwords do not match.');
-            return;
-        }
-
-        if (userType && email) {
-            const profile = {
-                firstName,
-                lastName,
-                fullName: `${firstName} ${lastName}`.trim(),
-                email,
-                phone,
-                age,
-                country,
-                region,
-                postalCode,
-                gender,
-                userType
-            };
-
-            const account = { email, userType, profile };
-            const accounts = getDemoAccounts();
-            const existingIndex = accounts.findIndex((item) => item.email === email);
-
-            if (existingIndex >= 0) {
-                accounts[existingIndex] = account;
+    if (passwordInput && confirmInput) {
+        const validatePassword = () => {
+            const val = passwordInput.value;
+            const errorEl = document.getElementById('error-register-password');
+            if (val.length > 0 && val.length < 8) {
+                errorEl.innerText = 'Password must be at least 8 characters.';
+                errorEl.style.display = 'block';
             } else {
-                accounts.push(account);
+                errorEl.style.display = 'none';
             }
+            validateMatch();
+        };
 
-            saveDemoAccounts(accounts);
-            setCurrentUser(account);
-        }
-
-        registerForm.classList.add('register-success');
-
-        setTimeout(() => {
-            setMode('login');
-            const loginEmail = document.getElementById('loginEmail');
-            if (loginEmail && email) {
-                loginEmail.value = email;
+        const validateMatch = () => {
+            const errorEl = document.getElementById('error-register-password_confirmation');
+            if (confirmInput.value.length > 0 && confirmInput.value !== passwordInput.value) {
+                errorEl.innerText = 'The password confirmation does not match.';
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
             }
-            registerForm.classList.remove('register-success');
-        }, 700);
-    });
+        };
+
+        passwordInput.addEventListener('input', validatePassword);
+        confirmInput.addEventListener('input', validateMatch);
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('input', () => {
+            const val = emailInput.value;
+            const errorEl = document.getElementById('error-register-email');
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (val.length > 0 && !emailRegex.test(val)) {
+                errorEl.innerText = 'Please enter a valid email address.';
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        });
+    }
 }
 
 function setupLoginFlow() {
     const loginForm = document.getElementById('loginForm');
-    if (!loginForm) return;
+    handleAjaxSubmit(loginForm, 'login');
+
+    const adminDemoButton = document.getElementById('fillAdminDemo');
+    const donorDemoButton = document.getElementById('fillDonorDemo');
+    const recipientDemoButton = document.getElementById('fillRecipientDemo');
 
     if (adminDemoButton) {
         adminDemoButton.addEventListener('click', () => {
@@ -225,26 +281,28 @@ function setupLoginFlow() {
             const passwordField = document.getElementById('loginPassword');
 
             if (emailField) {
-                emailField.value = ADMIN_DEMO_EMAIL;
+                emailField.value = 'admin@hairlink.local';
             }
 
             if (passwordField) {
-                passwordField.value = ADMIN_DEMO_PASSWORD;
+                passwordField.value = 'admin12345';
             }
         });
     }
 
     if (donorDemoButton) {
         donorDemoButton.addEventListener('click', () => {
-            runRoleDemo('donor');
+            fillDemo('donor');
         });
     }
 
     if (recipientDemoButton) {
         recipientDemoButton.addEventListener('click', () => {
-            runRoleDemo('recipient');
+            fillDemo('recipient');
         });
     }
+<<<<<<< HEAD
+=======
 
     if (staffDemoButton) {
         staffDemoButton.addEventListener('click', () => {
@@ -288,6 +346,7 @@ function setupLoginFlow() {
         // Fallback for quick frontend checks: keep using last selected role.
         redirectByUserType(storedType);
     });
+>>>>>>> origin/main
 }
 
 document.addEventListener('DOMContentLoaded', () => {

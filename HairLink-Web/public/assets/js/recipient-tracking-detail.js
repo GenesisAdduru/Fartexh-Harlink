@@ -75,30 +75,43 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Load and display request
      */
-    function loadRequest() {
+    async function loadRequest() {
         const reference = getRequestReference();
-        const request = window.hairlinkRecipientModule.getRequest(reference);
+        let request;
+        try {
+            request = await window.hairlinkRecipientModule.getRequest(reference);
+        } catch (error) {
+            console.error('Error loading request:', error);
+        }
 
         if (!request) {
-            requestReferenceDisplay.textContent = 'Request not found';
+            if (requestReferenceDisplay) requestReferenceDisplay.textContent = 'Request not found';
             return;
         }
 
-        requestReferenceDisplay.textContent = `Reference #${request.reference}`;
-        summaryReference.textContent = request.reference;
-        summaryStatus.textContent = request.status;
-        summarySubmitted.textContent = window.hairlinkRecipientModule.formatDate(request.createdAt);
-        summaryName.textContent = request.fullName;
+        if (requestReferenceDisplay) requestReferenceDisplay.textContent = `Reference #${request.reference}`;
+        if (summaryReference) summaryReference.textContent = request.reference;
+        if (summaryStatus) summaryStatus.textContent = request.status;
+        if (summarySubmitted) summarySubmitted.textContent = window.hairlinkRecipientModule.formatDate(request.createdAt);
+        if (summaryName) summaryName.textContent = request.fullName || (request.user ? request.user.name : 'Recipient');
 
         renderTimeline(request);
         renderDetails(request);
-
-        // Simulate status button
-        simulateBtn.addEventListener('click', () => {
-            window.hairlinkRecipientModule.nextStatus(reference);
-            loadRequest(); // Reload to show updated status
-        });
     }
 
+    // Initial load
     loadRequest();
+
+    // Simulate status button
+    if (simulateBtn) {
+        simulateBtn.addEventListener('click', async () => {
+            const reference = getRequestReference();
+            try {
+                await window.hairlinkRecipientModule.nextStatus(reference);
+                await loadRequest(); // Reload to show updated status
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        });
+    }
 });

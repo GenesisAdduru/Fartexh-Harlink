@@ -7,7 +7,7 @@ function escapeHtml(value) {
         .replaceAll("'", '&#39;');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const moduleApi = window.hairlinkDonorModule;
     if (!moduleApi) {
         return;
@@ -17,7 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('trackingEmpty');
     const filterInput = document.getElementById('trackingFilter');
 
-    const donations = moduleApi.getAllDonations();
+    let donations = [];
+    try {
+        donations = await moduleApi.getAllDonations();
+    } catch (error) {
+        console.error('Error fetching donations:', error);
+    }
 
     function renderRows(items) {
         if (!tableBody) {

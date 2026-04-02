@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -20,8 +20,17 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
+        'role',
         'email',
         'password',
+        'country',
+        'region',
+        'postal_code',
+        'age',
+        'gender',
+        'phone'
     ];
 
     /**
@@ -45,5 +54,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
+    }
+
+    public function hairRequests()
+    {
+        return $this->hasMany(HairRequest::class);
+    }
+
+    public function communityPosts()
+    {
+        return $this->hasMany(CommunityPost::class);
+    }
+
+    public function communityComments()
+    {
+        return $this->hasMany(CommunityComment::class);
+    }
+
+    public function likedPosts()
+    {
+        return $this->belongsToMany(CommunityPost::class, 'community_post_likes', 'user_id', 'community_post_id')->withTimestamps();
     }
 }

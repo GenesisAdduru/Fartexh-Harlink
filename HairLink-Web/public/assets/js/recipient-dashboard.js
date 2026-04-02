@@ -11,13 +11,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Set greeting
-    greetingName.textContent = 'Friend';
+    const greetingTitle = document.getElementById('greeting-title');
+    const userName = greetingTitle ? greetingTitle.dataset.name : 'Friend';
+    if (greetingTitle) {
+        greetingTitle.innerHTML = `${getGreeting()}, <span id="greeting-name">${userName}</span>!`;
+    }
     
     // Update active requests count
-    function updateActiveRequests() {
-        const requests = window.hairlinkRecipientModule.getRequests();
-        const activeCount = requests.filter(r => r.status !== 'Completed' && r.status !== 'Rejected').length;
-        activeRequestsCount.textContent = activeCount;
+    async function updateActiveRequests() {
+        try {
+            const requests = await window.hairlinkRecipientModule.getRequests();
+            const activeCount = requests.filter(r => r.status !== 'Completed' && r.status !== 'Rejected').length;
+            if (activeRequestsCount) activeRequestsCount.textContent = activeCount;
+        } catch (error) {
+            console.error('Error fetching active requests:', error);
+        }
     }
 
     updateActiveRequests();

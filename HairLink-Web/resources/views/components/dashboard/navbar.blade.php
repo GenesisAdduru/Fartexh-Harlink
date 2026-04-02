@@ -1,6 +1,6 @@
 <header class="dash-header" data-dash-header>
     <nav class="dash-nav" aria-label="Dashboard navigation">
-        <a class="dash-brand" href="{{ url('/') }}" aria-label="HairLink home">
+        <a class="dash-brand" href="{{ Auth::user()->role === 'recipient' ? route('recipient.dashboard') : route('donor.dashboard') }}" aria-label="HairLink home">
             <img src="{{ asset('assets/images/landing/pink-ribbon.png') }}" alt="Pink ribbon icon">
             <span>HairLink</span>
         </a>
@@ -11,8 +11,13 @@
             <span></span>
         </button>
 
+<<<<<<< HEAD
+        <div class="dash-links" data-dash-links>
+            <a href="{{ Auth::user()->role === 'recipient' ? route('recipient.dashboard') : route('donor.dashboard') }}">Home</a>
+=======
         <div class="dash-links {{ request()->routeIs('staff.*') ? 'dash-links-staff' : '' }} {{ request()->routeIs('admin.*') ? 'dash-links-staff' : '' }}" data-dash-links>
             <a href="{{ url('/') }}">Home</a>
+>>>>>>> origin/main
             @if(request()->routeIs('donor.*'))
                 <a href="{{ route('donor.dashboard') }}" class="{{ request()->routeIs('donor.dashboard') ? 'active' : '' }}">Overview</a>
                 <a href="{{ route('donor.donate') }}" class="{{ request()->routeIs('donor.donate') ? 'active' : '' }}">Donate Hair</a>
@@ -48,7 +53,10 @@
                 <a href="{{ route('wigmaker.dashboard') }}">Wigmaker</a>
                 <a href="{{ route('staff.dashboard') }}">Staff</a>
             @endif
-            <a href="{{ route('login') }}">Logout</a>
+            <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                @csrf
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </div>
     </nav>
 </header>
