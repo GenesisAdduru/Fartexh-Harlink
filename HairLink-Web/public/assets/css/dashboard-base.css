@@ -95,6 +95,16 @@ a {
     background: linear-gradient(135deg, var(--dash-primary), var(--dash-primary-strong));
 }
 
+.dash-links.dash-links-staff {
+    gap: 0.3rem;
+}
+
+.dash-links.dash-links-staff a {
+    padding: 0.3rem 0.56rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
 .dash-burger {
     display: none;
     width: 44px;

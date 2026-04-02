@@ -20,6 +20,7 @@ Route::get('/email/verify', function () {
     return view('pages.verify-email');
 })->middleware('auth')->name('verification.notice');
 
+<<<<<<< HEAD
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
     
@@ -90,3 +91,51 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/haircare/videos', [App\Http\Controllers\Api\HaircareController::class, 'videos']);
     });
 });
+=======
+Route::view('/recipient/dashboard', 'pages.recipient-dashboard')->name('recipient.dashboard');
+Route::view('/recipient/request', 'pages.recipient-request')->name('recipient.request');
+Route::view('/recipient/tracking', 'pages.recipient-tracking')->name('recipient.tracking');
+Route::get('/recipient/tracking/{reference}', function (string $reference) {
+    return view('pages.recipient-tracking-detail', compact('reference'));
+})->name('recipient.tracking.detail');
+Route::view('/recipient/confirmation', 'pages.recipient-confirmation')->name('recipient.confirmation');
+Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
+Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
+Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
+
+Route::get('/donor/monetary-donation', function () {
+    return view('pages.monetary-donation', ['userRole' => 'donor']);
+})->name('donor.monetary');
+
+Route::get('/recipient/monetary-donation', function () {
+    return view('pages.monetary-donation', ['userRole' => 'recipient']);
+})->name('recipient.monetary');
+
+Route::view('/wigmaker/dashboard', 'pages.wigmaker-dashboard')->name('wigmaker.dashboard');
+Route::get('/wigmaker/tasks/{taskCode}', function (string $taskCode) {
+    return view('pages.wigmaker-task-detail', compact('taskCode'));
+})->name('wigmaker.task.detail');
+
+Route::view('/staff/dashboard', 'pages.staff-dashboard')->name('staff.dashboard');
+Route::view('/staff/donor-verification', 'pages.staff-donor-verification')->name('staff.donor-verification');
+Route::view('/staff/recipient-verification', 'pages.staff-recipient-verification')->name('staff.recipient-verification');
+Route::get('/staff/verification/{type}/{reference}', function (string $type, string $reference) {
+    return view('pages.staff-verification-detail', compact('type', 'reference'));
+})->whereIn('type', ['donor', 'recipient'])->name('staff.verification.detail');
+Route::view('/staff/realtime-tracking', 'pages.staff-realtime-tracking')->name('staff.realtime-tracking');
+Route::view('/staff/delivery-batches', 'pages.staff-delivery-batches')->name('staff.delivery-batches');
+Route::view('/staff/hair-stock', 'pages.staff-hair-stock')->name('staff.hair-stock');
+Route::view('/staff/wig-stock', 'pages.staff-wig-stock')->name('staff.wig-stock');
+Route::view('/staff/recipient-matching-list', 'pages.staff-recipient-matching-list')->name('staff.recipient-matching-list');
+Route::view('/staff/rule-matching', 'pages.staff-rule-matching')->name('staff.rule-matching');
+
+Route::view('/admin/dashboard', 'pages.admin-dashboard')->name('admin.dashboard');
+Route::view('/admin/verification', 'pages.admin-verification')->name('admin.verification');
+Route::view('/admin/matching', 'pages.admin-matching')->name('admin.matching');
+Route::view('/admin/operations', 'pages.admin-operations')->name('admin.operations');
+Route::view('/admin/inventory', 'pages.admin-inventory')->name('admin.inventory');
+Route::view('/admin/users', 'pages.admin-users')->name('admin.users');
+Route::view('/admin/events', 'pages.admin-events')->name('admin.events');
+Route::view('/admin/community', 'pages.admin-community')->name('admin.community');
+Route::view('/admin/reports', 'pages.admin-reports')->name('admin.reports');
+>>>>>>> origin/main

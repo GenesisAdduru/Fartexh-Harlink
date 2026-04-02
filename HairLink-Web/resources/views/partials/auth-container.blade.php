@@ -36,6 +36,10 @@
                     <button type="button" class="demo-fill-btn" id="fillDonorDemo">Open Donor Demo</button>
                     <button type="button" class="demo-fill-btn" id="fillRecipientDemo">Open Recipient Demo</button>
                 </div>
+                <div class="demo-switch-row">
+                    <button type="button" class="demo-fill-btn" id="fillStaffDemo">Open Staff Demo</button>
+                    <button type="button" class="demo-fill-btn" id="fillWigmakerDemo">Open Wigmaker Demo</button>
+                </div>
             </div>
 
             <div class="input-wrapper">

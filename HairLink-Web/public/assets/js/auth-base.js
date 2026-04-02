@@ -4,15 +4,123 @@ const loginBtn = document.querySelector('.login-btn');
 const adminDemoButton = document.getElementById('fillAdminDemo');
 const donorDemoButton = document.getElementById('fillDonorDemo');
 const recipientDemoButton = document.getElementById('fillRecipientDemo');
+const staffDemoButton = document.getElementById('fillStaffDemo');
+const wigmakerDemoButton = document.getElementById('fillWigmakerDemo');
 const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
 
+<<<<<<< HEAD
 function fillDemo(userType) {
     const emailField = document.getElementById('loginEmail');
     const passwordField = document.getElementById('loginPassword');
     if (emailField) emailField.value = userType === 'recipient' ? 'recipient.demo@hairlink.local' : 'donor.demo@hairlink.local';
     if (passwordField) passwordField.value = 'password123'; // assuming standard password for demo accounts
+=======
+function getDemoAccounts() {
+    try {
+        return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
+    } catch (_error) {
+        return [];
+    }
+}
+
+function saveDemoAccounts(accounts) {
+    localStorage.setItem(DEMO_ACCOUNTS_KEY, JSON.stringify(accounts));
+}
+
+function setCurrentUser(account) {
+    if (!account) return;
+
+    localStorage.setItem('hairlinkUserType', account.userType || 'donor');
+    localStorage.setItem('hairlinkUserEmail', account.email || '');
+    localStorage.setItem('hairlinkUserProfile', JSON.stringify(account.profile || {}));
+}
+
+function redirectByUserType(userType) {
+    if (userType === 'staff') {
+        alert('Login successful. Redirecting to staff dashboard.');
+        window.location.href = '/staff/dashboard';
+        return;
+    }
+
+    if (userType === 'wigmaker') {
+        alert('Login successful. Redirecting to wigmaker dashboard.');
+        window.location.href = '/wigmaker/dashboard';
+        return;
+    }
+
+    if (userType === 'admin') {
+        alert('Login successful. Redirecting to admin dashboard.');
+        window.location.href = '/admin/dashboard';
+        return;
+    }
+
+    if (userType === 'recipient') {
+        alert('Login successful. Redirecting to recipient dashboard.');
+        window.location.href = '/recipient/dashboard';
+        return;
+    }
+
+    alert('Login successful. Redirecting to donor dashboard.');
+    window.location.href = '/donor/dashboard';
+}
+
+function runRoleDemo(userType) {
+    const account = {
+        email: userType === 'recipient'
+            ? 'recipient.demo@hairlink.local'
+            : userType === 'staff'
+                ? 'staff.demo@hairlink.local'
+                : userType === 'wigmaker'
+                    ? 'wigmaker.demo@hairlink.local'
+                    : 'donor.demo@hairlink.local',
+        userType,
+        profile: {
+            firstName: userType === 'recipient'
+                ? 'Recipient'
+                : userType === 'staff'
+                    ? 'Staff'
+                    : userType === 'wigmaker'
+                        ? 'Wigmaker'
+                        : 'Donor',
+            lastName: 'Demo',
+            fullName: userType === 'recipient'
+                ? 'Recipient Demo'
+                : userType === 'staff'
+                    ? 'Staff Demo'
+                    : userType === 'wigmaker'
+                        ? 'Wigmaker Demo'
+                        : 'Donor Demo',
+            email: userType === 'recipient'
+                ? 'recipient.demo@hairlink.local'
+                : userType === 'staff'
+                    ? 'staff.demo@hairlink.local'
+                    : userType === 'wigmaker'
+                        ? 'wigmaker.demo@hairlink.local'
+                        : 'donor.demo@hairlink.local',
+            phone: '0917-000-0000',
+            age: '22',
+            country: 'ph',
+            region: 'Metro Manila',
+            postalCode: '1000',
+            gender: 'prefer_not_say',
+            userType
+        }
+    };
+
+    const accounts = getDemoAccounts();
+    const existingIndex = accounts.findIndex((item) => item.email === account.email);
+    if (existingIndex >= 0) {
+        accounts[existingIndex] = account;
+    } else {
+        accounts.push(account);
+    }
+
+    saveDemoAccounts(accounts);
+    setCurrentUser(account);
+    redirectByUserType(userType);
+>>>>>>> origin/main
 }
 
 function setMode(mode) {
@@ -177,6 +285,52 @@ function setupLoginFlow() {
             fillDemo('recipient');
         });
     }
+<<<<<<< HEAD
+=======
+
+    if (staffDemoButton) {
+        staffDemoButton.addEventListener('click', () => {
+            runRoleDemo('staff');
+        });
+    }
+
+    if (wigmakerDemoButton) {
+        wigmakerDemoButton.addEventListener('click', () => {
+            runRoleDemo('wigmaker');
+        });
+    }
+
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('loginEmail')?.value || '';
+        const password = document.getElementById('loginPassword')?.value || '';
+        const storedType = localStorage.getItem('hairlinkUserType') || 'donor';
+        const accounts = getDemoAccounts();
+
+        if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
+            alert('Admin demo login successful. Redirecting to admin dashboard.');
+            window.location.href = '/admin/dashboard';
+            return;
+        }
+
+        if (!email) {
+            redirectByUserType(storedType);
+            return;
+        }
+
+        const matchedAccount = accounts.find((item) => item.email === email);
+
+        if (matchedAccount) {
+            setCurrentUser(matchedAccount);
+            redirectByUserType(matchedAccount.userType);
+            return;
+        }
+
+        // Fallback for quick frontend checks: keep using last selected role.
+        redirectByUserType(storedType);
+    });
+>>>>>>> origin/main
 }
 
 document.addEventListener('DOMContentLoaded', () => {

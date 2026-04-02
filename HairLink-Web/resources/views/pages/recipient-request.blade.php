@@ -138,6 +138,41 @@
             </div>
         </div>
 
+        <!-- Wig Preferences Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="section-icon">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 2.76 1.57 5.15 3.87 6.4L8 20h8l-.87-4.6C17.43 14.15 19 11.76 19 9c0-3.87-3.13-7-7-7zm-1 14h2v2h-2zm0-3h2v1h-2zm1-9c2.21 0 4 1.79 4 4 0 1.61-.96 3.01-2.35 3.65L13 13h-2l-.65-2.35C8.96 10.01 8 8.61 8 7c0-2.21 1.79-4 4-4z"/>
+                </svg>
+                <h3>Wig Preferences</h3>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="wig-length">Preferred Wig Length <span class="required">*</span></label>
+                    <select id="wig-length" name="wigLength" required>
+                        <option value="">Select Wig Length</option>
+                        <option value="short">Short</option>
+                        <option value="medium">Medium</option>
+                        <option value="long">Long</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="wig-color">Preferred Hair Color <span class="required">*</span></label>
+                    <select id="wig-color" name="wigColor" required>
+                        <option value="">Select Hair Color</option>
+                        <option value="black">Black</option>
+                        <option value="dark-brown">Dark Brown</option>
+                        <option value="light-brown">Light Brown</option>
+                        <option value="blonde">Blonde</option>
+                        <option value="auburn">Auburn / Red</option>
+                        <option value="gray">Gray / White</option>
+                        <option value="no-preference">No Preference</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <!-- Form Actions -->
         <div class="form-actions">
             <button type="submit" class="soft-btn">Submit Request</button>

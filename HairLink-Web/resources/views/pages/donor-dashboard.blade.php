@@ -89,19 +89,13 @@
                 <article class="reward-card">
                     <h3>Donate Hair</h3>
                     <p>Give confidence to someone in need by donating your hair.</p>
-                    <a class="soft-btn" href="{{ route('donor.donate') }}">Donate</a>
+                    <a class="soft-btn" href="{{ route('donor.donate') }}">Donate Hair</a>
                 </article>
 
                 <article class="reward-card">
-                    <h3>Request Hair</h3>
-                    <p>Apply for a free wig with your health documentation.</p>
-                    <button class="soft-btn" type="button" disabled>Request</button>
-                </article>
-
-                <article class="reward-card">
-                    <h3>Donation Tracking</h3>
-                    <p>Review status updates and open your latest donor certificate.</p>
-                    <a class="soft-btn" href="{{ route('donor.tracking') }}">Open Tracking</a>
+                    <h3>Monetary Donation</h3>
+                    <p>Support the cause by making a financial contribution to HairLink.</p>
+                    <a class="soft-btn" href="{{ route('donor.monetary') }}">Support Now</a>
                 </article>
             </div>
         </section>
