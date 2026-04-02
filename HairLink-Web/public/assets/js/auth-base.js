@@ -10,6 +10,19 @@ const ADMIN_DEMO_EMAIL = 'admin@hairlink.local';
 const ADMIN_DEMO_PASSWORD = 'admin12345';
 const DEMO_ACCOUNTS_KEY = 'hairlinkDemoAccountsV1';
 
+function buildAppUrl(path) {
+    const appBase = document
+        .querySelector('meta[name="app-base-url"]')
+        ?.getAttribute('content')
+        ?.replace(/\/$/, '') || window.location.origin;
+
+    return `${appBase}/${String(path || '').replace(/^\/+/, '')}`;
+}
+
+function redirectTo(path) {
+    window.location.href = buildAppUrl(path);
+}
+
 function getDemoAccounts() {
     try {
         return JSON.parse(localStorage.getItem(DEMO_ACCOUNTS_KEY) || '[]');
@@ -33,30 +46,30 @@ function setCurrentUser(account) {
 function redirectByUserType(userType) {
     if (userType === 'staff') {
         alert('Login successful. Redirecting to staff dashboard.');
-        window.location.href = '/staff/dashboard';
+        redirectTo('staff/dashboard');
         return;
     }
 
     if (userType === 'wigmaker') {
         alert('Login successful. Redirecting to wigmaker dashboard.');
-        window.location.href = '/wigmaker/dashboard';
+        redirectTo('wigmaker/dashboard');
         return;
     }
 
     if (userType === 'admin') {
         alert('Login successful. Redirecting to admin dashboard.');
-        window.location.href = '/admin/dashboard';
+        redirectTo('admin/dashboard');
         return;
     }
 
     if (userType === 'recipient') {
         alert('Login successful. Redirecting to recipient dashboard.');
-        window.location.href = '/recipient/dashboard';
+        redirectTo('recipient/dashboard');
         return;
     }
 
     alert('Login successful. Redirecting to donor dashboard.');
-    window.location.href = '/donor/dashboard';
+    redirectTo('donor/dashboard');
 }
 
 function runRoleDemo(userType) {
@@ -255,7 +268,7 @@ function setupLoginFlow() {
 
         if (email === ADMIN_DEMO_EMAIL && password === ADMIN_DEMO_PASSWORD) {
             alert('Admin demo login successful. Redirecting to admin dashboard.');
-            window.location.href = '/admin/dashboard';
+            redirectTo('admin/dashboard');
             return;
         }
 
