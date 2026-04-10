@@ -74,7 +74,7 @@
                                 @endif
                             </td>
                             <td>
-                                <button class="ghost-btn" data-user-toggle type="button">
+                                <button class="ghost-btn" data-user-toggle data-user-id="{{ $user->id }}" type="button">
                                     {{ $user->is_active ? 'Deactivate' : 'Activate' }}
                                 </button>
                             </td>
@@ -87,7 +87,7 @@
         <div class="admin-pager">
             {{ $users->links() }}
         </div>
-    </article>le>
+    </article>
 
 </section>
 @endsection

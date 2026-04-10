@@ -55,7 +55,7 @@ class DonationController extends Controller
     public function updateStatus(Request $request, $reference)
     {
         $user = Auth::user();
-        $query = Donation::where('reference_number', $reference);
+        $query = Donation::where('reference', $reference);
         
         // If not staff/admin, they can only update their own (for legacy simulation, though we removed those buttons)
         if (!in_array($user->role, ['staff', 'admin'])) {

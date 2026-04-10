@@ -17,19 +17,19 @@
     <div class="inv-summary-grid">
         <div class="inv-summary-item">
             <span>Staff Active</span>
-            <strong>6</strong>
+            <strong>{{ $staffCount }}</strong>
         </div>
         <div class="inv-summary-item">
             <span>Wigmaker Tasks</span>
-            <strong>14</strong>
+            <strong>{{ $wigTasksCount }}</strong>
         </div>
         <div class="inv-summary-item">
-            <span>In Transit Batches</span>
-            <strong>2</strong>
+            <span>In Progress Tasks</span>
+            <strong>{{ $transitCount }}</strong>
         </div>
         <div class="inv-summary-item">
             <span>Completed Wigs</span>
-            <strong>39</strong>
+            <strong>{{ $completedCount }}</strong>
         </div>
     </div>
 
@@ -48,31 +48,31 @@
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
                             <strong>Verification Desk</strong>
-                            <span class="admin-chip approved">Stable</span>
+                            <span class="admin-chip {{ ($pendingDonationsCount + $pendingRequestsCount) > 0 ? 'pending' : 'approved' }}">{{ ($pendingDonationsCount + $pendingRequestsCount) > 0 ? 'Needs Review' : 'Stable' }}</span>
                         </div>
-                        <p>13 total queue items, 5 still waiting for admin review.</p>
+                        <p>{{ $pendingDonationsCount + $pendingRequestsCount }} queue items still waiting for review.</p>
                     </div>
                     <a class="admin-row-link" href="{{ route('admin.verification') }}">Open</a>
                 </article>
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>Recipient Release</strong>
-                            <span class="admin-chip pending">Monitor</span>
+                            <strong>Pending Donations</strong>
+                            <span class="admin-chip {{ $pendingDonationsCount > 0 ? 'pending' : 'approved' }}">{{ $pendingDonationsCount > 0 ? 'Active' : 'Clear' }}</span>
                         </div>
-                        <p>3 allocations require final release scheduling this week.</p>
+                        <p>{{ $pendingDonationsCount }} donation submissions awaiting verification.</p>
                     </div>
-                    <a class="admin-row-link" href="{{ route('admin.matching') }}">Open</a>
+                    <a class="admin-row-link" href="{{ route('staff.donor-verification') }}">Open</a>
                 </article>
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>Inventory Intake</strong>
-                            <span class="admin-chip available">On Track</span>
+                            <strong>Pending Requests</strong>
+                            <span class="admin-chip {{ $pendingRequestsCount > 0 ? 'pending' : 'approved' }}">{{ $pendingRequestsCount > 0 ? 'Active' : 'Clear' }}</span>
                         </div>
-                        <p>Hair stock updates are synchronized with approved donor records.</p>
+                        <p>{{ $pendingRequestsCount }} recipient requests awaiting validation.</p>
                     </div>
-                    <a class="admin-row-link" href="{{ route('admin.inventory') }}">Open</a>
+                    <a class="admin-row-link" href="{{ route('staff.recipient-verification') }}">Open</a>
                 </article>
             </div>
         </article>
@@ -83,39 +83,39 @@
                     <p class="admin-section-kicker">Wigmaker Network</p>
                     <h2><i class='bx bx-cog'></i> Production Snapshot</h2>
                 </div>
-                <span>Batch progress and delivery status</span>
+                <span>Task progress and completion status</span>
             </div>
 
             <div class="admin-queue-list">
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>Batch 004 · Reyes Wig Studio</strong>
-                            <span class="admin-chip transit">In Transit</span>
+                            <strong>Total Wig Tasks</strong>
+                            <span class="admin-chip {{ $wigTasksCount > 0 ? 'pending' : 'approved' }}">{{ $wigTasksCount }} tasks</span>
                         </div>
-                        <p>3 wigs dispatched Mar 25, expected arrival Mar 29.</p>
+                        <p>{{ $activeWigTasks }} active tasks across {{ $activeWigmakers }} wigmaker(s).</p>
                     </div>
-                    <a class="admin-row-link" href="{{ route('staff.delivery-batches') }}">Track</a>
+                    <a class="admin-row-link" href="{{ route('admin.inventory') }}">View</a>
                 </article>
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>A104 · Hand-finishing</strong>
-                            <span class="admin-chip pending">In Progress</span>
+                            <strong>Completed Wigs</strong>
+                            <span class="admin-chip arrived">{{ $completedCount }} ready</span>
                         </div>
-                        <p>Quality review remarks submitted by staff for next stage update.</p>
+                        <p>Wigs completed and available for recipient allocation.</p>
+                    </div>
+                    <a class="admin-row-link" href="{{ route('staff.wig-stock') }}">View</a>
+                </article>
+                <article class="admin-queue-item">
+                    <div class="admin-queue-main">
+                        <div class="admin-queue-title-row">
+                            <strong>In Progress</strong>
+                            <span class="admin-chip transit">{{ $transitCount }} active</span>
+                        </div>
+                        <p>Wig production tasks currently being worked on by wigmakers.</p>
                     </div>
                     <a class="admin-row-link" href="{{ route('staff.realtime-tracking') }}">Track</a>
-                </article>
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>Batch 003 · Reyes Wig Studio</strong>
-                            <span class="admin-chip arrived">Delivered</span>
-                        </div>
-                        <p>4 wigs stocked and available for recipient allocation.</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.inventory') }}">Track</a>
                 </article>
             </div>
         </article>
@@ -140,15 +140,34 @@
                         <th>Area</th>
                         <th>Owner</th>
                         <th>Current Load</th>
-                        <th>Latest Update</th>
-                        <th>Attention</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-admin-search-row><td>Donor Verification</td><td>Staff Desk</td><td>8 pending</td><td>2 approvals in last hour</td><td><span class="admin-chip pending">Review Queue</span></td></tr>
-                    <tr data-admin-search-row><td>Recipient Verification</td><td>Staff Desk</td><td>5 pending</td><td>1 case awaiting medical recheck</td><td><span class="admin-chip pending">Needs Review</span></td></tr>
-                    <tr data-admin-search-row><td>Wigmaker Tracking</td><td>Reyes Wig Studio</td><td>14 active tasks</td><td>A104 flagged during finishing</td><td><span class="admin-chip rejected">Issue Flag</span></td></tr>
-                    <tr data-admin-search-row><td>Delivery Batches</td><td>Dispatch Team</td><td>2 in transit</td><td>Batch 004 due today</td><td><span class="admin-chip transit">Monitor</span></td></tr>
+                    <tr data-admin-search-row>
+                        <td>Donor Verification</td>
+                        <td>Staff Desk</td>
+                        <td>{{ $pendingDonationsCount }} pending</td>
+                        <td><span class="admin-chip {{ $pendingDonationsCount > 0 ? 'pending' : 'approved' }}">{{ $pendingDonationsCount > 0 ? 'Review Queue' : 'Clear' }}</span></td>
+                    </tr>
+                    <tr data-admin-search-row>
+                        <td>Recipient Verification</td>
+                        <td>Staff Desk</td>
+                        <td>{{ $pendingRequestsCount }} pending</td>
+                        <td><span class="admin-chip {{ $pendingRequestsCount > 0 ? 'pending' : 'approved' }}">{{ $pendingRequestsCount > 0 ? 'Needs Review' : 'Clear' }}</span></td>
+                    </tr>
+                    <tr data-admin-search-row>
+                        <td>Wigmaker Tracking</td>
+                        <td>Wigmaker Network</td>
+                        <td>{{ $activeWigTasks }} active tasks</td>
+                        <td><span class="admin-chip {{ $activeWigTasks > 0 ? 'transit' : 'approved' }}">{{ $activeWigTasks > 0 ? 'Active' : 'Idle' }}</span></td>
+                    </tr>
+                    <tr data-admin-search-row>
+                        <td>Completed Wigs</td>
+                        <td>Production</td>
+                        <td>{{ $completedCount }} completed</td>
+                        <td><span class="admin-chip arrived">Stock Ready</span></td>
+                    </tr>
                 </tbody>
             </table>
         </div>

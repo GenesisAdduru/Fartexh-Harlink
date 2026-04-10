@@ -27,12 +27,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderPoints(0);
 
     // Load real points from DB then animate bar
+    // Load real points from SSR
     try {
-        const moduleApi = window.hairlinkDonorModule;
-        if (moduleApi) {
-            const donations = await moduleApi.getAllDonations();
-            // 10 pts per hair donation
-            points = donations.length * 10;
+        if (greetingText && greetingText.dataset.points) {
+            points = parseInt(greetingText.dataset.points, 10);
         }
     } catch (error) {
         console.warn('Could not load donation points:', error);

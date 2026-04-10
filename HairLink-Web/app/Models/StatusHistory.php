@@ -12,7 +12,8 @@ class StatusHistory extends Model
     protected $fillable = [
         'trackable_id',
         'trackable_type',
-        'status'
+        'status',
+        'notes',
     ];
 
     public function trackable()

@@ -30,7 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'postal_code',
         'age',
         'gender',
-        'phone'
+        'phone',
+        'is_active',
     ];
 
     /**
@@ -53,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -79,5 +81,32 @@ class User extends Authenticatable implements MustVerifyEmail
     public function likedPosts()
     {
         return $this->belongsToMany(CommunityPost::class, 'community_post_likes', 'user_id', 'community_post_id')->withTimestamps();
+    }
+
+    /**
+     * Send email verification — wrapped in try/catch so registration
+     * never hangs or crashes even if SMTP is unreachable.
+     */
+    public function sendEmailVerificationNotification()
+    {
+        try {
+            $otp = rand(100000, 999999);
+            \Illuminate\Support\Facades\Cache::put('email_otp_' . $this->id, $otp, now()->addMinutes(10));
+            $this->notify(new \App\Notifications\VerifyEmailOtp($otp));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Email verification could not be sent: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send password reset notification — handled gracefully.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        try {
+            $this->notify(new \Illuminate\Auth\Notifications\ResetPassword($token));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Password reset email could not be sent: ' . $e->getMessage());
+        }
     }
 }

@@ -15,14 +15,19 @@ class WigmakerController extends Controller
             return redirect('/login');
         }
 
-        $tasks = WigProduction::where('wigmaker_id', $user->id)->get();
+        $tasks = WigProduction::with('donation')->where('wigmaker_id', $user->id)->get();
         return view('pages.wigmaker-dashboard', compact('tasks'));
     }
 
     public function taskDetail($taskCode)
     {
-        $task = WigProduction::with('donation')->where('task_code', $taskCode)->firstOrFail();
-        return view('pages.wigmaker-task-detail', compact('task'));
+        $task = WigProduction::with(['donation', 'statusHistories'])
+            ->where('task_code', $taskCode)
+            ->firstOrFail();
+
+        $histories = $task->statusHistories()->orderBy('created_at', 'desc')->get();
+
+        return view('pages.wigmaker-task-detail', compact('task', 'histories'));
     }
 
     public function updateTask(Request $request, $taskCode)
@@ -31,14 +36,17 @@ class WigmakerController extends Controller
         
         $validated = $request->validate([
             'status' => 'required|string|in:assigned,processing,completed',
-            'notes' => 'required|string',
+            'notes' => 'nullable|string',
         ]);
 
         $task->update([
             'status' => $validated['status'],
         ]);
 
-        // In a real app, we'd save the notes to a related history table here
+        $task->statusHistories()->create([
+            'status' => $validated['status'],
+            'notes' => $validated['notes'],
+        ]);
 
         return response()->json(['message' => 'Task updated successfully', 'success' => true]);
     }

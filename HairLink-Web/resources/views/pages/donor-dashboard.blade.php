@@ -9,7 +9,7 @@
 @section('content')
     <section class="section-wrap reveal">
         <div class="section-title-block">
-            <h1 id="greetingText" data-name="{{ auth()->user()->first_name ?? auth()->user()->name }}">Welcome Back!</h1>
+            <h1 id="greetingText" data-name="{{ auth()->user()->first_name ?? auth()->user()->name }}" data-points="{{ $points ?? 0 }}">Welcome Back!</h1>
             <p>Your impact snapshots and reward progress are shown below.</p>
         </div>
 

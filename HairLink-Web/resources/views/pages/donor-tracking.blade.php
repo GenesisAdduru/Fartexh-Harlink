@@ -30,12 +30,29 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="trackingTableBody"></tbody>
+                    <tbody id="trackingTableBody">
+                        @forelse($donations as $donation)
+                        <tr>
+                            <td><strong>{{ $donation->reference }}</strong></td>
+                            <td>{{ $donation->created_at->format('Y-m-d') }}</td>
+                            <td><span class="status-pill status-{{ strtolower($donation->status) }}">{{ $donation->status }}</span></td>
+                            <td>{{ $donation->hair_length ?? 'N/A' }}</td>
+                            <td>
+                                @if(in_array($donation->status, ['Verified', 'Completed']))
+                                    <a href="{{ route('donor.certificate') }}" class="link-text">View Certificate</a>
+                                @else
+                                    <span style="color:#ada9b0;">N/A</span>
+                                @endif
+                            </td>
+                            <td><a href="{{ route('donor.tracking.detail', $donation->reference) }}" class="ghost-btn">Details</a></td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" style="text-align:center; padding: 2rem; color: #7a687f;">No donation records yet. Submit your first hair donation to begin tracking.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
                 </table>
-            </div>
-
-            <div class="empty-state" id="trackingEmpty" hidden>
-                No donation records yet. Submit your first hair donation to begin tracking.
             </div>
         </article>
     </section>
@@ -43,5 +60,4 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/donor-module.js') }}" defer></script>
-    <script src="{{ asset('assets/js/donor-tracking.js') }}" defer></script>
 @endpush

@@ -72,7 +72,15 @@ class HairRequestController extends Controller
 
     public function updateStatus(Request $request, $reference)
     {
-        $hairRequest = Auth::user()->hairRequests()->where('reference', $reference)->firstOrFail();
+        $user = Auth::user();
+        $query = HairRequest::where('reference', $reference);
+        
+        // If not staff/admin, they can only update their own
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $hairRequest = $query->firstOrFail();
         
         $validated = $request->validate([
             'status' => 'required|string'

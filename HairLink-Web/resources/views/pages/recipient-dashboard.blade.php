@@ -19,7 +19,7 @@
         </div>
         <div class="card-content">
             <h3>Active Requests</h3>
-            <p id="active-requests-count">0</p>
+            <p id="active-requests-count">{{ $requests->whereNotIn('status', ['Completed', 'Rejected'])->count() }}</p>
         </div>
     </div>
 

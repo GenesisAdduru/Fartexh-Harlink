@@ -36,7 +36,7 @@ class StaffController extends Controller
         if ($type === 'donor') {
             $record = Donation::with('user')->where('reference', $reference)->firstOrFail();
         } else {
-            $record = HairRequest::with('user')->where('reference_number', $reference)->firstOrFail();
+            $record = HairRequest::with('user')->where('reference', $reference)->firstOrFail();
         }
 
         return view('pages.staff-verification-detail', compact('type', 'reference', 'record'));
@@ -53,11 +53,17 @@ class StaffController extends Controller
         if ($type === 'donor') {
             $record = Donation::where('reference', $reference)->firstOrFail();
         } else {
-            $record = HairRequest::where('reference_number', $reference)->firstOrFail();
+            $record = HairRequest::where('reference', $reference)->firstOrFail();
         }
 
         $record->update([
             'status' => $validated['status'],
+        ]);
+
+        // Save the status change to history
+        $record->statusHistories()->create([
+            'status' => $validated['status'],
+            'notes' => $validated['remarks'],
         ]);
 
         return response()->json(['message' => 'Status updated successfully', 'success' => true]);
@@ -74,7 +80,27 @@ class StaffController extends Controller
 
     public function deliveryBatches()
     {
-        return view('pages.staff-delivery-batches');
+        $batches = WigProduction::with(['wigmaker', 'donation'])
+            ->whereIn('status', ['completed', 'processing'])
+            ->orderBy('updated_at', 'desc')
+            ->get()
+            ->groupBy(function ($task) {
+                // Group by wigmaker and month for batch grouping
+                return $task->wigmaker_id . '-' . $task->created_at->format('Y-m');
+            })
+            ->map(function ($group, $key) {
+                static $batchNum = 0;
+                $batchNum++;
+                return (object) [
+                    'batch_number' => $batchNum,
+                    'date' => $group->first()->updated_at,
+                    'count' => $group->count(),
+                    'status' => $group->every(fn($t) => $t->status === 'completed') ? 'Completed' : 'In Process',
+                ];
+            })
+            ->values();
+
+        return view('pages.staff-delivery-batches', compact('batches'));
     }
 
     public function hairStock()
@@ -118,7 +144,15 @@ class StaffController extends Controller
 
     public function recipientMatchingList()
     {
-        return view('pages.staff-recipient-matching-list');
+        $requests = HairRequest::with('user')
+            ->whereIn('status', ['Validated', 'Matched', 'In Transit', 'Arrived'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        // Get completed wigs to find assigned wig codes
+        $wigs = WigProduction::where('status', 'completed')->get()->keyBy('id');
+
+        return view('pages.staff-recipient-matching-list', compact('requests', 'wigs'));
     }
 
     public function ruleMatching()
@@ -134,3 +168,4 @@ class StaffController extends Controller
         return view('pages.staff-rule-matching', compact('recipients', 'wigs'));
     }
 }
+

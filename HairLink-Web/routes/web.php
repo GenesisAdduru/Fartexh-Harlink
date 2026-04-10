@@ -14,6 +14,12 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::view('/register', 'pages.register')->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Password Reset Routes
+Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 Route::post('/api/partnership', [App\Http\Controllers\PartnershipController::class, 'store'])->name('partnership.store');
 
 
@@ -22,49 +28,51 @@ Route::get('/email/verify', function () {
     return view('pages.verify-email');
 })->middleware('auth')->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', function (Request $request, $id, $hash) {
-    $user = \App\Models\User::findOrFail($id);
+Route::post('/email/verify-otp', function (Request $request) {
+    $request->validate([
+        'otp' => 'required|digits:6',
+    ]);
 
-    if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        abort(403, 'Invalid verification link.');
+    $user = $request->user();
+    $cachedOtp = \Illuminate\Support\Facades\Cache::get('email_otp_' . $user->id);
+
+    if (!$cachedOtp || $cachedOtp != $request->otp) {
+        return back()->with('error', 'Invalid or expired OTP. Please try again or request a new one.');
     }
 
-    if (! $user->hasVerifiedEmail()) {
+    if (!$user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
         event(new \Illuminate\Auth\Events\Verified($user));
+        \Illuminate\Support\Facades\Cache::forget('email_otp_' . $user->id);
     }
-    
-    return redirect('/login')->with('success', 'Email verified successfully! You may now sign in.');
-})->middleware(['signed'])->name('verification.verify');
+
+    return redirect(route($user->role . '.dashboard'))->with('success', 'Email verified successfully!');
+})->middleware(['auth'])->name('verification.verify.otp');
 
 Route::post('/email/verification-notification', function (Request $request) {
     if ($request->expectsJson()) {
         $request->user()->sendEmailVerificationNotification();
-        return response()->json(['message' => 'Verification link sent!']);
+        return response()->json(['message' => 'OTP sent!']);
     }
-    
+
     $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
+    return back()->with('message', 'OTP sent! Please check your email.');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-Route::middleware(['auth'])->group(function () {
-    Route::view('/donor/dashboard', 'pages.donor-dashboard')->name('donor.dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/donor/dashboard', [App\Http\Controllers\DonorController::class, 'dashboard'])->name('donor.dashboard');
     Route::view('/donor/donate', 'pages.donate-dashboard')->name('donor.donate');
-    Route::view('/donor/tracking', 'pages.donor-tracking')->name('donor.tracking');
-    Route::get('/donor/tracking/{reference}', function (string $reference) {
-        return view('pages.donor-tracking-detail', compact('reference'));
-    })->name('donor.tracking.detail');
+    Route::get('/donor/tracking', [App\Http\Controllers\DonorController::class, 'tracking'])->name('donor.tracking');
+    Route::get('/donor/tracking/{reference}', [App\Http\Controllers\DonorController::class, 'trackingDetail'])->name('donor.tracking.detail');
     Route::view('/donor/confirmation', 'pages.donor-confirmation')->name('donor.confirmation');
-    Route::view('/donor/certificate', 'pages.donor-certificate')->name('donor.certificate');
+    Route::get('/donor/certificate', [App\Http\Controllers\DonorController::class, 'certificate'])->name('donor.certificate');
     Route::view('/donor/profile', 'pages.donor-profile')->name('donor.profile');
     Route::view('/donor/community', 'pages.donor-community')->name('donor.community');
 
-    Route::view('/recipient/dashboard', 'pages.recipient-dashboard')->name('recipient.dashboard');
+    Route::get('/recipient/dashboard', [App\Http\Controllers\RecipientController::class, 'dashboard'])->name('recipient.dashboard');
     Route::view('/recipient/request', 'pages.recipient-request')->name('recipient.request');
-    Route::view('/recipient/tracking', 'pages.recipient-tracking')->name('recipient.tracking');
-    Route::get('/recipient/tracking/{reference}', function (string $reference) {
-        return view('pages.recipient-tracking-detail', compact('reference'));
-    })->name('recipient.tracking.detail');
+    Route::get('/recipient/tracking', [App\Http\Controllers\RecipientController::class, 'tracking'])->name('recipient.tracking');
+    Route::get('/recipient/tracking/{reference}', [App\Http\Controllers\RecipientController::class, 'trackingDetail'])->name('recipient.tracking.detail');
     Route::view('/recipient/confirmation', 'pages.recipient-confirmation')->name('recipient.confirmation');
     Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
     Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
@@ -104,10 +112,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/donor/monetary-donation', function () {
         return view('pages.monetary-donation', ['userRole' => 'donor']);
     })->name('donor.monetary');
+    Route::post('/donor/monetary-donation', [\App\Http\Controllers\MonetaryDonationController::class, 'store'])->name('donor.monetary.store');
 
     Route::get('/recipient/monetary-donation', function () {
         return view('pages.monetary-donation', ['userRole' => 'recipient']);
     })->name('recipient.monetary');
+    Route::post('/recipient/monetary-donation', [\App\Http\Controllers\MonetaryDonationController::class, 'store'])->name('recipient.monetary.store');
 
     Route::get('/wigmaker/dashboard', [App\Http\Controllers\WigmakerController::class, 'dashboard'])->name('wigmaker.dashboard');
     Route::get('/wigmaker/tasks/{taskCode}', [App\Http\Controllers\WigmakerController::class, 'taskDetail'])->name('wigmaker.task.detail');
@@ -131,7 +141,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/operations', [App\Http\Controllers\AdminController::class, 'operations'])->name('admin.operations');
     Route::get('/admin/inventory', [App\Http\Controllers\AdminController::class, 'inventory'])->name('admin.inventory');
     Route::get('/admin/users', [App\Http\Controllers\AdminController::class, 'users'])->name('admin.users');
+    Route::post('/admin/users/{id}/toggle', [App\Http\Controllers\AdminController::class, 'toggleUser'])->name('admin.users.toggle');
     Route::get('/admin/events', [App\Http\Controllers\AdminController::class, 'events'])->name('admin.events');
+    Route::post('/admin/events', [App\Http\Controllers\AdminController::class, 'storeEvent'])->name('admin.events.store');
     Route::get('/admin/community', [App\Http\Controllers\AdminController::class, 'community'])->name('admin.community');
+    Route::delete('/admin/community/{id}', [App\Http\Controllers\AdminController::class, 'deleteCommunityPost'])->name('admin.community.delete');
     Route::get('/admin/reports', [App\Http\Controllers\AdminController::class, 'reports'])->name('admin.reports');
 });

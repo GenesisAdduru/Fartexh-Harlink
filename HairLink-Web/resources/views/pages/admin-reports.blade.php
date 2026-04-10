@@ -18,20 +18,20 @@
     {{-- KPI overview --}}
     <div class="inv-summary-grid">
         <div class="inv-summary-item">
-            <span>Total Donations</span>
-            <strong>13.5K</strong>
+            <span>Monetary Total</span>
+            <strong>₱{{ number_format($monetaryTotal, 0) }}</strong>
         </div>
         <div class="inv-summary-item">
             <span>Hair Received</span>
-            <strong>79</strong>
+            <strong>{{ $donationsCount }}</strong>
         </div>
         <div class="inv-summary-item">
-            <span>Wigs Distributed</span>
-            <strong>34</strong>
+            <span>Wigs Produced</span>
+            <strong>{{ $wigsDistributed }}</strong>
         </div>
         <div class="inv-summary-item">
             <span>Recipients Served</span>
-            <strong>28</strong>
+            <strong>{{ $recipientsServed }}</strong>
         </div>
     </div>
 
@@ -39,14 +39,14 @@
     <article class="admin-card">
         <div class="admin-card-head">
             <h2><i class='bx bx-file-blank'></i> Downloadable Reports</h2>
-            <span>Demo – click to simulate download</span>
+            <span>Click to simulate download</span>
         </div>
 
         <div class="report-grid">
             <div class="report-card">
                 <h3><i class='bx bx-donate-heart'></i> Monetary Donations</h3>
                 <p>Summary of all monetary donations by period, donor, and amount.</p>
-                <span class="report-stat">₱13.5K</span>
+                <span class="report-stat">₱{{ number_format($monetaryTotal, 0) }}</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download CSV
                 </button>
@@ -54,7 +54,7 @@
             <div class="report-card">
                 <h3><i class='bx bx-transfer-alt'></i> Hair Donation Report</h3>
                 <p>All hair submissions with length, color, and approval status breakdown.</p>
-                <span class="report-stat">79 records</span>
+                <span class="report-stat">{{ $donationsCount }} records</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download CSV
                 </button>
@@ -62,7 +62,7 @@
             <div class="report-card">
                 <h3><i class='bx bx-package'></i> Wig Production Report</h3>
                 <p>Batch-level production progress and wig completion rates by wigmaker.</p>
-                <span class="report-stat">4 batches</span>
+                <span class="report-stat">{{ $wigsDistributed }} wigs</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download PDF
                 </button>
@@ -70,7 +70,7 @@
             <div class="report-card">
                 <h3><i class='bx bx-user-check'></i> Recipient Distribution Report</h3>
                 <p>Matched and distributed wigs per recipient, with wig size and color data.</p>
-                <span class="report-stat">34 wigs</span>
+                <span class="report-stat">{{ $recipientsServed }} served</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download PDF
                 </button>
@@ -78,7 +78,7 @@
             <div class="report-card">
                 <h3><i class='bx bx-calendar-event'></i> Events Report</h3>
                 <p>Attendance and participation data across all HairLink events in the period.</p>
-                <span class="report-stat">6 events</span>
+                <span class="report-stat">{{ $eventsCount }} events</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download CSV
                 </button>
@@ -86,7 +86,7 @@
             <div class="report-card">
                 <h3><i class='bx bx-group'></i> User Activity Report</h3>
                 <p>New signups, active sessions, and role distribution for all users.</p>
-                <span class="report-stat">89 users</span>
+                <span class="report-stat">{{ $usersCount }} users</span>
                 <button class="report-download-btn" data-report-dl type="button">
                     <i class='bx bx-download'></i> Download CSV
                 </button>
@@ -98,7 +98,7 @@
     <article class="admin-card">
         <div class="admin-card-head">
             <h2><i class='bx bx-bar-chart-alt-2'></i> Monthly Activity Breakdown</h2>
-            <span>Jan – Mar 2026</span>
+            <span>Last 3 months</span>
         </div>
 
         <div class="table-wrap">
@@ -114,30 +114,18 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($monthlyData as $month)
                     <tr>
-                        <td>January 2026</td>
-                        <td>₱4,200</td>
-                        <td>28</td>
-                        <td>6</td>
-                        <td>4</td>
-                        <td>12</td>
+                        <td>{{ $month->label }}</td>
+                        <td>₱{{ number_format($month->monetary, 0) }}</td>
+                        <td>{{ $month->hair_submissions }}</td>
+                        <td>{{ $month->wigs_produced }}</td>
+                        <td>{{ $month->wigs_distributed }}</td>
+                        <td>{{ $month->new_users }}</td>
                     </tr>
-                    <tr>
-                        <td>February 2026</td>
-                        <td>₱5,150</td>
-                        <td>34</td>
-                        <td>9</td>
-                        <td>8</td>
-                        <td>18</td>
-                    </tr>
-                    <tr>
-                        <td>March 2026</td>
-                        <td>₱4,150</td>
-                        <td>17</td>
-                        <td>4</td>
-                        <td>5</td>
-                        <td>9</td>
-                    </tr>
+                    @empty
+                    <tr><td colspan="6" style="text-align:center;color:#7a687f;">No data available.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

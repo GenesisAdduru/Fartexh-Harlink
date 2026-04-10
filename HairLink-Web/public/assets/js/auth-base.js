@@ -106,7 +106,7 @@ function handleAjaxSubmit(form, formType) {
             // Delay hiding the loader slightly in case of instant redirect
             setTimeout(() => {
                 if (loader) loader.style.display = 'none';
-            }, 300);
+            }, 50);
         }
     });
 }

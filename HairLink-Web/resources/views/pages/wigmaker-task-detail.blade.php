@@ -99,18 +99,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($histories as $history)
                         <tr>
-                            <td>2026-03-25 09:10</td>
-                            <td>Wigmaker - Ana P.</td>
-                            <td><span class="status-pill status-in-progress">In Progress</span></td>
-                            <td>Cap base prepared and initial stitch line completed.</td>
+                            <td>{{ $history->created_at->format('Y-m-d H:i') }}</td>
+                            <td>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</td>
+                            <td><span class="status-pill status-{{ $history->status }}">{{ str_replace('-', ' ', ucfirst($history->status)) }}</span></td>
+                            <td>{{ $history->notes ?? '—' }}</td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>2026-03-30 08:35</td>
-                            <td>Staff - Maria D.</td>
-                            <td><span class="status-pill status-queued">Queued</span></td>
-                            <td>Task assigned after verification and inventory release approval.</td>
+                            <td colspan="4" style="text-align:center;color:#7a687f;">No update history yet.</td>
                         </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

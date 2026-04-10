@@ -24,27 +24,26 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Matched Wig</th>
+                        <th>Reference</th>
                         <th>Status</th>
-                        <th>Pick-up Date</th>
+                        <th>Date Updated</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr data-search-row><td>Marie Santos</td><td>A101</td><td>Arrived</td><td>04/13/24</td></tr>
-                    <tr data-search-row><td>Patrixia Lopez</td><td>A105</td><td>Arrived</td><td>04/13/24</td></tr>
-                    <tr data-search-row><td>Grace Dela Fuente</td><td>A106</td><td>Arrived</td><td>04/13/24</td></tr>
-                    <tr data-search-row><td>Xyliana Nogrado</td><td>A102</td><td>Arrived</td><td>04/18/24</td></tr>
-                    <tr data-search-row><td>Chanell Alonzo</td><td>A109</td><td>In Transit</td><td>05/18/24</td></tr>
-                    <tr data-search-row><td>Princess Tan</td><td>A108</td><td>In Transit</td><td>05/18/25</td></tr>
+                    @forelse($requests as $request)
+                    <tr data-search-row>
+                        <td>{{ $request->user->first_name ?? '' }} {{ $request->user->last_name ?? '' }}</td>
+                        <td>{{ $request->reference }}</td>
+                        <td>{{ $request->status }}</td>
+                        <td>{{ $request->updated_at->format('m/d/y') }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center;color:#7a687f;">No matched recipients found.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <div class="pager">
-            <button class="active" type="button">1</button>
-            <button type="button">2</button>
-            <button type="button">3</button>
-            <button type="button">4</button>
         </div>
     </article>
 </section>

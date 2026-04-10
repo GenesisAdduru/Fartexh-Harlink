@@ -21,7 +21,7 @@
             <h2><i class='bx bx-calendar-plus'></i> Add New Event</h2>
         </div>
 
-        <form data-event-form style="display:grid;gap:0.7rem;">
+        <form data-event-form id="eventForm" data-action-url="{{ route('admin.events.store') }}" style="display:grid;gap:0.7rem;">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;">
                 <div>
                     <label style="font-size:0.8rem;font-weight:700;color:#3b2e43;display:block;margin-bottom:0.25rem;">Event Title *</label>
@@ -55,40 +55,24 @@
     <article class="admin-card">
         <div class="admin-card-head">
             <h2><i class='bx bx-calendar-event'></i> Upcoming Events</h2>
-            <span>3 scheduled</span>
+            <span>{{ count($upcomingEvents) }} scheduled</span>
         </div>
 
         <div class="event-list">
+            @forelse($upcomingEvents as $event)
             <div class="event-item">
                 <div class="event-date-block">
-                    <span class="event-day">05</span>
-                    <span class="event-month">Apr</span>
+                    <span class="event-day">{{ \Carbon\Carbon::parse($event->date)->format('d') }}</span>
+                    <span class="event-month">{{ \Carbon\Carbon::parse($event->date)->format('M') }}</span>
                 </div>
                 <div class="event-body">
-                    <h4>Hair Donation Drive — Quezon City</h4>
-                    <p>Walk-in donations accepted at YMCA QC Branch. All lengths welcome.</p>
+                    <h4>{{ $event->title }}</h4>
+                    <p>{{ $event->description }} - {{ $event->location }}</p>
                 </div>
             </div>
-            <div class="event-item">
-                <div class="event-date-block">
-                    <span class="event-day">18</span>
-                    <span class="event-month">Apr</span>
-                </div>
-                <div class="event-body">
-                    <h4>Recipient Orientation Seminar</h4>
-                    <p>Online orientation for new recipient applicants. Register through the portal.</p>
-                </div>
-            </div>
-            <div class="event-item">
-                <div class="event-date-block">
-                    <span class="event-day">03</span>
-                    <span class="event-month">May</span>
-                </div>
-                <div class="event-body">
-                    <h4>Wigmaker Community Workshop</h4>
-                    <p>Hands-on training and networking session for HairLink partner wigmakers.</p>
-                </div>
-            </div>
+            @empty
+            <p>No upcoming events.</p>
+            @endforelse
         </div>
     </article>
 
@@ -111,27 +95,17 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($pastEvents as $event)
                     <tr>
-                        <td>Year-End Hair Drive 2025</td>
-                        <td>Dec 20, 2025</td>
-                        <td>Manila Main Branch</td>
-                        <td>64</td>
-                        <td><span class="admin-chip arrived">Completed</span></td>
+                        <td>{{ $event->title }}</td>
+                        <td>{{ \Carbon\Carbon::parse($event->date)->format('M d, Y') }}</td>
+                        <td>{{ $event->location }}</td>
+                        <td>{{ $event->participants_count }}</td>
+                        <td><span class="admin-chip arrived">{{ $event->status }}</span></td>
                     </tr>
-                    <tr>
-                        <td>Wig Distribution Day</td>
-                        <td>Jan 10, 2026</td>
-                        <td>Makati Community Center</td>
-                        <td>12</td>
-                        <td><span class="admin-chip arrived">Completed</span></td>
-                    </tr>
-                    <tr>
-                        <td>Online Donation Webinar</td>
-                        <td>Feb 14, 2026</td>
-                        <td>Virtual — Zoom</td>
-                        <td>89</td>
-                        <td><span class="admin-chip arrived">Completed</span></td>
-                    </tr>
+                    @empty
+                    <tr><td colspan="5" style="text-align:center;">No past events.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

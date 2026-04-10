@@ -65,7 +65,7 @@
             </div>
 
             <div class="forgot-link">
-                <a href="#">Forgot Password?</a>
+                <a href="{{ route('password.request') }}">Forgot Password?</a>
             </div>
 
             <button type="submit" class="btn">Login</button>

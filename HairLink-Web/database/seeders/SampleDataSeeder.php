@@ -14,20 +14,46 @@ class SampleDataSeeder extends Seeder
     public function run(): void
     {
         // Demo Admin
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@hairlink.local'],
             [
                 'name' => 'Admin User',
                 'first_name' => 'Admin',
                 'last_name' => 'User',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('admin12345'),
                 'role' => 'admin',
                 'email_verified_at' => now(),
             ]
         );
 
+        // Staff demo
+        User::updateOrCreate(
+            ['email' => 'staff.demo@hairlink.local'],
+            [
+                'name' => 'Staff Demo',
+                'first_name' => 'Staff',
+                'last_name' => 'Demo',
+                'password' => Hash::make('password123'),
+                'role' => 'staff',
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // Wigmaker demo
+        User::updateOrCreate(
+            ['email' => 'wigmaker.demo@hairlink.local'],
+            [
+                'name' => 'Wigmaker Demo',
+                'first_name' => 'Wigmaker',
+                'last_name' => 'Demo',
+                'password' => Hash::make('password123'),
+                'role' => 'wigmaker',
+                'email_verified_at' => now(),
+            ]
+        );
+
         // Demo Donor
-        $donor = User::firstOrCreate(
+        $donor = User::updateOrCreate(
             ['email' => 'donor.demo@hairlink.local'],
             [
                 'name' => 'Donor Demo',
@@ -40,7 +66,7 @@ class SampleDataSeeder extends Seeder
         );
 
         // Demo Recipient
-        $recipient = User::firstOrCreate(
+        $recipient = User::updateOrCreate(
             ['email' => 'recipient.demo@hairlink.local'],
             [
                 'name' => 'Recipient Demo',
@@ -77,11 +103,11 @@ class SampleDataSeeder extends Seeder
         ];
 
         foreach ($donations as $donationData) {
-            $donation = $user->donations()->firstOrCreate(
-                ['reference' => $donationData['reference']],
-                $donationData
-            );
-            
+            $existing = $user->donations()->where('reference', $donationData['reference'])->first();
+            if ($existing) continue;
+
+            $donation = $user->donations()->create($donationData);
+
             // Add status history
             if ($donation->status === 'Completed') {
                 $statusFlow = ['Submitted', 'Received', 'Validated', 'Processing', 'Completed'];
@@ -118,11 +144,11 @@ class SampleDataSeeder extends Seeder
         ];
 
         foreach ($requests as $requestData) {
-            $hairRequest = $user->hairRequests()->firstOrCreate(
-                ['reference' => $requestData['reference']],
-                $requestData
-            );
-            
+            $existing = $user->hairRequests()->where('reference', $requestData['reference'])->first();
+            if ($existing) continue;
+
+            $hairRequest = $user->hairRequests()->create($requestData);
+
             // Add status history
             if ($hairRequest->status === 'Matched') {
                 $statusFlow = ['Submitted', 'Under Review', 'Matched'];
@@ -152,16 +178,19 @@ class SampleDataSeeder extends Seeder
             ]
         ];
 
-        foreach ($posts as $postData) {
-            $post = $user->communityPosts()->create($postData);
-            
-            // Add a comment to the first post
-            if ($postData['likes'] === 12) {
-                $post->comments()->create([
-                    'user_id' => $user->id,
-                    'content' => 'This is so inspiring! Wishing you all the best on your journey.',
-                    'created_at' => now()->subDays(1)
-                ]);
+        // Only seed community posts if the user has none yet
+        if ($user->communityPosts()->count() === 0) {
+            foreach ($posts as $postData) {
+                $post = $user->communityPosts()->create($postData);
+
+                // Add a comment to the first post
+                if ($postData['likes'] === 12) {
+                    $post->comments()->create([
+                        'user_id' => $user->id,
+                        'content' => 'This is so inspiring! Wishing you all the best on your journey.',
+                        'created_at' => now()->subDays(1)
+                    ]);
+                }
             }
         }
     }

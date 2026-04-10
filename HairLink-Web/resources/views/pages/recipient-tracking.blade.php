@@ -27,13 +27,23 @@
                 </tr>
             </thead>
             <tbody id="requests-list">
+                @forelse($requests as $request)
+                <tr>
+                    <td><strong>{{ $request->reference }}</strong></td>
+                    <td>{{ $request->created_at->format('Y-m-d') }}</td>
+                    <td><span class="status-pill status-{{ strtolower($request->status) }}">{{ $request->status }}</span></td>
+                    <td>{{ $request->name ?? 'N/A' }}</td>
+                    <td><a href="{{ route('recipient.tracking.detail', $request->reference) }}" class="ghost-btn">Details</a></td>
+                </tr>
+                @empty
                 <tr class="empty-state">
                     <td colspan="5">No requests found. <a href="{{ route('recipient.request') }}">Submit your first request</a></td>
                 </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
 
-<script src="{{ asset('assets/js/recipient-tracking.js') }}"></script>
+
 @endsection

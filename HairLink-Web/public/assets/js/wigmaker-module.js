@@ -34,6 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (row) {
                 row.dataset.taskStatus = select.value;
+                const taskCodeEl = row.querySelector('strong');
+                if (taskCodeEl) {
+                    const taskCode = taskCodeEl.textContent.trim();
+                    fetch(`/wigmaker/tasks/${taskCode}/update`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: select.value,
+                            notes: 'Status fast-updated via dashboard quick-select.'
+                        })
+                    }).catch(console.error);
+                }
             }
 
             if (note) {
@@ -106,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     setTimeout(() => {
                         window.location.href = '/wigmaker/dashboard';
-                    }, 1500);
+                    }, 200);
                 } else {
                     alert(result.message || 'Error saving update.');
                 }

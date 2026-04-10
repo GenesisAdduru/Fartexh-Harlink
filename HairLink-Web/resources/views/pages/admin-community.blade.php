@@ -15,15 +15,21 @@
         <p style="color:#665772;font-size:0.88rem;margin-top:0.25rem;">Moderate posts, approve threads, and pin important announcements.</p>
     </header>
 
+    @if (session('success'))
+        <div style="background:#e9f9f0; color:#1a7a47; border:1px solid #a8e5c4; padding:0.8rem 1.2rem; border-radius:8px; margin-bottom:1.5rem; font-size:0.9rem; font-weight:600;">
+            {{ session('success') }}
+        </div>
+    @endif
+
     {{-- Summary --}}
     <div class="inv-summary-grid">
         <div class="inv-summary-item">
             <span>Total Posts</span>
-            <strong>214</strong>
+            <strong>{{ count($posts) }}</strong>
         </div>
         <div class="inv-summary-item">
-            <span>Pending Review</span>
-            <strong>7</strong>
+            <span>Recent Posts (7 days)</span>
+            <strong>{{ $recentCount }}</strong>
         </div>
         <div class="inv-summary-item">
             <span>Pinned</span>
@@ -31,7 +37,7 @@
         </div>
         <div class="inv-summary-item">
             <span>Flagged</span>
-            <strong>2</strong>
+            <strong>0</strong>
         </div>
     </div>
 
@@ -54,36 +60,22 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @forelse($posts->take(5) as $post)
                     <tr>
-                        <td>Sofia Tan</td>
-                        <td><span class="role-badge donor">Donor</span></td>
-                        <td>My experience donating hair for the first time</td>
-                        <td>Mar 28, 2026</td>
-                        <td style="display:flex;gap:0.4rem;padding:0.52rem 0.75rem;">
-                            <button class="soft-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Approve</button>
-                            <button class="ghost-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Reject</button>
+                        <td>{{ $post->user ? $post->user->name : 'Anonymous' }}</td>
+                        <td><span class="role-badge donor">{{ $post->user ? ucfirst($post->user->role) : 'User' }}</span></td>
+                        <td>{{ Str::limit($post->content, 40) }}</td>
+                        <td>{{ $post->created_at->format('M d, Y') }}</td>
+                            <form action="{{ route('admin.community.delete', $post->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this community post?');" style="margin:0;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="ghost-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem; color: #d81b60;" type="submit">Delete</button>
+                            </form>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Linda Cruz</td>
-                        <td><span class="role-badge recipient">Recipient</span></td>
-                        <td>Grateful for my new wig — thank you HairLink</td>
-                        <td>Mar 27, 2026</td>
-                        <td style="display:flex;gap:0.4rem;padding:0.52rem 0.75rem;">
-                            <button class="soft-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Approve</button>
-                            <button class="ghost-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Reject</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Anonymous</td>
-                        <td><span class="role-badge donor">Donor</span></td>
-                        <td>Questions about hair length requirements</td>
-                        <td>Mar 26, 2026</td>
-                        <td style="display:flex;gap:0.4rem;padding:0.52rem 0.75rem;">
-                            <button class="soft-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Approve</button>
-                            <button class="ghost-btn" style="font-size:0.75rem;padding:0.25rem 0.6rem;" type="button">Reject</button>
-                        </td>
-                    </tr>
+                    @empty
+                    <tr><td colspan="5" style="text-align:center;">No recent posts.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = verificationForm.dataset.actionUrl.includes('/donor/') 
                             ? '/staff/donor-verification' 
                             : '/staff/recipient-verification';
-                    }, 1500);
+                    }, 200);
                 } else {
                     alert(data.message || 'Error updating status');
                 }

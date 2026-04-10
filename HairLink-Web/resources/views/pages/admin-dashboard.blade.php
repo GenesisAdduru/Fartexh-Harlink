@@ -25,7 +25,7 @@
             <div class="admin-hero-summary">
                 <div>
                     <strong>Next priority</strong>
-                    <span>5 records awaiting review</span>
+                    <span>{{ $pendingVerifications }} records awaiting review</span>
                 </div>
                 <a class="admin-quick-btn admin-quick-btn-primary" href="{{ route('admin.verification') }}">
                     <i class='bx bx-right-arrow-alt'></i> Open Review Queue
@@ -109,63 +109,41 @@
 
             <div class="admin-focus-summary">
                 <div class="admin-mini-stat">
-                    <strong>68</strong>
+                    <strong>{{ $approvedDonations }}</strong>
                     <span>Approved</span>
                 </div>
                 <div class="admin-mini-stat">
-                    <strong>8</strong>
+                    <strong>{{ $pendingDonationsCount }}</strong>
                     <span>Pending</span>
                 </div>
                 <div class="admin-mini-stat">
-                    <strong>3</strong>
+                    <strong>{{ $rejectedDonations }}</strong>
                     <span>Rejected</span>
                 </div>
             </div>
 
             <div class="admin-queue-list">
+                @forelse($recentDonations as $donation)
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>HD-0001 · Maria Santos</strong>
-                            <span class="admin-chip approved">Approved</span>
+                            <strong>{{ $donation->reference }} · {{ $donation->user->first_name ?? '' }} {{ $donation->user->last_name ?? '' }}</strong>
+                            @php
+                                $chipClass = match($donation->status) {
+                                    'Completed' => 'approved',
+                                    'Rejected' => 'rejected',
+                                    default => 'pending',
+                                };
+                            @endphp
+                            <span class="admin-chip {{ $chipClass }}">{{ $donation->status }}</span>
                         </div>
-                        <p>Long hair · Black · Submitted Mar 28, 2026</p>
+                        <p>{{ $donation->hair_length }} hair · {{ $donation->hair_color }} · Submitted {{ $donation->created_at->format('M d, Y') }}</p>
                     </div>
                     <a class="admin-row-link" href="{{ route('admin.verification') }}">Review</a>
                 </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>HD-0003 · Linda Cruz</strong>
-                            <span class="admin-chip pending">Pending</span>
-                        </div>
-                        <p>Short hair · Light · Needs final validation</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.verification') }}">Review</a>
-                </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>HD-0004 · Ana Reyes</strong>
-                            <span class="admin-chip approved">Approved</span>
-                        </div>
-                        <p>Long hair · Brown · Stock-ready after intake</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.verification') }}">Review</a>
-                </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>HD-0005 · Roberto Lim</strong>
-                            <span class="admin-chip rejected">Rejected</span>
-                        </div>
-                        <p>Medium hair · Black · Rejected due to quality mismatch</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.verification') }}">Review</a>
-                </article>
+                @empty
+                <p style="color:#7a687f;padding:0.5rem 0;">No donor submissions yet.</p>
+                @endforelse
             </div>
         </article>
 
@@ -180,63 +158,41 @@
 
             <div class="admin-focus-summary">
                 <div class="admin-mini-stat">
-                    <strong>21</strong>
+                    <strong>{{ $approvedRequests }}</strong>
                     <span>Approved</span>
                 </div>
                 <div class="admin-mini-stat">
-                    <strong>5</strong>
+                    <strong>{{ $pendingRequestsCount }}</strong>
                     <span>Pending</span>
                 </div>
                 <div class="admin-mini-stat">
-                    <strong>5</strong>
+                    <strong>{{ $needsMatchRequests }}</strong>
                     <span>Needs Match</span>
                 </div>
             </div>
 
             <div class="admin-queue-list">
+                @forelse($recentRequests as $request)
                 <article class="admin-queue-item">
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
-                            <strong>RR-0001 · Ana Reyes</strong>
-                            <span class="admin-chip approved">Approved</span>
+                            <strong>{{ $request->reference }} · {{ $request->user->first_name ?? '' }} {{ $request->user->last_name ?? '' }}</strong>
+                            @php
+                                $chipClass = match($request->status) {
+                                    'Validated' => 'approved',
+                                    'Rejected' => 'rejected',
+                                    default => 'pending',
+                                };
+                            @endphp
+                            <span class="admin-chip {{ $chipClass }}">{{ $request->status }}</span>
                         </div>
-                        <p>Medium wig · Black · Ready for matching workflow</p>
+                        <p>Request submitted {{ $request->created_at->format('M d, Y') }}</p>
                     </div>
                     <a class="admin-row-link" href="{{ route('admin.matching') }}">Review</a>
                 </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>RR-0002 · Linda Cruz</strong>
-                            <span class="admin-chip pending">Pending</span>
-                        </div>
-                        <p>Short wig · Brown · Waiting for admin approval</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.matching') }}">Review</a>
-                </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>RR-0003 · Carmen Torres</strong>
-                            <span class="admin-chip approved">Approved</span>
-                        </div>
-                        <p>Long wig · Black · Waiting for stock allocation</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.matching') }}">Review</a>
-                </article>
-
-                <article class="admin-queue-item">
-                    <div class="admin-queue-main">
-                        <div class="admin-queue-title-row">
-                            <strong>RR-0004 · Sofia Tan</strong>
-                            <span class="admin-chip pending">Pending</span>
-                        </div>
-                        <p>Medium wig · Light · Medical documents under checking</p>
-                    </div>
-                    <a class="admin-row-link" href="{{ route('admin.matching') }}">Review</a>
-                </article>
+                @empty
+                <p style="color:#7a687f;padding:0.5rem 0;">No recipient requests yet.</p>
+                @endforelse
             </div>
         </article>
     </section>
@@ -331,24 +287,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($monetaryDonations as $md)
                         <tr>
-                            <td>Maria Santos</td>
-                            <td>Mar 28, 2026 · 09:14 AM</td>
-                            <td>m.santos@email.com</td>
-                            <td>₱500.00</td>
+                            <td>{{ $md->name }}</td>
+                            <td>{{ $md->created_at->format('M d, Y · h:i A') }}</td>
+                            <td>{{ $md->email }}</td>
+                            <td>₱{{ number_format($md->amount, 2) }}</td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>Jose Dela Cruz</td>
-                            <td>Mar 27, 2026 · 03:42 PM</td>
-                            <td>jdelacruz@mail.com</td>
-                            <td>₱1,000.00</td>
+                            <td colspan="4" style="text-align:center;color:#7a687f;">No monetary donations recorded.</td>
                         </tr>
-                        <tr>
-                            <td>Ana Reyes</td>
-                            <td>Mar 27, 2026 · 11:05 AM</td>
-                            <td>ana.reyes@gmail.com</td>
-                            <td>₱250.00</td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

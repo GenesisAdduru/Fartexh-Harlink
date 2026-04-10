@@ -11,6 +11,11 @@
     function q(sel, ctx) { return (ctx || document).querySelector(sel); }
     function qa(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
 
+    function getCsrf() {
+        const meta = q('meta[name="csrf-token"]');
+        return meta ? meta.content : '';
+    }
+
     function showToast(msg, type) {
         const existing = q('[data-admin-toast]');
         if (existing) existing.remove();
@@ -29,8 +34,8 @@
                 : 'background:#fff0f0;color:#b52424;border:1px solid #f5bebe'
         ].join(';');
         document.body.appendChild(toast);
-        setTimeout(() => { toast.style.opacity = '0'; }, 2400);
-        setTimeout(() => toast.remove(), 2750);
+        setTimeout(() => { toast.style.opacity = '0'; }, 800);
+        setTimeout(() => toast.remove(), 1000);
     }
 
     /* ---- Table search ------------------------------------- */
@@ -75,14 +80,38 @@
 
     /* ---- User status toggle ------------------------------- */
     qa('[data-user-toggle]').forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', async function () {
             const row    = btn.closest('tr');
             const chip   = q('[data-user-chip]', row);
             const name   = q('[data-user-name]', row)?.textContent.trim() ?? 'this user';
+            const userId = btn.dataset.userId;
             const isActive = chip?.dataset.userChip === 'active';
             const action = isActive ? 'deactivate' : 'activate';
 
             if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} account for ${name}?`)) return;
+
+            if (userId) {
+                try {
+                    const response = await fetch(`/admin/users/${userId}/toggle`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrf(),
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ action: action })
+                    });
+
+                    if (!response.ok) {
+                        showToast('Failed to update user status.', 'err');
+                        return;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    showToast('Network error.', 'err');
+                    return;
+                }
+            }
 
             if (isActive) {
                 chip.textContent = 'Inactive';
@@ -102,12 +131,64 @@
     /* ---- Event form save ---------------------------------- */
     const eventForm = q('[data-event-form]');
     if (eventForm) {
-        eventForm.addEventListener('submit', function (e) {
+        eventForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             const title = (q('[name="event_title"]', eventForm)?.value ?? '').trim();
+            const date = (q('[name="event_date"]', eventForm)?.value ?? '').trim();
             if (!title) { showToast('Event title is required.', 'err'); return; }
-            showToast('Event saved (demo).', 'ok');
-            eventForm.reset();
+            if (!date) { showToast('Event date is required.', 'err'); return; }
+
+            const url = eventForm.dataset.actionUrl;
+            if (!url) {
+                showToast('Event saved (demo).', 'ok');
+                eventForm.reset();
+                return;
+            }
+
+            const formData = new FormData(eventForm);
+            const data = {
+                event_title: formData.get('event_title'),
+                event_date: formData.get('event_date'),
+                event_description: formData.get('event_description') || '',
+                event_location: formData.get('event_location') || '',
+            };
+
+            const submitBtn = eventForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': getCsrf(),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message || 'Event created successfully.', 'ok');
+                    eventForm.reset();
+                    setTimeout(() => window.location.reload(), 200);
+                } else {
+                    const errors = result.errors ? Object.values(result.errors).flat().join(', ') : (result.message || 'Validation failed.');
+                    showToast(errors, 'err');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Network error saving event.', 'err');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save Event';
+                }
+            }
         });
     }
 

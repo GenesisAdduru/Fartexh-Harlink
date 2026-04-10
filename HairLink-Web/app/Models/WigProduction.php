@@ -13,6 +13,7 @@ class WigProduction extends Model
         'task_code',
         'wigmaker_id',
         'donation_id',
+        'hair_request_id',
         'target_length',
         'target_color',
         'status',
@@ -27,5 +28,15 @@ class WigProduction extends Model
     public function donation()
     {
         return $this->belongsTo(Donation::class);
+    }
+
+    public function hairRequest()
+    {
+        return $this->belongsTo(HairRequest::class);
+    }
+
+    public function statusHistories()
+    {
+        return $this->morphMany(StatusHistory::class, 'trackable');
     }
 }

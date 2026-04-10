@@ -86,13 +86,62 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Form submit ──
     const form = document.getElementById('monetary-form');
     if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            alert('Thank you for your monetary donation! We will verify your submission shortly.');
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Processing...';
+            submitBtn.disabled = true;
+
+            const rNum = amountNumber ? parseFloat(amountNumber.value.replace(/,/g, '')) : 0;
+            const bName = document.getElementById('billing-name').value;
+            const currencyVal = document.getElementById('currency').value || 'PHP';
+            const payMethod = document.querySelector('.tab-btn.active') ? document.querySelector('.tab-btn.active').dataset.tab : 'bank';
+
+            const formData = new FormData();
+            formData.append('amount', rNum);
+            formData.append('name', bName);
+            formData.append('currency', currencyVal);
+            formData.append('payment_method', payMethod);
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if(csrfToken) {
+                formData.append('_token', csrfToken.getAttribute('content'));
+            }
+
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : ''
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Thank you! Your donation has been received. Reference: ' + data.reference);
+                    form.reset();
+                    if(amountNumber) amountNumber.value = '';
+                    if(fileList) fileList.innerHTML = '';
+                    pills.forEach(p => p.classList.remove('active'));
+                } else {
+                    alert('Error processing donation. Please try again.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('A network error occurred.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
     }
 });
