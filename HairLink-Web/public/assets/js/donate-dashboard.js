@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (submitBtn) submitBtn.disabled = true;
 
         try {
+            const photoFile = hairPhoto.files?.[0];
+
             const payload = {
                 fullName: (document.getElementById('fullName')?.value || '').trim(),
                 email: (document.getElementById('email')?.value || '').trim(),
@@ -48,7 +50,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 hairColor: (document.getElementById('hairColor')?.value || '').trim(),
                 treatedHair: Boolean(document.getElementById('treatedHair')?.checked),
                 address: (document.getElementById('address')?.value || '').trim(),
-                reason: (document.getElementById('reason')?.value || '').trim()
+                reason: (document.getElementById('reason')?.value || '').trim(),
+                photoFront: photoFile
             };
 
             const donation = await moduleApi.createDonation(payload);

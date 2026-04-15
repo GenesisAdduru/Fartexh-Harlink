@@ -21,6 +21,10 @@ Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name(
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 Route::post('/api/partnership', [App\Http\Controllers\PartnershipController::class, 'store'])->name('partnership.store');
+Route::get('/dashboard', function () {
+    $role = Illuminate\Support\Facades\Auth::user()->role;
+    return redirect()->route($role . '.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 
 // Email Verification Routes

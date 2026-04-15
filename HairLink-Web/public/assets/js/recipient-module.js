@@ -53,6 +53,8 @@
             documents: data.documents || [],
             createdAt: data.created_at,
             appointmentAt: data.appointment_at,
+            wigLength: data.wig_length,
+            wigColor: data.wig_color,
             statusHistory: (data.status_histories || []).map(sh => ({
                 status: sh.status,
                 timestamp: sh.created_at
@@ -104,10 +106,27 @@
             formData.append('gender', payload.gender);
             formData.append('story', payload.story);
             
+            if (payload.wigLength) {
+                formData.append('wig_length', payload.wigLength);
+            }
+            if (payload.wigColor) {
+                formData.append('wig_color', payload.wigColor);
+            }
+
             if (payload.appointmentAt) {
                 formData.append('appointment_at', payload.appointmentAt);
             } else {
                 formData.append('appointment_at', new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString());
+            }
+
+            if (payload.medicalCertificate) {
+                formData.append('medical_certificate', payload.medicalCertificate);
+            }
+            if (payload.diagnosisPhoto) {
+                formData.append('diagnosis_photo', payload.diagnosisPhoto);
+            }
+            if (payload.recipientPhoto) {
+                formData.append('recipient_photo', payload.recipientPhoto);
             }
 
             if (payload.filePhoto) {

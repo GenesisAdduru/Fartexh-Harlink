@@ -22,28 +22,31 @@ class HairRequestController extends Controller
             'contact_number' => 'nullable|string',
             'gender' => 'nullable|string',
             'story' => 'nullable|string',
+            'medical_certificate' => 'nullable|file|max:10240',
+            'diagnosis_photo' => 'nullable|image|max:10240',
+            'recipient_photo' => 'nullable|image|max:10240',
             'additional_photo' => 'nullable|image|max:10240',
             'documents.*' => 'nullable|file|max:10240',
             'appointment_at' => 'nullable|date',
             'notes' => 'nullable|string',
+            'wig_length' => 'nullable|string',
+            'wig_color' => 'nullable|string',
         ]);
 
-        if ($request->hasFile('additional_photo')) {
-            $path = $request->file('additional_photo')->store('requests/photos', 'public');
-            $validated['additional_photo'] = $path;
+        if ($request->hasFile('medical_certificate')) {
+            $validated['medical_certificate'] = $request->file('medical_certificate')->store('requests/verification', 'public');
         }
 
-        if ($request->hasFile('documents')) {
-            $docs = [];
-            foreach ($request->file('documents') as $file) {
-                $docs[] = [
-                    'name' => $file->getClientOriginalName(),
-                    'path' => $file->store('requests/docs', 'public'),
-                    'type' => $file->getMimeType(),
-                    'size' => $file->getSize()
-                ];
-            }
-            $validated['documents'] = $docs;
+        if ($request->hasFile('diagnosis_photo')) {
+            $validated['diagnosis_photo'] = $request->file('diagnosis_photo')->store('requests/verification', 'public');
+        }
+
+        if ($request->hasFile('recipient_photo')) {
+            $validated['recipient_photo'] = $request->file('recipient_photo')->store('requests/verification', 'public');
+        }
+
+        if ($request->hasFile('additional_photo')) {
+            $validated['additional_photo'] = $request->file('additional_photo')->store('requests/photos', 'public');
         }
 
         $hairRequest = Auth::user()->hairRequests()->create($validated);

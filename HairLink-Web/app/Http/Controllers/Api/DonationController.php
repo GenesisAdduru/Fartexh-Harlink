@@ -26,7 +26,17 @@ class DonationController extends Controller
             'reason' => 'nullable|string',
             'dropoff_location' => 'nullable|string',
             'appointment_at' => 'nullable|date',
+            'photo_front' => 'nullable|image|max:10240',
+            'photo_side' => 'nullable|image|max:10240',
         ]);
+
+        if ($request->hasFile('photo_front')) {
+            $validated['photo_front'] = $request->file('photo_front')->store('donations/photos', 'public');
+        }
+
+        if ($request->hasFile('photo_side')) {
+            $validated['photo_side'] = $request->file('photo_side')->store('donations/photos', 'public');
+        }
 
         $donation = Auth::user()->donations()->create($validated);
 

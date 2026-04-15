@@ -147,6 +147,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 gender: document.getElementById('gender').value,
                 email: document.getElementById('email').value,
                 story: document.getElementById('story').value,
+                wigLength: document.getElementById('wig-length')?.value || '',
+                wigColor: document.getElementById('wig-color')?.value || '',
+                medicalCertificate: selectedDocuments[0] || null,
+                diagnosisPhoto: selectedDocuments[1] || null,
+                recipientPhoto: selectedPhoto || null,
                 fileDocuments: selectedDocuments,
                 filePhoto: selectedPhoto
             };

@@ -21,11 +21,11 @@
         </div>
         <div class="summary-item">
             <span class="summary-label">Submitted</span>
-            <span class="summary-value">{{ $requestData->created_at->format('Y-m-d') }}</span>
+            <span class="summary-value">{{ $requestData->created_at->format('M d, Y') }}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Name</span>
-            <span class="summary-value">{{ $requestData->name }}</span>
+            <span class="summary-value">{{ $requestData->user->name ?? 'N/A' }}</span>
         </div>
     </div>
 
@@ -61,9 +61,19 @@
     <div class="details-box">
         <h3>Request Information</h3>
         <div class="details-content" id="request-details">
-            <p><strong>Requirement:</strong> {{ $requestData->requirement ?? 'N/A' }}</p>
-            <p><strong>Diagnosis:</strong> {{ $requestData->diagnosis ?? 'N/A' }}</p>
-            <p><strong>Medical Certificate:</strong> {{ $requestData->medical_certificate ? 'Submitted' : 'Not Provided' }}</p>
+            <p><strong>Contact Number:</strong> {{ $requestData->contact_number ?? 'N/A' }}</p>
+            <p><strong>Gender:</strong> {{ ucfirst($requestData->gender ?? 'N/A') }}</p>
+            <p><strong>Story:</strong> {{ $requestData->story ?? 'N/A' }}</p>
+            <p><strong>Wig Length Preference:</strong> {{ ucfirst($requestData->wig_length ?? 'N/A') }}</p>
+            <p><strong>Wig Color Preference:</strong> {{ ucfirst($requestData->wig_color ?? 'N/A') }}</p>
+            <p><strong>Documents Submitted:</strong> {{ is_array($requestData->documents) ? count($requestData->documents) . ' file(s)' : 'None' }}</p>
+            <p><strong>Reference Photo:</strong> {{ $requestData->additional_photo ? 'Uploaded' : 'Not Provided' }}</p>
+            @if($requestData->appointment_at)
+            <p><strong>Appointment:</strong> {{ $requestData->appointment_at->format('M d, Y H:i') }}</p>
+            @endif
+            @if($requestData->notes)
+            <p><strong>Notes:</strong> {{ $requestData->notes }}</p>
+            @endif
         </div>
     </div>
 
@@ -73,6 +83,3 @@
 </div>
 @endsection
 
-@push('scripts')
-    <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
-@endpush

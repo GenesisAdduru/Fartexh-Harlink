@@ -54,28 +54,28 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="full-name">Full Name <span class="required">*</span></label>
-                    <input type="text" id="full-name" name="fullName" placeholder="Ex. Last Name, First Name M.I." required>
+                    <input type="text" id="full-name" name="fullName" value="{{ auth()->user()->first_name ? auth()->user()->first_name . ' ' . auth()->user()->last_name : auth()->user()->name }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                 </div>
                 <div class="form-group">
                     <label for="contact-number">Contact Number <span class="required">*</span></label>
-                    <input type="tel" id="contact-number" name="contactNumber" placeholder="Ex. 0917-123-4567" required>
+                    <input type="tel" id="contact-number" name="contactNumber" value="{{ auth()->user()->phone ?? '' }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group">
                     <label for="gender">Gender <span class="required">*</span></label>
-                    <select id="gender" name="gender" required>
+                    <select id="gender" name="gender" required style="background:#f5f3f7;cursor:not-allowed;pointer-events:none;">
                         <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                        <option value="prefer-not-to-say">Prefer not to say</option>
+                        <option value="male" {{ auth()->user()->gender == 'male' ? 'selected' : '' }}>Male</option>
+                        <option value="female" {{ auth()->user()->gender == 'female' ? 'selected' : '' }}>Female</option>
+                        <option value="other" {{ auth()->user()->gender == 'other' ? 'selected' : '' }}>Other</option>
+                        <option value="prefer-not-to-say" {{ auth()->user()->gender == 'prefer-not-to-say' ? 'selected' : '' }}>Prefer not to say</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="email">Email Address <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    <input type="email" id="email" name="email" value="{{ auth()->user()->email }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                 </div>
             </div>
         </div>

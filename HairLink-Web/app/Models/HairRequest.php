@@ -19,7 +19,12 @@ class HairRequest extends Model
         'status',
         'appointment_at',
         'notes',
-        'documents'
+        'documents',
+        'wig_length',
+        'wig_color',
+        'medical_certificate',
+        'diagnosis_photo',
+        'recipient_photo',
     ];
 
     protected $casts = [
