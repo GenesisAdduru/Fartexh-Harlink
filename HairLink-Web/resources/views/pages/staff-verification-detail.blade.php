@@ -44,16 +44,65 @@
 
             <section>
                 <h2>Attached Files</h2>
-                <ul class="verification-list">
+                <div class="file-preview-grid">
                     @if($isDonor)
-                        @if($record->photo_front) <li><a href="{{ Storage::url($record->photo_front) }}" target="_blank">hair-photo-front.jpg</a></li> @endif
-                        @if($record->photo_side) <li><a href="{{ Storage::url($record->photo_side) }}" target="_blank">hair-photo-side.jpg</a></li> @endif
+                        @if($record->photo_front)
+                            <div class="file-preview-item">
+                                <a href="{{ Storage::url($record->photo_front) }}" target="_blank" class="file-thumbnail">
+                                    <img src="{{ Storage::url($record->photo_front) }}" alt="Hair Front">
+                                    <div class="preview-overlay">View Full</div>
+                                </a>
+                                <span class="file-label-small">Hair Front</span>
+                            </div>
+                        @endif
+                        @if($record->photo_side)
+                            <div class="file-preview-item">
+                                <a href="{{ Storage::url($record->photo_side) }}" target="_blank" class="file-thumbnail">
+                                    <img src="{{ Storage::url($record->photo_side) }}" alt="Hair Side">
+                                    <div class="preview-overlay">View Full</div>
+                                </a>
+                                <span class="file-label-small">Hair Side</span>
+                            </div>
+                        @endif
                     @else
-                        @if($record->medical_certificate) <li><a href="{{ Storage::url($record->medical_certificate) }}" target="_blank">medical-certificate.pdf</a></li> @endif
-                        @if($record->diagnosis_photo) <li><a href="{{ Storage::url($record->diagnosis_photo) }}" target="_blank">doctor-diagnosis.jpg</a></li> @endif
-                        @if($record->recipient_photo) <li><a href="{{ Storage::url($record->recipient_photo) }}" target="_blank">recipient-photo.jpg</a></li> @endif
+                        @if($record->medical_certificate)
+                            <div class="file-preview-item">
+                                @php $isImg = in_array(pathinfo($record->medical_certificate, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp','gif']); @endphp
+                                <a href="{{ Storage::url($record->medical_certificate) }}" target="_blank" class="file-thumbnail">
+                                    @if($isImg)
+                                        <img src="{{ Storage::url($record->medical_certificate) }}" alt="Medical Certificate">
+                                    @else
+                                        <i class='bx bxs-file-pdf'></i>
+                                    @endif
+                                    <div class="preview-overlay">View Full</div>
+                                </a>
+                                <span class="file-label-small">Medical Certificate</span>
+                            </div>
+                        @endif
+                        @if($record->diagnosis_photo)
+                            <div class="file-preview-item">
+                                <a href="{{ Storage::url($record->diagnosis_photo) }}" target="_blank" class="file-thumbnail">
+                                    <img src="{{ Storage::url($record->diagnosis_photo) }}" alt="Diagnosis Photo">
+                                    <div class="preview-overlay">View Full</div>
+                                </a>
+                                <span class="file-label-small">Diagnosis Photo</span>
+                            </div>
+                        @endif
+                        @if($record->recipient_photo)
+                            <div class="file-preview-item">
+                                <a href="{{ Storage::url($record->recipient_photo) }}" target="_blank" class="file-thumbnail">
+                                    <img src="{{ Storage::url($record->recipient_photo) }}" alt="Recipient Photo">
+                                    <div class="preview-overlay">View Full</div>
+                                </a>
+                                <span class="file-label-small">Recipient Photo</span>
+                            </div>
+                        @endif
                     @endif
-                </ul>
+                </div>
+
+                @if(!$record->photo_front && !$record->photo_side && !$record->medical_certificate && !$record->diagnosis_photo && !$record->recipient_photo)
+                    <p class="empty-note">No documents or photos attached to this submission.</p>
+                @endif
             </section>
         </div>
     </article>

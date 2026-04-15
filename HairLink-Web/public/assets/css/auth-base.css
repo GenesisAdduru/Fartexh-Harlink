@@ -98,7 +98,7 @@ body {
 .container {
     position: relative;
     width: min(780px, 84vw);
-    min-height: 500px;
+    min-height: 570px;
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -148,18 +148,8 @@ body {
 }
 
 .form-box.register form {
-    max-height: 390px;
-    overflow-y: auto;
-    padding-right: 0.25rem;
-}
-
-.form-box.register form::-webkit-scrollbar {
-    width: 8px;
-}
-
-.form-box.register form::-webkit-scrollbar-thumb {
-    background: #e8c1db;
-    border-radius: 999px;
+    width: 100%;
+    padding-right: 0;
 }
 
 .form-box h1 {
@@ -469,7 +459,7 @@ body {
     }
 
     .container {
-        min-height: 980px;
+        min-height: 1050px;
         border-radius: 22px;
     }
 
@@ -496,7 +486,7 @@ body {
     }
 
     .form-box.register form {
-        max-height: 560px;
+        width: 100%;
     }
 
     .form-box.login {

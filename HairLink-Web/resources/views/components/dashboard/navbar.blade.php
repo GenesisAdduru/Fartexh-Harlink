@@ -1,17 +1,6 @@
 <header class="dash-header" data-dash-header>
     <nav class="dash-nav" aria-label="Dashboard navigation">
-        @php
-            $dashboardRoutes = [
-                'donor'     => 'donor.dashboard',
-                'recipient' => 'recipient.dashboard',
-                'wigmaker'  => 'wigmaker.dashboard',
-                'staff'     => 'staff.dashboard',
-                'admin'     => 'admin.dashboard',
-            ];
-            $userRole = Auth::check() ? Auth::user()->role : 'donor';
-            $userDashboardUrl = route($dashboardRoutes[$userRole] ?? 'donor.dashboard');
-        @endphp
-        <a class="dash-brand" href="{{ $userDashboardUrl }}" aria-label="HairLink home">
+        <a class="dash-brand" href="{{ route('dashboard') }}" aria-label="HairLink home">
             <img src="{{ asset('assets/images/landing/pink-ribbon.png') }}" alt="Pink ribbon icon">
             <span>HairLink</span>
         </a>

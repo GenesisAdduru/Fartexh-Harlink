@@ -16,7 +16,10 @@
             }
         };
 
-        if (body) {
+        if (body instanceof FormData) {
+            options.body = body;
+            // Fetch will set the correct Content-Type with boundary automatically
+        } else if (body) {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(body);
         }
@@ -77,17 +80,26 @@
         },
 
         async createDonation(payload) {
-            const backendPayload = {
-                reference: payload.reference || `HD-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 900 + 100)}`,
-                hair_length: payload.hairLength,
-                hair_color: payload.hairColor,
-                treated_hair: Boolean(payload.treatedHair),
-                address: payload.address,
-                reason: payload.reason,
-                dropoff_location: 'Manila Downtown YMCA, 945 Sabino Padilla St, Binondo, Manila',
-                appointment_at: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
-            };
-            const data = await apiCall('/api/donations', 'POST', backendPayload);
+            const formData = new FormData();
+            formData.append('reference', payload.reference || `HD-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 900 + 100)}`);
+            formData.append('hair_length', payload.hairLength);
+            formData.append('hair_color', payload.hairColor);
+            formData.append('treated_hair', payload.treatedHair ? '1' : '0');
+            formData.append('address', payload.address || '');
+            formData.append('reason', payload.reason || '');
+            formData.append('dropoff_location', 'Manila Downtown YMCA, 945 Sabino Padilla St, Binondo, Manila');
+            
+            const apptAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+            formData.append('appointment_at', apptAt);
+
+            if (payload.photoFront) {
+                formData.append('photo_front', payload.photoFront);
+            }
+            if (payload.photoSide) {
+                formData.append('photo_side', payload.photoSide);
+            }
+
+            const data = await apiCall('/api/donations', 'POST', formData);
             return mapDonation(data);
         },
 

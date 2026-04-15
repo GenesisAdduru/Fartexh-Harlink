@@ -38,12 +38,12 @@
                 <tbody>
                     @forelse($requests as $req)
                         <tr data-search-row>
-                            <td>{{ $req->reference_number }}</td>
+                            <td>{{ $req->reference }}</td>
                             <td>{{ $req->user->first_name ?? 'Unknown' }} {{ $req->user->last_name ?? '' }}</td>
                             <td>{{ $req->preferred_length }} / {{ $req->preferred_color }}</td>
                             <td>{{ $req->medical_condition }}</td>
                             <td><span class="status-chip">{{ $req->status }}</span></td>
-                            <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => $req->reference_number]) }}">Review</a></td>
+                            <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => $req->reference]) }}">Review</a></td>
                         </tr>
                     @empty
                         <tr>

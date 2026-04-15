@@ -75,7 +75,13 @@ class StaffController extends Controller
             ->whereIn('status', ['Received', 'In Queue', 'In Progress', 'Completed'])
             ->orderBy('updated_at', 'desc')
             ->get();
-        return view('pages.staff-realtime-tracking', compact('donations'));
+
+        $requests = HairRequest::with('user')
+            ->whereIn('status', ['Validated', 'In Production', 'Matched', 'In Transit', 'Arrived', 'Completed'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return view('pages.staff-realtime-tracking', compact('donations', 'requests'));
     }
 
     public function deliveryBatches()

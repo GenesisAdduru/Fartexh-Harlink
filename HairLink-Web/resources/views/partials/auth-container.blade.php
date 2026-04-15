@@ -115,13 +115,9 @@
             <div class="grid-two-cols">
                 <div class="input-wrapper">
                     <div class="input-box select-wrapper" style="margin-bottom: 0;">
-                        <select name="country" required>
-                            <option value="" disabled selected>Country</option>
-                            <option value="ph">Philippines</option>
-                            <option value="us">United States</option>
-                            <option value="ca">Canada</option>
-                            <option value="gb">United Kingdom</option>
-                            <option value="au">Australia</option>
+                        <input type="hidden" name="country" value="ph">
+                        <select disabled style="background:#f5f3f7; cursor:not-allowed; -webkit-appearance:none; -moz-appearance:none; appearance:none;">
+                            <option value="ph" selected>Philippines</option>
                         </select>
                         <i class='bx bx-world'></i>
                     </div>

@@ -22,7 +22,7 @@
 
     <div class="auth-actions">
         @auth
-            <a class="btn btn-outline" href="{{ Auth::user()->role === 'recipient' ? route('recipient.dashboard') : route('donor.dashboard') }}">Dashboard</a>
+            <a class="btn btn-outline" href="{{ route('dashboard') }}">Dashboard</a>
             <form action="{{ route('logout') }}" method="POST" style="display:inline">
                 @csrf
                 <button type="submit" class="btn btn-primary">Logout</button>

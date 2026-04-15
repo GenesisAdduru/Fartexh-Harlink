@@ -116,8 +116,8 @@
                 <div class="billing-fields">
                     <div class="form-group">
                         <label for="billing-name">Full Name <span class="required">*</span></label>
-                        <p class="help-text">Full Name must be the same on the ACCOUNT NAME used for donations</p>
-                        <input type="text" id="billing-name" name="billingName" required>
+                        <p class="help-text">Full Name matched from your profile</p>
+                        <input type="text" id="billing-name" name="billingName" value="{{ auth()->user()->first_name ? auth()->user()->first_name . ' ' . auth()->user()->last_name : auth()->user()->name }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                     </div>
 
                     <div class="form-row">

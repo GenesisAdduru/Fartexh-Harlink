@@ -20,7 +20,9 @@ class Donation extends Model
         'dropoff_location',
         'appointment_at',
         'status',
-        'certificate_no'
+        'certificate_no',
+        'photo_front',
+        'photo_side'
     ];
 
     protected $casts = [

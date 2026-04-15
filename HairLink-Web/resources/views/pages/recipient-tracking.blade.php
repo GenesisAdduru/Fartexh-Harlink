@@ -32,7 +32,7 @@
                     <td><strong>{{ $request->reference }}</strong></td>
                     <td>{{ $request->created_at->format('Y-m-d') }}</td>
                     <td><span class="status-pill status-{{ strtolower($request->status) }}">{{ $request->status }}</span></td>
-                    <td>{{ $request->name ?? 'N/A' }}</td>
+                    <td>{{ $request->user->name ?? 'N/A' }}</td>
                     <td><a href="{{ route('recipient.tracking.detail', $request->reference) }}" class="ghost-btn">Details</a></td>
                 </tr>
                 @empty

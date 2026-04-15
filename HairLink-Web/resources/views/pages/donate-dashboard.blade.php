@@ -33,15 +33,15 @@
                 <div class="form-grid two-col">
                     <label>
                         Full Name <span>*</span>
-                        <input id="fullName" name="fullName" type="text" required>
+                        <input id="fullName" name="fullName" type="text" value="{{ auth()->user()->first_name ? auth()->user()->first_name . ' ' . auth()->user()->last_name : auth()->user()->name }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                     </label>
                     <label>
                         Email <span>*</span>
-                        <input id="email" name="email" type="email" required>
+                        <input id="email" name="email" type="email" value="{{ auth()->user()->email }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                     </label>
                     <label>
                         Phone Number <span>*</span>
-                        <input id="phone" name="phone" type="tel" required>
+                        <input id="phone" name="phone" type="tel" value="{{ auth()->user()->phone ?? '' }}" readonly required style="background:#f5f3f7;cursor:not-allowed;">
                     </label>
                     <label>
                         Hair Length <span>*</span>
