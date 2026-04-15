@@ -23,9 +23,9 @@
     <div class="auth-actions">
         @auth
             <a class="btn btn-outline" href="{{ route('dashboard') }}">Dashboard</a>
-            <form action="{{ route('logout') }}" method="POST" style="display:inline">
+            <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('landing-logout-form').submit();">Logout</a>
+            <form id="landing-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                 @csrf
-                <button type="submit" class="btn btn-primary">Logout</button>
             </form>
         @else
             @if (Route::has('login'))

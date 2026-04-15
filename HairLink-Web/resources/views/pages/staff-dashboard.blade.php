@@ -35,11 +35,9 @@
         <div class="staff-actions two-col">
             <a class="staff-action-link" href="{{ route('staff.donor-verification') }}">
                 <h3>Donor Hair Verification</h3>
-                <p>Review donor hair submissions and approve or reject with remarks.</p>
             </a>
             <a class="staff-action-link" href="{{ route('staff.recipient-verification') }}">
                 <h3>Recipient Request Verification</h3>
-                <p>Validate recipient requests and supporting medical documentation.</p>
             </a>
         </div>
     </article>
@@ -52,19 +50,15 @@
         <div class="staff-actions three-col">
             <a class="staff-action-link" href="{{ route('staff.realtime-tracking') }}">
                 <h3>Real-time Wigmaker Tracking</h3>
-                <p>Monitor partner wigmaker progress and update stage movement.</p>
             </a>
             <a class="staff-action-link" href="{{ route('staff.delivery-batches') }}">
                 <h3>Delivery Per Batch</h3>
-                <p>Track delivery batches and document processing status.</p>
             </a>
             <a class="staff-action-link" href="{{ route('staff.hair-stock') }}">
                 <h3>Hair Stock</h3>
-                <p>View available stock by size and hair color categories.</p>
             </a>
             <a class="staff-action-link" href="{{ route('staff.wig-stock') }}">
                 <h3>Wig Stock</h3>
-                <p>Maintain completed wig inventory records and statuses.</p>
             </a>
         </div>
     </article>
@@ -77,11 +71,9 @@
         <div class="staff-actions two-col">
             <a class="staff-action-link" href="{{ route('staff.recipient-matching-list') }}">
                 <h3>Recipient Matching List</h3>
-                <p>Review matched wigs and release scheduling progress.</p>
             </a>
             <a class="staff-action-link" href="{{ route('staff.rule-matching') }}">
                 <h3>Rule-based Matching</h3>
-                <p>Select recipients and assign best-fit wigs by compatibility.</p>
             </a>
         </div>
     </article>

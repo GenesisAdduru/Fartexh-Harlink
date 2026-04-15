@@ -19,6 +19,21 @@ class WigmakerController extends Controller
         return view('pages.wigmaker-dashboard', compact('tasks'));
     }
 
+    public function productionTasks(Request $request)
+    {
+        $user = $request->user();
+        $tasks = WigProduction::with('donation')
+            ->where('wigmaker_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+        
+        $queuedCount = $tasks->where('status', 'assigned')->count();
+        $inProgressCount = $tasks->where('status', 'processing')->count();
+        $completedCount = $tasks->where('status', 'completed')->count();
+            
+        return view('pages.wigmaker-production-tasks', compact('tasks', 'queuedCount', 'inProgressCount', 'completedCount'));
+    }
+
     public function taskDetail($taskCode)
     {
         $task = WigProduction::with(['donation', 'statusHistories'])

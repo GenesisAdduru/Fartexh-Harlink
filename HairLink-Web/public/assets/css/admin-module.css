@@ -34,7 +34,7 @@
 }
 
 .admin-hero-copy h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     color: #2e2434;
     font-size: clamp(1.42rem, 2.6vw, 2.1rem);
     line-height: 1.05;
@@ -96,7 +96,7 @@
 }
 
 .admin-optional-head h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1rem;
     color: #7a687f;
     display: flex;
@@ -175,7 +175,7 @@
 }
 
 .admin-stat h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.7rem, 3.5vw, 2.4rem);
     color: #ad246d;
     line-height: 1;
@@ -231,7 +231,7 @@
 }
 
 .admin-card-head h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     color: #3b2e43;
     display: flex;
     align-items: center;
@@ -376,7 +376,7 @@
 
 /* ---- Inventory sections ---------------------------------- */
 .inv-section-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1.15rem;
     color: #3b2e43;
     display: flex;
@@ -418,7 +418,7 @@
     font-size: 1.5rem;
     font-weight: 800;
     color: #ad246d;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
 }
 
 /* Hair stock grid (3 columns) */
@@ -641,7 +641,7 @@
 
 .report-card .report-stat {
     font-size: 1.5rem;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-weight: 800;
     color: #ad246d;
 }
@@ -726,7 +726,7 @@
 }
 
 .admin-page-head h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.55rem, 3vw, 2.2rem);
     color: #2f2436;
     line-height: 1.04;
@@ -925,7 +925,7 @@
 }
 
 .admin-toolbar-copy h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     color: #33273b;
     font-size: 1.22rem;
 }
@@ -1020,7 +1020,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     color: #34293c;
     font-size: 1.4rem;
 }
@@ -1054,7 +1054,7 @@
 
 .admin-mini-stat strong {
     display: block;
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1.5rem;
     color: #2d2333;
     line-height: 1;
@@ -1496,3 +1496,4 @@
         padding: 0.88rem;
     }
 }
+

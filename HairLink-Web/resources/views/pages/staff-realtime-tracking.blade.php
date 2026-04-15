@@ -49,8 +49,8 @@
                                 <option value="in-transit" @selected($normStatus === 'in-transit')>In Transit</option>
                                 <option value="completed" @selected($normStatus === 'completed')>Completed</option>
                             </select>
-                            <label><input type="checkbox" data-issue-toggle> Mark as issue</label>
-                            <button type="button" class="ghost-btn" data-save-edit>Save Edit</button>
+                            <label class="issue-checkbox"><input type="checkbox" data-issue-toggle> <span>Flag Issue</span></label>
+                            <button type="button" class="save-task-btn" data-save-edit>Save Edit</button>
                         </div>
                         <p class="edit-banner" data-edit-banner hidden></p>
                     </div>
@@ -83,25 +83,29 @@
                         <div class="stage" data-stage="in-queue"><i class='bx bx-time-five'></i><small>In Queue</small></div>
                         <div class="stage" data-stage="in-progress"><i class='bx bxs-star'></i><small>In Progress</small></div>
                         <div class="stage" data-stage="completed"><i class='bx bx-heart'></i><small>Completed</small></div>
+                        <div class="stage" data-stage="wig-received"><i class='bx bx-gift'></i><small>Wig Received</small></div>
                     </div>
                     <div class="track-actions">
                         <button type="button" class="soft-btn" data-move-next>Advance Status ></button>
                     </div>
-                    <div class="progress-editor">
-                        <div class="progress-editor-row">
-                            <select data-manual-status>
-                                <option value="received" @selected($normStatus === 'received')>Received</option>
-                                <option value="in-queue" @selected($normStatus === 'in-queue')>In Queue</option>
-                                <option value="in-progress" @selected($normStatus === 'in-progress')>In Progress</option>
-                                <option value="completed" @selected($normStatus === 'completed')>Completed</option>
-                            </select>
-                            <label><input type="checkbox" data-issue-toggle> Mark as issue</label>
-                            <button type="button" class="ghost-btn" data-save-edit>Save Edit</button>
+                    <div class="assignment-section">
+                        <label class="assignment-label"><i class='bx bx-user-plus'></i> Choose a Wigmaker</label>
+                        <div class="progress-editor">
+                            <div class="progress-editor-row">
+                                <select data-wigmaker-assignment>
+                                    <option value="" disabled selected>Select Task Expert...</option>
+                                    <option value="1">Wigmaker 1</option>
+                                    <option value="2">Wigmaker 2</option>
+                                    <option value="3">Wigmaker 3</option>
+                                </select>
+                                <label class="issue-checkbox"><input type="checkbox" data-issue-toggle> <span>Flag Issue</span></label>
+                                <button type="button" class="save-task-btn" data-save-edit>Assign expert</button>
+                            </div>
+                            <div class="issue-wrap" data-issue-wrap hidden>
+                                <textarea rows="2" placeholder="Describe the issue and action needed..." data-issue-note></textarea>
+                            </div>
+                            <p class="edit-banner" data-edit-banner hidden></p>
                         </div>
-                        <div class="issue-wrap" data-issue-wrap hidden>
-                            <textarea rows="2" placeholder="Describe the issue and action needed..." data-issue-note></textarea>
-                        </div>
-                        <p class="edit-banner" data-edit-banner hidden></p>
                     </div>
                     <p class="tracking-footnote" data-last-updated>Last updated: {{ $donation->updated_at->diffForHumans() }}</p>
                 </article>

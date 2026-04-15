@@ -26,7 +26,7 @@
                 <a href="{{ route('recipient.profile') }}" class="{{ request()->routeIs('recipient.profile') ? 'active' : '' }}">Profile</a>
             @elseif(request()->routeIs('wigmaker.*'))
                 <a href="{{ route('wigmaker.dashboard') }}" class="{{ request()->routeIs('wigmaker.dashboard') ? 'active' : '' }}">Overview</a>
-                <a href="{{ route('wigmaker.dashboard') }}#tasksBoard" class="{{ request()->routeIs('wigmaker.task.*') ? 'active' : '' }}">Production Tasks</a>
+                <a href="{{ route('wigmaker.production-tasks') }}" class="{{ request()->routeIs('wigmaker.production-tasks') ? 'active' : '' }}">Production Tasks</a>
             @elseif(request()->routeIs('staff.*'))
                 <a href="{{ route('staff.dashboard') }}" class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">Overview</a>
                 <a href="{{ route('staff.donor-verification') }}" class="{{ request()->routeIs('staff.donor-verification') ? 'active' : '' }}">Donor</a>

@@ -17,7 +17,7 @@
 
 body {
     min-height: 100vh;
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--dash-ink);
     background:
         radial-gradient(circle at 8% 14%, #f6deef 0, transparent 44%),
@@ -142,7 +142,7 @@ a {
 }
 
 .section-title-block h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.4rem, 2.8vw, 2.05rem);
     line-height: 1.05;
 }
@@ -214,3 +214,4 @@ a {
         text-align: center;
     }
 }
+

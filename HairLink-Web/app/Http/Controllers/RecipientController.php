@@ -18,7 +18,14 @@ class RecipientController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('pages.recipient-dashboard', compact('requests'));
+        // Points: 1 star for every ₱100 donated
+        $monetaryDonations = \App\Models\MonetaryDonation::where('user_id', $user->id)
+            ->where('status', 'Completed')
+            ->sum('amount');
+        
+        $points = floor($monetaryDonations / 100);
+
+        return view('pages.recipient-dashboard', compact('requests', 'points'));
     }
 
     public function tracking()

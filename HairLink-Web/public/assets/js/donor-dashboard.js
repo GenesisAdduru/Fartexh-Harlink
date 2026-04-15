@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => { referralCode.style.outline = ''; }, 1500);
                 return;
             }
-            // 3 pts for referral — just a visual reward for now
-            points = Math.min(points + 3, goal);
+            // 5 pts for referral — matching updated requirements
+            points = Math.min(points + 5, goal);
             renderPoints(points);
             referralCode.value = '';
             submitCodeBtn.textContent = '✓ Code Applied';

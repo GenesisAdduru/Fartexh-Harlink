@@ -1,19 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
     const trackingCards = document.querySelectorAll('[data-track-card]');
-    const steps = ['received', 'in-queue', 'in-progress', 'completed'];
+    const donorSteps = ['received', 'in-queue', 'in-progress', 'completed', 'wig-received'];
+    const recipientSteps = ['validated', 'matched', 'in-transit', 'completed'];
+    
     const labels = {
         'received': 'Received',
         'in-queue': 'In Queue',
         'in-progress': 'In Progress',
         'completed': 'Completed',
+        'wig-received': 'Wig Received',
+        'validated': 'Validated',
+        'matched': 'Matched',
+        'in-transit': 'In Transit'
     };
 
     trackingCards.forEach((card) => {
         const cardId = card.dataset.cardId || 'Unknown';
+        const cardType = card.dataset.cardType || 'donor';
+        const steps = cardType === 'donor' ? donorSteps : recipientSteps;
+        
         const actionBtn = card.querySelector('[data-move-next]');
         const statusChip = card.querySelector('[data-status-chip]');
         const stageItems = card.querySelectorAll('[data-stage]');
-        const manualStatus = card.querySelector('[data-manual-status]');
+        const wigSelection = card.querySelector('[data-wigmaker-assignment]');
         const issueToggle = card.querySelector('[data-issue-toggle]');
         const issueWrap = card.querySelector('[data-issue-wrap]');
         const issueNote = card.querySelector('[data-issue-note]');
@@ -24,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const stampUpdate = (reason) => {
             if (!lastUpdated) return;
             const now = new Date().toLocaleString();
-            lastUpdated.textContent = `Last updated: ${now} by Staff Demo (${reason}, Donation # ${cardId})`;
+            lastUpdated.textContent = `Last updated: ${now} by Staff Demo (${reason}, ${cardType === 'donor' ? 'Donation' : 'Request'} # ${cardId})`;
         };
 
         const paint = (status) => {
@@ -39,11 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (index < activeIndex) item.classList.add('done');
                 if (index === activeIndex) item.classList.add('active');
             });
-            if (manualStatus) {
-                manualStatus.value = status;
+            if (wigSelection) {
+                // For now, mockup doesn't auto-set value based on status
             }
             if (actionBtn) {
-                if (status === 'completed' || hasIssue) {
+                const isLastStep = activeIndex === steps.length - 1;
+                if (isLastStep || hasIssue) {
                     actionBtn.hidden = true;
                 } else {
                     const next = steps[activeIndex + 1];
@@ -55,8 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         const updateBackend = async (newStatus, reason) => {
-            const url = `/api/donations/${cardId}/status`;
-            const capitalizedStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1).replace('-', ' ');
+            const url = cardType === 'donor' ? `/api/donations/${cardId}/status` : `/api/requests/${cardId}/status`;
+            const capitalizedStatus = newStatus.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             
             try {
                 const response = await fetch(url, {
@@ -94,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const idx = steps.indexOf(current);
                 if (idx >= 0 && idx < steps.length - 1) {
                     const nextStatus = steps[idx + 1];
-                    const proceed = window.confirm(`Confirm move of Donation # ${cardId} from ${labels[current]} to ${labels[nextStatus]}?`);
+                    const proceed = window.confirm(`Confirm move of ${cardType === 'donor' ? 'Donation' : 'Request'} # ${cardId} from ${labels[current]} to ${labels[nextStatus]}?`);
                     if (!proceed) return;
 
                     actionBtn.disabled = true;
@@ -120,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (saveEdit) {
             saveEdit.addEventListener('click', async () => {
-                const nextStatus = manualStatus ? manualStatus.value : card.dataset.currentStatus;
+                const nextStatus = card.querySelector('[data-manual-status]') ? card.querySelector('[data-manual-status]').value : card.dataset.currentStatus;
+                const assignedWigmaker = wigSelection ? wigSelection.value : null;
                 const flaggedIssue = issueToggle ? issueToggle.checked : false;
 
                 if (flaggedIssue && issueNote && !issueNote.value.trim()) {
@@ -128,10 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                const label = labels[nextStatus] || nextStatus;
                 const changeNote = flaggedIssue
-                    ? `${labels[nextStatus]} with issue flag`
-                    : labels[nextStatus];
-                const proceed = window.confirm(`Save edit for Donation # ${cardId}: set status to ${changeNote}?`);
+                    ? `${label} with issue flag`
+                    : nextStatus === card.dataset.currentStatus ? 'Update info' : label;
+
+                const wmNote = assignedWigmaker ? ` (Assigned to Wigmaker ${assignedWigmaker})` : '';
+                const proceed = window.confirm(`Save edit for ${cardType === 'donor' ? 'Donation' : 'Request'} # ${cardId}${wmNote}?`);
                 if (!proceed) return;
 
                 saveEdit.disabled = true;

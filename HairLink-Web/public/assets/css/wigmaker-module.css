@@ -48,7 +48,7 @@
 .task-board-head h2,
 .task-detail-shell h2,
 .task-update-shell h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     color: #3b2e43;
 }
 
@@ -278,3 +278,4 @@
         grid-template-columns: 1fr;
     }
 }
+

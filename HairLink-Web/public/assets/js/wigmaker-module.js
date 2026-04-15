@@ -1,107 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const statusSelects = document.querySelectorAll('[data-status-select]');
-    const note = document.querySelector('[data-progress-note]');
-    const filterButtons = document.querySelectorAll('[data-filter]');
-    const taskRows = document.querySelectorAll('[data-task-row]');
-
-    const applyTaskFilter = (value) => {
-        taskRows.forEach((row) => {
-            const rowStatus = row.dataset.taskStatus;
-            const visible = value === 'all' || rowStatus === value;
-            row.hidden = !visible;
-        });
+    const trackingCards = document.querySelectorAll('[data-track-card]');
+    const donorSteps = ['received', 'in-queue', 'in-progress', 'completed', 'wig-received'];
+    
+    const labels = {
+        'received': 'Received',
+        'in-queue': 'In Queue',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'wig-received': 'Wig Received'
     };
 
-    filterButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            filterButtons.forEach((item) => item.classList.remove('active'));
-            button.classList.add('active');
-            applyTaskFilter(button.dataset.filter);
-        });
-    });
+    trackingCards.forEach((card) => {
+        const cardId = card.dataset.cardId || 'Unknown';
+        const steps = donorSteps;
+        
+        const actionBtn = card.querySelector('[data-move-next]');
+        const statusChip = card.querySelector('[data-status-chip]');
+        const stageItems = card.querySelectorAll('[data-stage]');
+        const issueToggle = card.querySelector('[data-issue-toggle]');
+        const issueWrap = card.querySelector('[data-issue-wrap]');
+        const issueNote = card.querySelector('[data-issue-note]');
+        const saveEdit = card.querySelector('[data-save-edit]');
+        const editBanner = card.querySelector('[data-edit-banner]');
+        const lastUpdated = card.querySelector('[data-last-updated]');
 
-    statusSelects.forEach((select) => {
-        const row = select.closest('tr');
-        const pill = row ? row.querySelector('[data-status-pill]') : null;
+        const stampUpdate = (reason) => {
+            if (!lastUpdated) return;
+            const now = new Date().toLocaleString();
+            lastUpdated.textContent = `Last updated: ${now} by Wigmaker (${reason}, Task # ${cardId})`;
+        };
 
-        select.addEventListener('change', () => {
-            if (pill) {
-                const next = select.value;
-                pill.classList.remove('status-queued', 'status-in-progress', 'status-completed');
-                pill.classList.add(`status-${next}`);
-                pill.textContent = next.replace('-', ' ').replace(/\b\w/g, (char) => char.toUpperCase());
+        const paint = (status) => {
+            const activeIndex = steps.indexOf(status);
+            const hasIssue = card.dataset.issue === 'true';
+            
+            if (statusChip) {
+                const label = labels[status] || status;
+                statusChip.textContent = hasIssue ? `${label} • Issue` : label;
+                statusChip.classList.toggle('issue-chip', hasIssue);
             }
+            
+            stageItems.forEach((item, index) => {
+                item.classList.remove('done', 'active');
+                if (index < activeIndex) item.classList.add('done');
+                if (index === activeIndex) item.classList.add('active');
+            });
 
-            if (row) {
-                row.dataset.taskStatus = select.value;
-                const taskCodeEl = row.querySelector('strong');
-                if (taskCodeEl) {
-                    const taskCode = taskCodeEl.textContent.trim();
-                    fetch(`/wigmaker/tasks/${taskCode}/update`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            status: select.value,
-                            notes: 'Status fast-updated via dashboard quick-select.'
-                        })
-                    }).catch(console.error);
+            if (actionBtn) {
+                const isLastStep = activeIndex >= steps.indexOf('completed');
+                if (isLastStep || hasIssue) {
+                    actionBtn.hidden = true;
+                } else {
+                    const next = steps[activeIndex + 1];
+                    actionBtn.hidden = false;
+                    actionBtn.textContent = `Move to ${labels[next]} >`;
                 }
             }
+            card.dataset.currentStatus = status;
+        };
 
-            if (note) {
-                note.hidden = false;
-                clearTimeout(note.dataset.timerId);
-                const timerId = setTimeout(() => {
-                    note.hidden = true;
-                }, 2400);
-                note.dataset.timerId = String(timerId);
-            }
-
-            const activeFilter = document.querySelector('[data-filter].active');
-            if (activeFilter) {
-                applyTaskFilter(activeFilter.dataset.filter);
-            }
-        });
-    });
-
-    const taskUpdateForm = document.getElementById('taskUpdateForm');
-    const updateBanner = document.querySelector('[data-update-banner]');
-
-    if (taskUpdateForm) {
-        const now = new Date();
-        const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-            .toISOString()
-            .slice(0, 16);
-        const updatedAtInput = document.getElementById('updated-at');
-        if (updatedAtInput && !updatedAtInput.value) {
-            updatedAtInput.value = localNow;
-        }
-
-        taskUpdateForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            if (!taskUpdateForm.checkValidity()) {
-                taskUpdateForm.reportValidity();
-                return;
-            }
-
-            const btn = taskUpdateForm.querySelector('button[type="submit"]');
-            const originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
-
-            const formData = new FormData(taskUpdateForm);
-            const data = {
-                status: formData.get('status'),
-                notes: formData.get('progressNotes')
-            };
-
-            const url = taskUpdateForm.dataset.actionUrl;
-
+        const updateBackend = async (newStatus, reason) => {
+            // Map the unified UI status back to the WigProduction model statuses
+            let backendStatus = newStatus;
+            if (newStatus === 'in-queue') backendStatus = 'assigned';
+            if (newStatus === 'in-progress') backendStatus = 'processing';
+            
+            const url = `/wigmaker/tasks/${cardId}/update`;
+            
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -110,29 +75,91 @@ document.addEventListener('DOMContentLoaded', () => {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        status: backendStatus,
+                        notes: reason
+                    })
                 });
 
-                const result = await response.json();
-
                 if (response.ok) {
-                    if (updateBanner) {
-                        updateBanner.hidden = false;
-                        updateBanner.textContent = result.message || 'Status saved successfully.';
-                    }
-                    setTimeout(() => {
-                        window.location.href = '/wigmaker/dashboard';
-                    }, 200);
+                    paint(newStatus);
+                    stampUpdate(reason);
+                    return true;
                 } else {
-                    alert(result.message || 'Error saving update.');
+                    const data = await response.json();
+                    alert(data.message || 'Error updating task status');
+                    return false;
                 }
             } catch (error) {
                 console.error(error);
-                alert('A network error occurred.');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = originalText;
+                alert('Network error updating task');
+                return false;
             }
+        };
+
+        // Initialize UI
+        paint(card.dataset.currentStatus);
+
+        if (actionBtn) {
+            actionBtn.addEventListener('click', async () => {
+                const currentStatus = card.dataset.currentStatus;
+                const currentIndex = steps.indexOf(currentStatus);
+                if (currentIndex < steps.length - 1) {
+                    const nextStatus = steps[currentIndex + 1];
+                    actionBtn.disabled = true;
+                    await updateBackend(nextStatus, `Advanced to ${labels[nextStatus]}`);
+                    actionBtn.disabled = false;
+                }
+            });
+        }
+
+        if (issueToggle) {
+            issueToggle.addEventListener('change', () => {
+                if (issueWrap) {
+                    issueWrap.hidden = !issueToggle.checked;
+                }
+            });
+        }
+
+        if (saveEdit) {
+            saveEdit.addEventListener('click', async () => {
+                const currentStatus = card.dataset.currentStatus;
+                const flaggedIssue = issueToggle ? issueToggle.checked : false;
+
+                if (flaggedIssue && issueNote && !issueNote.value.trim()) {
+                    issueNote.reportValidity();
+                    return;
+                }
+
+                const msg = flaggedIssue ? 'Flagging production issue...' : 'Updating info...';
+                const proceed = window.confirm(`Update task # ${cardId}?`);
+                if (!proceed) return;
+
+                saveEdit.disabled = true;
+                const success = await updateBackend(currentStatus, flaggedIssue ? `ISSUE: ${issueNote.value}` : 'Info updated');
+                saveEdit.disabled = false;
+
+                if (success) {
+                    card.dataset.issue = flaggedIssue ? 'true' : 'false';
+                    paint(currentStatus); // Refresh chip
+                    if (editBanner) {
+                        editBanner.hidden = false;
+                        editBanner.textContent = flaggedIssue ? 'Issue flagged.' : 'Saved successfully.';
+                        setTimeout(() => { editBanner.hidden = true; }, 3000);
+                    }
+                }
+            });
+        }
+    });
+
+    // Simple search filter
+    const searchInput = document.querySelector('[data-search-input]');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim().toLowerCase();
+            trackingCards.forEach(card => {
+                card.hidden = !card.textContent.toLowerCase().includes(query);
+            });
         });
     }
 });

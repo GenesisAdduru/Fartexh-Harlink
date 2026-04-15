@@ -16,7 +16,7 @@
         <article class="points-card">
             <p class="points-info" id="pointsInfo">
                 <i class='bx bx-info-circle'></i>
-                10 points earned for every donation and 3 points for every referral.
+                10 stars for hair donation, 5 points for referral and 1 star for every 100 pesos donated monetary.
                 Star Points <span class="star-inline">★</span> <span id="pointValue">0</span>
             </p>
 

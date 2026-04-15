@@ -56,9 +56,6 @@
                     <thead>
                         <tr>
                             <th>Task</th>
-                            <th>Hair Ref</th>
-                            <th>Recipient</th>
-                            <th>Wig Specs</th>
                             <th>Status</th>
                             <th>Dates</th>
                             <th>Actions</th>
@@ -70,9 +67,6 @@
                                 <td>
                                     <strong>{{ $task->task_code }}</strong>
                                 </td>
-                                <td>{{ $task->donation ? $task->donation->reference_number : 'N/A' }}</td>
-                                <td>N/A</td>
-                                <td>{{ $task->target_length }} / {{ $task->target_color }}</td>
                                 <td>
                                     <span class="status-pill status-{{ $task->status }}" data-status-pill>{{ str_replace('-', ' ', ucfirst($task->status)) }}</span>
                                     <select class="status-select" data-status-select>

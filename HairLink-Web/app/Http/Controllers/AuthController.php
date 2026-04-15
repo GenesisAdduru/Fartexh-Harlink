@@ -88,6 +88,7 @@ class AuthController extends Controller
 
         event(new Registered($user));
 
+
         Auth::login($user);
 
         $redirectUrl = $user->role === 'recipient' ? '/recipient/dashboard' : '/donor/dashboard';

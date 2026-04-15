@@ -124,6 +124,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/recipient/monetary-donation', [\App\Http\Controllers\MonetaryDonationController::class, 'store'])->name('recipient.monetary.store');
 
     Route::get('/wigmaker/dashboard', [App\Http\Controllers\WigmakerController::class, 'dashboard'])->name('wigmaker.dashboard');
+    Route::get('/wigmaker/production-tasks', [App\Http\Controllers\WigmakerController::class, 'productionTasks'])->name('wigmaker.production-tasks');
     Route::get('/wigmaker/tasks/{taskCode}', [App\Http\Controllers\WigmakerController::class, 'taskDetail'])->name('wigmaker.task.detail');
     Route::post('/wigmaker/tasks/{taskCode}/update', [App\Http\Controllers\WigmakerController::class, 'updateTask'])->name('wigmaker.task.update');
 

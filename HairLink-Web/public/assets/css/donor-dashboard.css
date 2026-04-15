@@ -125,7 +125,7 @@
 }
 
 .rewards-head h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: 1.2rem;
 }
 
@@ -172,3 +172,4 @@
         grid-template-columns: 1fr;
     }
 }
+

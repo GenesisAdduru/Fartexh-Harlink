@@ -65,6 +65,22 @@
             </div>
         </article>
 
+        <article class="referral-code-card">
+            <div class="referral-code-head">
+                <i class='bx bxs-gift'></i>
+                <div>
+                    <h3>Your Referral Code</h3>
+                    <p>Share this code with friends to earn star points!</p>
+                </div>
+            </div>
+            <div class="referral-code-display">
+                <span id="myReferralCode">HL-{{ strtoupper(substr(md5('hairlink-referral-' . $user->id), 0, 8)) }}</span>
+                <button class="copy-code-btn" id="copyCodeBtn" type="button" title="Copy to clipboard">
+                    <i class='bx bx-copy'></i> Copy
+                </button>
+            </div>
+        </article>
+
         <article class="profile-stats">
             <div class="profile-stat">
                 <small>Account Type</small>

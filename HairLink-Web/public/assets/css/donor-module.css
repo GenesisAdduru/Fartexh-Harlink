@@ -14,7 +14,7 @@
 }
 
 .module-head h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.35rem, 2.8vw, 2rem);
     line-height: 1.1;
 }
@@ -220,7 +220,7 @@
 }
 
 .certificate-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.35rem, 2.7vw, 2rem);
     color: #97225e;
 }
@@ -278,3 +278,6 @@
         border-color: #333;
     }
 }
+
+
+.stage-row > .stage { flex: 1; overflow: hidden; }

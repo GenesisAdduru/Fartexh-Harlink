@@ -14,9 +14,21 @@ class DonorController extends Controller
         $user = Auth::user();
         if (!$user) return redirect('/login');
 
-        // Number of points: 10 per donation for now
-        $donations = Donation::with('statusHistories')->where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
-        $points = $donations->count() * 10;
+        // Fetch hair donations first
+        $donations = Donation::with('statusHistories')
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Points: 1 star for every ₱100 donated monetary
+        $monetaryDonations = \App\Models\MonetaryDonation::where('user_id', $user->id)
+            ->where('status', 'Completed')
+            ->sum('amount');
+        
+        $monetaryPoints = floor($monetaryDonations / 100);
+        $hairPoints = $donations->count() * 10;
+        
+        $points = $monetaryPoints + $hairPoints;
 
         return view('pages.donor-dashboard', compact('donations', 'points'));
     }

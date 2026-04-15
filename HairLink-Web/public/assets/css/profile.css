@@ -16,7 +16,7 @@
 }
 
 .profile-head h1 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Outfit', sans-serif;
     font-size: clamp(1.35rem, 2.8vw, 2rem);
     line-height: 1.1;
 }
@@ -141,4 +141,83 @@
     .profile-stats {
         grid-template-columns: 1fr;
     }
+}
+
+/* Referral Code Card */
+.referral-code-card {
+    background: #fff;
+    border: 1px solid #ead7e8;
+    border-radius: 16px;
+    padding: 0.8rem;
+    box-shadow: 0 12px 26px rgba(73, 20, 52, 0.08);
+}
+
+.referral-code-head {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.referral-code-head i {
+    font-size: 1.6rem;
+    color: #cf2f84;
+}
+
+.referral-code-head h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #3b2e43;
+    margin: 0;
+}
+
+.referral-code-head p {
+    font-size: 0.82rem;
+    color: #796a83;
+    margin: 0.1rem 0 0;
+}
+
+.referral-code-display {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: linear-gradient(135deg, #fdf2f8, #f5e6f0);
+    border: 2px dashed #e0b4d4;
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+}
+
+.referral-code-display span {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #a71f68;
+    letter-spacing: 2px;
+    flex: 1;
+}
+
+.copy-code-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: linear-gradient(135deg, #cf2f84, #a71f68);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.45rem 0.8rem;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 6px 14px rgba(167, 31, 104, 0.22);
+}
+
+.copy-code-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(167, 31, 104, 0.3);
+}
+
+.copy-code-btn:active {
+    transform: translateY(0);
 }
