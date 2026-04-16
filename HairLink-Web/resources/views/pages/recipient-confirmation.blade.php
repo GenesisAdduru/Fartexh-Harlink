@@ -3,7 +3,7 @@
 @section('title', 'Request Submitted')
 
 @section('content')
-<div class="section-wrap">
+<div class="section-wrap" id="confirmationContent">
     <div class="module-head">
         <h1>Request Submitted Successfully!</h1>
         <p>Thank you for trusting us with your journey. We're here to support you every step of the way.</p>
@@ -21,19 +21,19 @@
     <div class="summary-grid">
         <div class="summary-item">
             <span class="summary-label">Reference Number</span>
-            <span class="summary-value" id="confirmation-reference">-</span>
+            <span class="summary-value" id="confirmation-reference">{{ $requestData->reference }}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Status</span>
-            <span class="summary-value" id="confirmation-status">-</span>
+            <span class="summary-value" id="confirmation-status">{{ $requestData->status }}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Full Name</span>
-            <span class="summary-value" id="confirmation-name">-</span>
+            <span class="summary-value" id="confirmation-name">{{ $requestData->user->name ?? 'Recipient' }}</span>
         </div>
         <div class="summary-item">
             <span class="summary-label">Submitted Date</span>
-            <span class="summary-value" id="confirmation-submitted">-</span>
+            <span class="summary-value" id="confirmation-submitted">{{ $requestData->created_at->format('M d, Y') }}</span>
         </div>
     </div>
 
@@ -41,7 +41,68 @@
     <div class="details-box">
         <h3>Request Summary</h3>
         <div class="details-content" id="confirmation-details">
-            <!-- Details rendered by JS -->
+            <div class="detail-item">
+                <span class="detail-label">Full Name</span>
+                <span class="detail-value">{{ $requestData->user->name ?? 'Recipient' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Contact Number</span>
+                <span class="detail-value">{{ $requestData->contact_number }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Gender</span>
+                <span class="detail-value">{{ ucfirst($requestData->gender) }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-label">Your Story</span>
+                <span class="detail-value">{{ $requestData->story }}</span>
+            </div>
+            
+            @php
+                $docs = is_array($requestData->documents) ? $requestData->documents : (is_string($requestData->documents) ? json_decode($requestData->documents, true) : []);
+                $photo = $requestData->additional_photo;
+            @endphp
+            
+            @if(count($docs) > 0 || $photo)
+                <div class="detail-item">
+                    <span class="detail-label">Attached Files & Photos</span>
+                    <div class="detail-value">
+                        <div class="file-preview-grid">
+                            @foreach($docs as $index => $doc)
+                                @php $isImg = in_array(pathinfo($doc, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp','gif','svg']); @endphp
+                                <div class="file-preview-item">
+                                    <a href="{{ Storage::url($doc) }}" target="_blank" class="file-thumbnail">
+                                        @if($isImg)
+                                            <img src="{{ Storage::url($doc) }}" alt="Doc {{ $index + 1 }}">
+                                        @else
+                                            <i class='bx bxs-file-pdf'></i>
+                                        @endif
+                                        <div class="preview-overlay">View Full</div>
+                                    </a>
+                                    <span class="file-label-small">Document {{ $index + 1 }}</span>
+                                </div>
+                            @endforeach
+
+                            @if($photo)
+                                <div class="file-preview-item">
+                                    <a href="{{ Storage::url($photo) }}" target="_blank" class="file-thumbnail">
+                                        <img src="{{ Storage::url($photo) }}" alt="Reference Photo">
+                                        <div class="preview-overlay">View Full</div>
+                                    </a>
+                                    <span class="file-label-small">Reference Photo</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if($requestData->appointment_at)
+                <div class="detail-item">
+                    <span class="detail-label">Appointment Date & Time</span>
+                    <span class="detail-value">{{ \Carbon\Carbon::parse($requestData->appointment_at)->format('M d, Y, h:i A') }}</span>
+                </div>
+            @endif
         </div>
     </div>
 

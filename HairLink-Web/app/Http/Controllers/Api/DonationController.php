@@ -80,14 +80,20 @@ class DonationController extends Controller
         ]);
 
         if ($donation->status !== $validated['status']) {
-            $donation->update(['status' => $validated['status']]);
-            $donation->statusHistories()->create(['status' => $validated['status']]);
+            $updateData = ['status' => $validated['status']];
 
-            if ($validated['status'] === 'Completed' && !$donation->certificate_no) {
-                $donation->update([
-                    'certificate_no' => 'CERT-' . date('Y') . '-' . substr($donation->reference, -6)
-                ]);
+            // Generate certificate when hair is received by staff
+            if ($validated['status'] === 'Received Hair' && !$donation->certificate_no) {
+                $updateData['certificate_no'] = 'CERT-' . date('Y') . '-' . substr($donation->reference, -6);
             }
+
+            // Stamp received_wig_at when wig is received back from wigmaker
+            if ($validated['status'] === 'Wig Received') {
+                $updateData['received_wig_at'] = now();
+            }
+
+            $donation->update($updateData);
+            $donation->statusHistories()->create(['status' => $validated['status']]);
         }
 
         return response()->json($donation->load(['statusHistories', 'user']));

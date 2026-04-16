@@ -24,6 +24,7 @@
                 <thead>
                     <tr>
                         <th>Stock ID</th>
+                        <th style="width: 70px; text-align: center;">Photo</th>
                         <th>Batch Number</th>
                         <th>Size</th>
                         <th>Color</th>
@@ -33,17 +34,40 @@
                 </thead>
                 <tbody>
                     @forelse($wigs as $wig)
+                        @php
+                            $latestPhoto = null;
+                            if ($wig->statusHistories) {
+                                $historyWithPhoto = $wig->statusHistories->whereNotNull('metadata')->sortByDesc('created_at')->filter(function($hist) {
+                                    return isset($hist->metadata['preview_photo']);
+                                })->first();
+                                if ($historyWithPhoto) {
+                                    $latestPhoto = $historyWithPhoto->metadata['preview_photo'];
+                                }
+                            }
+                        @endphp
                         <tr data-search-row>
-                            <td><strong>{{ $wig->task_code }}</strong></td>
-                            <td>{{ $wig->donation ? $wig->donation->reference : 'N/A' }}</td>
-                            <td>{{ $wig->target_length }}</td>
-                            <td>{{ $wig->target_color }}</td>
-                            <td>{{ $wig->updated_at->format('m/d/y') }}</td>
-                            <td><span class="status-chip" style="background:#d4edda;color:#155724;border:none;">Arrived</span></td>
+                            <td style="vertical-align: middle;"><strong>{{ $wig->task_code }}</strong></td>
+                            <td style="text-align: center; vertical-align: middle; padding: 0.3rem;">
+                                @if($latestPhoto)
+                                    <a href="{{ asset('storage/' . $latestPhoto) }}" target="_blank" class="file-thumbnail" style="width: 42px; height: 42px; display: inline-block; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
+                                        <img src="{{ asset('storage/' . $latestPhoto) }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <div class="preview-overlay">
+                                            <i class='bx bx-search' style="font-size: 1.1rem;"></i>
+                                        </div>
+                                    </a>
+                                @else
+                                    <span style="color: #ccc; font-size: 0.75rem;">---</span>
+                                @endif
+                            </td>
+                            <td style="vertical-align: middle;">{{ $wig->donation ? $wig->donation->reference : 'N/A' }}</td>
+                            <td style="vertical-align: middle;">{{ $wig->target_length }}</td>
+                            <td style="vertical-align: middle;">{{ $wig->target_color }}</td>
+                            <td style="vertical-align: middle;">{{ $wig->updated_at->format('m/d/y') }}</td>
+                            <td style="vertical-align: middle;"><span class="status-chip" style="background:#d4edda;color:#155724;border:none;">Arrived</span></td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 2rem;">No wigs currently in stock.</td>
+                            <td colspan="7" style="text-align: center; padding: 2rem;">No wigs currently in stock.</td>
                         </tr>
                     @endforelse
                 </tbody>

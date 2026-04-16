@@ -1,8 +1,8 @@
 .staff-page {
-    max-width: 980px;
+    max-width: 1100px;
     margin-inline: auto;
     display: grid;
-    gap: 0.85rem;
+    gap: 0.75rem;
 }
 
 .staff-hero {
@@ -90,6 +90,10 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.staff-actions.four-col {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .staff-section-head {
     display: flex;
     justify-content: space-between;
@@ -134,15 +138,18 @@
 }
 
 .quick-stat-grid {
-    display: flex; justify-content: space-between;
-    gap: 0.65rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
 .quick-stat {
     border: 1px solid #ead7e8;
-    border-radius: 12px;
-    padding: 0.6rem;
+    border-radius: 14px;
+    padding: 0.75rem 1rem;
     background: #fff;
+    box-shadow: 0 4px 12px rgba(73, 20, 52, 0.04);
 }
 
 .quick-stat h2 {
@@ -209,10 +216,10 @@
 .staff-table th,
 .staff-table td {
     border-bottom: 1px solid #f0e3ee;
-    padding: 0.6rem 0.45rem;
+    padding: 0.5rem 0.45rem;
     text-align: left;
     color: #3f3246;
-    font-size: 0.84rem;
+    font-size: 0.82rem;
 }
 
 .staff-table th {
@@ -270,18 +277,41 @@
 }
 
 .status-chip {
-    border: 1px solid #ba2b72;
     border-radius: 999px;
-    padding: 0.22rem 0.55rem;
+    padding: 0.22rem 0.75rem;
     font-size: 0.76rem;
-    font-weight: 700;
-    background: #fff;
-    color: #4d3f56;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.status-chip.submitted {
+    background: #fff4e8;
+    border: 1px solid #f8dcb8;
+    color: #9c6420;
+}
+
+.status-chip.validated {
+    background: #eaf2ff;
+    border: 1px solid #c6d9ff;
+    color: #2f5ea8;
+}
+
+.status-chip.matched {
+    background: #e9f8ef;
+    border: 1px solid #c6ebd2;
+    color: #227644;
+}
+
+.status-chip.rejected {
+    background: #fff1f1;
+    border: 1px solid #f9d5d5;
+    color: #a82f2f;
 }
 
 .status-chip.issue-chip {
     background: #fff1f5;
-    border-color: #d03b78;
+    border: 1px solid #d03b78;
     color: #a1285d;
 }
 
@@ -590,8 +620,8 @@
 
 .verification-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.8rem;
+    grid-template-columns: 1fr 400px;
+    gap: 1.5rem;
 }
 
 .verification-list {
@@ -630,8 +660,8 @@
 
 /* Verification Detail Enhancement */
 .file-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
     margin-top: 0.5rem;
 }
@@ -640,6 +670,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 180px;
 }
 
 .file-thumbnail {
@@ -700,6 +731,9 @@
 
 @media (max-width: 920px) {
     .staff-actions,
+    .staff-actions.two-col,
+    .staff-actions.three-col,
+    .staff-actions.four-col,
     .quick-stat-grid,
     .tracking-grid,
     .stock-columns,
@@ -812,4 +846,118 @@
 
 .save-task-btn:active {
     transform: translateY(0);
+}
+
+/* ─── Real-time Tracking: Sync Notice ─── */
+.sync-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid #e0d5f0;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f8f4ff 0%, #fdf5fb 100%);
+    color: #5a4670;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-top: 0.45rem;
+}
+
+.sync-notice i {
+    font-size: 1.15rem;
+    color: #9b6dc5;
+    flex-shrink: 0;
+}
+
+.sync-notice strong {
+    color: #6f3b8e;
+}
+
+.sync-notice.final-notice {
+    border-color: #c5e8d5;
+    background: linear-gradient(135deg, #effaf4 0%, #f0fdf4 100%);
+    color: #1f6a3d;
+}
+
+.sync-notice.final-notice i {
+    color: #2d9a55;
+}
+
+.sync-notice.final-notice strong {
+    color: #1a7b3e;
+}
+
+/* ─── Tracking Action Buttons with Icons ─── */
+.track-actions [data-confirm-received],
+.track-actions [data-confirm-wig-received] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.track-actions [data-confirm-received] {
+    background: linear-gradient(135deg, #1a7b3e 0%, #2d9a55 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(26, 123, 62, 0.25);
+}
+
+.track-actions [data-confirm-received]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(26, 123, 62, 0.35);
+}
+
+.track-actions [data-confirm-wig-received] {
+    background: linear-gradient(135deg, #a1285d 0%, #d63384 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(161, 40, 93, 0.25);
+}
+
+.track-actions [data-confirm-wig-received]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(161, 40, 93, 0.35);
+}
+
+.track-actions button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ─── Stage: Verified step styling ─── */
+.stage[data-stage="verified"].active i {
+    background: #d4e8b8;
+    color: #3a6e1a;
+}
+
+.stage[data-stage="verified"].done i {
+    background: #c8e0a8;
+    color: #2e5a14;
+}
+
+/* ─── Stage: Wig Received step styling ─── */
+.stage[data-stage="wig-received"].active i {
+    background: #bde0c8;
+    color: #1f6a3d;
+}
+
+.stage[data-stage="wig-received"].done i {
+    background: #a8d4b4;
+    color: #1a5e35;
+}
+
+/* ─── Edit Banner: Approved variant ─── */
+.edit-banner.approved {
+    border-color: #cce8d8;
+    background: #effaf4;
+    color: #1f6a3d;
 }

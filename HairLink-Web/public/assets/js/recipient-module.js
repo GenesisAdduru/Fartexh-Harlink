@@ -3,9 +3,11 @@
 
     const STATUS_FLOW = [
         'Submitted',
-        'Under Review',
+        'Validated',
+        'In Production',
         'Matched',
-        'Ready for Pickup',
+        'In Transit',
+        'Arrived',
         'Completed'
     ];
 
@@ -65,23 +67,24 @@
     function formatDate(dateString) {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
+        return new Intl.DateTimeFormat('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
-        });
+        }).format(date);
     }
 
     function formatDateTime(dateString) {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
+        return new Intl.DateTimeFormat('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
-        });
+            minute: '2-digit',
+            hour12: true
+        }).format(date);
     }
 
     const recipientModule = {

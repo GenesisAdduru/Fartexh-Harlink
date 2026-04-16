@@ -10,10 +10,10 @@
     <section class="section-wrap donor-module-page reveal" id="certificateRoot">
         <header class="module-head">
             <h1>Donor Certificate</h1>
-            <p>Automatically generated once your donation reaches Completed status.</p>
+            <p>Automatically generated once staff confirms receipt of your hair donation.</p>
             <div class="action-row">
                 <a class="ghost-btn" href="{{ route('donor.tracking') }}">Back to Tracking</a>
-                @if($donation && $donation->status === 'Completed')
+                @if($donation && in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']))
                 <button id="printCertificateBtn" class="soft-btn" type="button">Print / Save as PDF</button>
                 @endif
             </div>
@@ -30,16 +30,16 @@
                 <div class="certificate-meta">
                     <p>Donation Reference: <strong id="certReference">{{ $donation->reference }}</strong></p>
                     <p>Certificate Number: <strong id="certNumber">{{ $donation->certificate_no ?? 'Pending' }}</strong></p>
-                    <p>Date Issued: <strong id="certIssued">{{ $donation->status === 'Completed' ? $donation->updated_at->format('M d, Y') : 'Pending completion' }}</strong></p>
+                    <p>Date Issued: <strong id="certIssued">{{ in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']) ? $donation->updated_at->format('M d, Y') : 'Pending receipt' }}</strong></p>
                     <p>Donation Status: <strong id="certStatus">{{ $donation->status }}</strong></p>
                 </div>
             </div>
 
             <div class="note-box" id="certificateStatusNote">
-                @if($donation->status === 'Completed')
+                @if(in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']))
                 Certificate is ready. Click "Print / Save as PDF" to download.
                 @else
-                Certificate is currently unavailable until donation status is Completed. Current status: {{ $donation->status }}.
+                Certificate will be available once staff confirms receipt of your hair. Current status: {{ $donation->status }}.
                 @endif
             </div>
             @else

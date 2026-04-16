@@ -69,15 +69,16 @@
                                 </td>
                                 <td>
                                     <span class="status-pill status-{{ $task->status }}" data-status-pill>{{ str_replace('-', ' ', ucfirst($task->status)) }}</span>
-                                    <select class="status-select" data-status-select>
-                                        <option value="assigned" @selected($task->status === 'assigned')>Assigned</option>
-                                        <option value="processing" @selected($task->status === 'processing')>Processing</option>
-                                        <option value="completed" @selected($task->status === 'completed')>Completed</option>
-                                    </select>
                                 </td>
                                 <td>
-                                    <small>Start: {{ $task->created_at->format('Y-m-d') }}</small>
-                                    <small>Target: {{ $task->due_date ?? 'TBD' }}</small>
+                                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                                        <small style="color: #8c7895;">Start: <strong>{{ $task->created_at->format('Y-m-d h:i A') }}</strong></small>
+                                        @if($task->status === 'completed')
+                                            <small style="color: #28a745;">End: <strong>{{ $task->updated_at->format('Y-m-d h:i A') }}</strong></small>
+                                        @else
+                                            <small style="color: #7f2958;">Target: <strong>{{ \Carbon\Carbon::parse($task->due_date)->format('Y-m-d') }} 05:00 PM</strong></small>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td>
                                     <a class="ghost-btn" href="{{ route('wigmaker.task.detail', $task->task_code) }}">Open Task</a>

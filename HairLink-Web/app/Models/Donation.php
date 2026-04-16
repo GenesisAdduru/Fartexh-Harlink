@@ -21,6 +21,7 @@ class Donation extends Model
         'appointment_at',
         'status',
         'certificate_no',
+        'received_wig_at',
         'photo_front',
         'photo_side'
     ];
@@ -28,6 +29,7 @@ class Donation extends Model
     protected $casts = [
         'treated_hair' => 'boolean',
         'appointment_at' => 'datetime',
+        'received_wig_at' => 'datetime',
     ];
 
     public function user()

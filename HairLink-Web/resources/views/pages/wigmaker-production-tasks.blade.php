@@ -80,20 +80,7 @@
                 </div>
 
                 <div class="track-actions">
-                    <button type="button" class="soft-btn" data-move-next>Advance Production Status ></button>
-                </div>
-
-                <div class="progress-editor">
-                    <div class="progress-editor-row" style="grid-template-columns: 1fr auto;">
-                        <label class="issue-checkbox" style="margin: 0;">
-                            <input type="checkbox" data-issue-toggle> <span>Flag Production Issue</span>
-                        </label>
-                        <button type="button" class="save-task-btn" data-save-edit>Save Update</button>
-                    </div>
-                    <div class="issue-wrap" data-issue-wrap hidden style="margin-top: 10px;">
-                        <textarea rows="2" placeholder="Describe the production issue..." data-issue-note></textarea>
-                    </div>
-                    <p class="edit-banner" data-edit-banner hidden></p>
+                    <a href="{{ route('wigmaker.task.detail', $task->task_code) }}" class="soft-btn" style="text-decoration: none; display: inline-block; text-align: center;">View Production Details</a>
                 </div>
 
                 <p class="tracking-footnote" data-last-updated>Last updated: {{ $task->updated_at->diffForHumans() }}</p>
@@ -109,5 +96,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/staff-module.js') }}" defer></script>
+    <script src="{{ asset('assets/js/wigmaker-module.js') }}" defer></script>
 @endpush

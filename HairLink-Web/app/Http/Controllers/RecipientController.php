@@ -46,11 +46,40 @@ class RecipientController extends Controller
         $user = Auth::user();
         if (!$user) return redirect('/login');
 
-        $requestData = HairRequest::with(['statusHistories', 'user'])
-            ->where('reference', $reference)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
+        $query = HairRequest::with(['statusHistories', 'user'])
+            ->where('reference', $reference);
+            
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $requestData = $query->firstOrFail();
 
         return view('pages.recipient-tracking-detail', compact('requestData'));
+    }
+
+    public function confirmation(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) return redirect('/login');
+
+        $reference = $request->query('ref');
+        $query = HairRequest::with(['statusHistories', 'user']);
+            
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($reference) {
+            $requestData = $query->where('reference', $reference)->first();
+        } else {
+            $requestData = $query->orderBy('created_at', 'desc')->first();
+        }
+
+        if (!$requestData) {
+            return redirect()->route('recipient.dashboard');
+        }
+
+        return view('pages.recipient-confirmation', compact('requestData'));
     }
 }

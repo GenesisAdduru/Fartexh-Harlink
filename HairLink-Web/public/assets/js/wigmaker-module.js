@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const donorSteps = ['received', 'in-queue', 'in-progress', 'completed', 'wig-received'];
     
     const labels = {
-        'received': 'Received',
+        'received': 'Received Hair',
         'in-queue': 'In Queue',
         'in-progress': 'In Progress',
         'completed': 'Completed',
@@ -152,13 +152,190 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Task Detail Form Handler
+    const taskUpdateForm = document.getElementById('taskUpdateForm');
+    if (taskUpdateForm) {
+        taskUpdateForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = taskUpdateForm.querySelector('button[type="submit"]');
+            const banner = document.querySelector('[data-update-banner]');
+            const historyTable = document.querySelector('.task-table tbody');
+            const timelineItems = document.querySelectorAll('.timeline-list li');
+            const actionUrl = taskUpdateForm.dataset.actionUrl;
+
+            // Form validation
+            if (!taskUpdateForm.checkValidity()) {
+                taskUpdateForm.reportValidity();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            const formData = new FormData(taskUpdateForm);
+
+            try {
+                const response = await fetch(actionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    if (banner) {
+                        banner.hidden = false;
+                        banner.textContent = data.message;
+                        banner.className = 'update-banner success-banner';
+                        setTimeout(() => { banner.hidden = true; }, 5000);
+                    }
+
+                    // 1. Update timeline
+                    const savedStatus = formData.get('status');
+                    const statusOrder = ['assigned', 'processing', 'completed'];
+                    const activeIndex = statusOrder.indexOf(savedStatus);
+
+                    timelineItems.forEach((li, idx) => {
+                        li.classList.remove('active', 'done');
+                        if (idx < activeIndex) li.classList.add('done');
+                        if (idx === activeIndex) li.classList.add('active');
+                    });
+
+                    // 2. Update the "Next Stage" fields for sequential flow
+                    if (savedStatus === 'completed') {
+                        // If we just saved 'completed', we are done!
+                        // Hide fields and show completion banner
+                        taskUpdateForm.innerHTML = `
+                            <div class="completion-banner" style="background: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+                                <i class='bx bxs-check-circle' style="font-size: 2rem;"></i>
+                                <div>
+                                    <strong>Production Completed</strong>
+                                    <p style="margin: 0; font-size: 0.9rem;">This task has been finalized and synced with the inventory system.</p>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <a class="soft-btn" href="/wigmaker/dashboard">Back to Dashboard</a>
+                            </div>
+                        `;
+                    } else {
+                        // Advance to the next stage in the sequence
+                        const nextStatusMap = {
+                            'assigned': 'processing',
+                            'processing': 'completed'
+                        };
+                        const nextStatus = nextStatusMap[savedStatus] || 'completed';
+                        const nextLabel = nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1);
+                        
+                        const displayInput = document.getElementById('task-status-display');
+                        const hiddenInput = taskUpdateForm.querySelector('input[name="status"]');
+                        
+                        if (displayInput) displayInput.value = nextLabel;
+                        if (hiddenInput) hiddenInput.value = nextStatus;
+                    }
+
+                    // 3. Add to history table
+                    if (historyTable && data.history) {
+                        const newRow = document.createElement('tr');
+                        const statusLabel = savedStatus === 'processing' ? 'In Progress' : (savedStatus.charAt(0).toUpperCase() + savedStatus.slice(1));
+                        const statusClass = savedStatus === 'processing' ? 'in-progress' : savedStatus;
+                        
+                        let photoHtml = '<span style="color: #ccc;">---</span>';
+                        if (data.history.metadata && data.history.metadata.preview_photo) {
+                            const photoPath = `/storage/${data.history.metadata.preview_photo}`;
+                            photoHtml = `
+                                <a href="${photoPath}" target="_blank" class="file-thumbnail">
+                                    <img src="${photoPath}" alt="Preview">
+                                    <div class="preview-overlay"><i class='bx bx-search'></i></div>
+                                </a>
+                            `;
+                        }
+
+                        newRow.innerHTML = `
+                            <td style="vertical-align: middle;">${data.history.at}</td>
+                            <td style="text-align: center; vertical-align: middle;">${photoHtml}</td>
+                            <td style="vertical-align: middle;"><span class="status-pill status-${statusClass}">${statusLabel}</span></td>
+                            <td style="vertical-align: middle;">${data.history.notes}</td>
+                        `;
+                        // Remove empty state if any
+                        const emptyRows = historyTable.querySelectorAll('td[colspan]');
+                        emptyRows.forEach(td => td.parentElement.remove());
+                        
+                        historyTable.insertBefore(newRow, historyTable.firstChild);
+                    }
+
+                    // Reset notes and photo
+                    const notesField = document.getElementById('progress-notes');
+                    const photoField = document.getElementById('preview-photo');
+                    if (notesField) notesField.value = '';
+                    if (photoField) photoField.value = '';
+
+                } else {
+                    alert(data.message || 'Failed to update task');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred while saving the update.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Save Update';
+            }
+        });
+    }
+
     // Simple search filter
     const searchInput = document.querySelector('[data-search-input]');
     if (searchInput) {
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.trim().toLowerCase();
-            trackingCards.forEach(card => {
-                card.hidden = !card.textContent.toLowerCase().includes(query);
+            const searchRows = document.querySelectorAll('[data-task-row]');
+            
+            if (searchRows.length > 0) {
+                searchRows.forEach(row => {
+                    const match = row.textContent.toLowerCase().includes(query);
+                    row.style.display = match ? '' : 'none';
+                });
+            } else {
+                trackingCards.forEach(card => {
+                    card.hidden = !card.textContent.toLowerCase().includes(query);
+                });
+            }
+        });
+    }
+
+    // DASHBOARD TASK FILTERS
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const taskRows = document.querySelectorAll('[data-task-row]');
+
+    if (filterButtons.length > 0 && taskRows.length > 0) {
+        filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filterValue = btn.dataset.filter;
+                
+                // Update active button state
+                filterButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                // Filter rows
+                taskRows.forEach(row => {
+                    const status = row.dataset.taskStatus; // 'assigned', 'processing', 'completed'
+                    
+                    if (filterValue === 'all') {
+                        row.style.display = '';
+                    } else if (filterValue === 'queued' && status === 'assigned') {
+                        row.style.display = '';
+                    } else if (filterValue === 'in-progress' && status === 'processing') {
+                        row.style.display = '';
+                    } else if (filterValue === 'completed' && status === 'completed') {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
             });
         });
     }

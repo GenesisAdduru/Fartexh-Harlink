@@ -132,15 +132,54 @@
 }
 
 .status-in-progress {
-    background: #eaf2ff;
-    border-color: #c6d9ff;
-    color: #2f5ea8;
+    background: #fdf2f8;
+    border-color: #f1a8cf;
+    color: #ad246d;
 }
 
 .status-completed {
     background: #e9f8ef;
     border-color: #c6ebd2;
     color: #227644;
+}
+
+/* File Preview Grid in Table */
+.file-thumbnail {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    border: 1px solid #ead7e8;
+    overflow: hidden;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.file-thumbnail:hover {
+    transform: scale(1.1);
+}
+
+.file-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.file-thumbnail .preview-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(173, 36, 109, 0.4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.file-thumbnail:hover .preview-overlay {
+    opacity: 1;
 }
 
 .status-select {

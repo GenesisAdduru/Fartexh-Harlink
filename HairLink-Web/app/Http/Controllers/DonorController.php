@@ -26,7 +26,9 @@ class DonorController extends Controller
             ->sum('amount');
         
         $monetaryPoints = floor($monetaryDonations / 100);
-        $hairPoints = $donations->count() * 10;
+        // Only count hair points for donations where staff has actually received the hair
+        $receivedStatuses = ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received'];
+        $hairPoints = $donations->whereIn('status', $receivedStatuses)->count() * 10;
         
         $points = $monetaryPoints + $hairPoints;
 
@@ -45,7 +47,13 @@ class DonorController extends Controller
     public function trackingDetail($reference)
     {
         $user = Auth::user();
-        $donation = Donation::with('statusHistories')->where('reference', $reference)->where('user_id', $user->id)->firstOrFail();
+        
+        $query = Donation::with('statusHistories')->where('reference', $reference);
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+        
+        $donation = $query->firstOrFail();
         
         return view('pages.donor-tracking-detail', compact('donation'));
     }
@@ -57,8 +65,11 @@ class DonorController extends Controller
 
         $ref = $request->query('ref');
         
-        $query = Donation::where('user_id', $user->id)
-                         ->whereIn('status', ['Verified', 'Completed']);
+        $query = Donation::whereIn('status', ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']);
+        
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
 
         if ($ref) {
             $donation = $query->where('reference', $ref)->first();
@@ -67,5 +78,28 @@ class DonorController extends Controller
         }
                              
         return view('pages.donor-certificate', compact('donation'));
+    }
+
+    public function confirmation(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) return redirect('/login');
+
+        $ref = $request->query('ref');
+        
+        $query = Donation::query();
+        if (!in_array($user->role, ['staff', 'admin'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        if ($ref) {
+            $donation = $query->where('reference', $ref)->first();
+        } else {
+            $donation = $query->orderBy('created_at', 'desc')->first();
+        }
+
+        if (!$donation) return redirect()->route('donor.dashboard');
+
+        return view('pages.donor-confirmation', compact('donation'));
     }
 }

@@ -149,9 +149,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 story: document.getElementById('story').value,
                 wigLength: document.getElementById('wig-length')?.value || '',
                 wigColor: document.getElementById('wig-color')?.value || '',
-                medicalCertificate: selectedDocuments[0] || null,
-                diagnosisPhoto: selectedDocuments[1] || null,
-                recipientPhoto: selectedPhoto || null,
                 fileDocuments: selectedDocuments,
                 filePhoto: selectedPhoto
             };

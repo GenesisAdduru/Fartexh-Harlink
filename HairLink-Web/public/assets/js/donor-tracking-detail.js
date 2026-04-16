@@ -1,14 +1,34 @@
 function timelineItemHtml(entry, formatDateTime) {
     const safeStatus = String(entry.status || 'Unknown');
     const safeDate = entry.at ? formatDateTime(entry.at) : '-';
-    return `<li><strong>${safeStatus}</strong><time>${safeDate}</time></li>`;
+    let rawNotes = entry.notes || `Status changed to ${safeStatus}`;
+    
+    // Remove tech prefixes (e.g., "Synced from...: " or "Assigned to...: ")
+    const cleanNotes = rawNotes.includes(': ') ? rawNotes.split(': ').pop() : rawNotes;
+    const safeNotes = `message: ${cleanNotes}`;
+    
+    return `
+        <li class="timeline-item">
+            <div class="timeline-meta">
+                <strong>${safeStatus}</strong>
+                <time>${safeDate}</time>
+            </div>
+            <div class="timeline-desc">
+                ${safeNotes}
+            </div>
+        </li>
+    `;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const moduleApi = window.hairlinkDonorModule;
-    if (!moduleApi) return;
-
     const root = document.getElementById('trackingDetailRoot');
+
+    if (!moduleApi) {
+        console.warn('Donor module API not found, server-side content is being displayed.');
+        return;
+    }
+
     const refFromRoute = root?.dataset?.reference || '';
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref') || refFromRoute;
@@ -37,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (detailStatus) detailStatus.textContent = donation.currentStatus;
         if (detailSubmitted) detailSubmitted.textContent = moduleApi.formatDateTime(donation.submittedAt);
         if (detailDonor) detailDonor.textContent = donation.fullName;
         if (detailHair) {
@@ -47,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (detailStatusPill) {
             detailStatusPill.textContent = donation.currentStatus;
-            detailStatusPill.className = `status-pill status-${donation.currentStatus.toLowerCase()}`;
+            detailStatusPill.className = `status-pill status-${donation.currentStatus.toLowerCase().replace(/\s+/g, '-')}`;
         }
 
         if (detailTimeline) {
@@ -81,7 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    render(ref);
+    // We NO LONGER run render() on init. 
+    // The Blade gives us a perfect initial state.
+    // JS only handles the simulation clicks now.
 
     if (simulateStatusBtn) {
         simulateStatusBtn.addEventListener('click', async () => {

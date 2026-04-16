@@ -35,10 +35,10 @@
                         <tr>
                             <td><strong>{{ $donation->reference }}</strong></td>
                             <td>{{ $donation->created_at->format('Y-m-d') }}</td>
-                            <td><span class="status-pill status-{{ strtolower($donation->status) }}">{{ $donation->status }}</span></td>
+                            <td><span class="status-pill status-{{ str_replace(' ', '-', strtolower($donation->status)) }}">{{ $donation->status }}</span></td>
                             <td>{{ $donation->hair_length ?? 'N/A' }}</td>
                             <td>
-                                @if(in_array($donation->status, ['Verified', 'Completed']))
+                                @if(in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']))
                                     <a href="{{ route('donor.certificate') }}" class="link-text">View Certificate</a>
                                 @else
                                     <span style="color:#ada9b0;">N/A</span>

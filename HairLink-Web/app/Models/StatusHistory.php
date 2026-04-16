@@ -14,6 +14,11 @@ class StatusHistory extends Model
         'trackable_type',
         'status',
         'notes',
+        'metadata',
+    ];
+
+    protected $casts = [
+        'metadata' => 'array',
     ];
 
     public function trackable()

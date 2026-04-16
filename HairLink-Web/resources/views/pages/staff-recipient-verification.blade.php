@@ -30,7 +30,7 @@
                         <th>Reference</th>
                         <th>Recipient</th>
                         <th>Wig Preference</th>
-                        <th>Medical Need</th>
+                        <th>Story</th>
                         <th>Current Status</th>
                         <th>Action</th>
                     </tr>
@@ -40,9 +40,9 @@
                         <tr data-search-row>
                             <td>{{ $req->reference }}</td>
                             <td>{{ $req->user->first_name ?? 'Unknown' }} {{ $req->user->last_name ?? '' }}</td>
-                            <td>{{ $req->preferred_length }} / {{ $req->preferred_color }}</td>
-                            <td>{{ $req->medical_condition }}</td>
-                            <td><span class="status-chip">{{ $req->status }}</span></td>
+                            <td>{{ ucfirst($req->wig_length) }} / {{ ucfirst($req->wig_color) }}</td>
+                            <td>{{ Str::limit($req->story, 50) }}</td>
+                            <td><span class="status-chip {{ strtolower($req->status) }}">{{ $req->status }}</span></td>
                             <td><a class="ghost-btn" href="{{ route('staff.verification.detail', ['type' => 'recipient', 'reference' => $req->reference]) }}">Review</a></td>
                         </tr>
                     @empty

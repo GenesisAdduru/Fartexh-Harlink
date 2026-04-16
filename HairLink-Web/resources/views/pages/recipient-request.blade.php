@@ -67,10 +67,10 @@
                     <label for="gender">Gender <span class="required">*</span></label>
                     <select id="gender" name="gender" required style="background:#f5f3f7;cursor:not-allowed;pointer-events:none;">
                         <option value="">Select Gender</option>
-                        <option value="male" {{ auth()->user()->gender == 'male' ? 'selected' : '' }}>Male</option>
-                        <option value="female" {{ auth()->user()->gender == 'female' ? 'selected' : '' }}>Female</option>
-                        <option value="other" {{ auth()->user()->gender == 'other' ? 'selected' : '' }}>Other</option>
-                        <option value="prefer-not-to-say" {{ auth()->user()->gender == 'prefer-not-to-say' ? 'selected' : '' }}>Prefer not to say</option>
+                        <option value="male" @selected(in_array(trim(strtolower(auth()->user()->gender)), ['male', 'm']))>Male</option>
+                        <option value="female" @selected(in_array(trim(strtolower(auth()->user()->gender)), ['female', 'f']))>Female</option>
+                        <option value="nonbinary" @selected(in_array(trim(strtolower(auth()->user()->gender)), ['nonbinary', 'non-binary', 'other']))>Non-binary</option>
+                        <option value="prefer_not_say" @selected(in_array(trim(strtolower(auth()->user()->gender)), ['prefer_not_say', 'prefer-not-to-say', 'prefer not to say']))>Prefer not to say</option>
                     </select>
                 </div>
                 <div class="form-group">

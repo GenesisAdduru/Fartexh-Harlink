@@ -18,20 +18,19 @@
 
             <div class="recipient-facts">
                 <strong data-recipient-name>{{ $first->user->first_name ?? 'Select' }} {{ $first->user->last_name ?? 'Recipient' }}</strong>
-                <span>Medical Need: <span data-recipient-need>{{ $first->medical_condition ?? 'N/A' }}</span></span>
-                <span>Preferred Wig Size: <span data-recipient-length>{{ $first->preferred_length ?? 'N/A' }}</span></span>
-                <span>Preferred Color: <span data-recipient-color>{{ $first->preferred_color ?? 'N/A' }}</span></span>
+                <span>Preferred Wig Size: <strong data-recipient-length>{{ ucfirst($first->wig_length ?? 'N/A') }}</strong></span>
+                <span>Preferred Color: <strong data-recipient-color>{{ ucfirst($first->wig_color ?? 'N/A') }}</strong></span>
             </div>
 
             <div class="recipient-list">
                 @forelse($recipients as $idx => $rec)
                     <button type="button" class="recipient-btn {{ $idx === 0 ? 'active' : '' }}" 
                         data-recipient-btn 
-                        data-name="{{ $rec->user->first_name }} {{ $rec->user->last_name }}" 
-                        data-need="{{ $rec->medical_condition }}" 
-                        data-length="{{ $rec->preferred_length }}" 
-                        data-color="{{ $rec->preferred_color }}">
-                        {{ $rec->user->first_name }} {{ $rec->user->last_name }} <b>{{ $rec->status }}</b>
+                        data-reference="{{ $rec->reference }}"
+                        data-name="{{ ($rec->user->first_name ?? 'Unknown') . ' ' . ($rec->user->last_name ?? 'User') }}" 
+                        data-length="{{ $rec->wig_length }}" 
+                        data-color="{{ $rec->wig_color }}">
+                        {{ $rec->user->first_name ?? 'Unknown' }} {{ $rec->user->last_name ?? 'User' }} <b>{{ $rec->status }}</b>
                     </button>
                 @empty
                     <p>No recipients pending matching.</p>
@@ -53,13 +52,20 @@
             <div class="wig-options">
                 @forelse($wigs as $wig)
                     <article class="wig-option" data-wig-card data-length="{{ $wig->target_length }}" data-color="{{ $wig->target_color }}" data-available="true" data-stock-date="{{ $wig->updated_at->format('Y-m-d') }}">
+                        @php
+                            $sizeLabel = ucfirst($wig->target_length);
+                            // Fallback for legacy data
+                            if (str_contains(strtolower($sizeLabel), '10 to 14')) $sizeLabel = 'Short';
+                            if (str_contains(strtolower($sizeLabel), '15 to 20')) $sizeLabel = 'Medium';
+                            if (str_contains(strtolower($sizeLabel), 'more than 20')) $sizeLabel = 'Long';
+                        @endphp
                         <h4>Stock #{{ $wig->task_code }}</h4>
-                        <p>Wig Size: {{ $wig->target_length }}</p>
-                        <p>Color: {{ $wig->target_color }}</p>
+                        <p>Wig Size: <strong>{{ $sizeLabel }}</strong></p>
+                        <p>Color: <strong>{{ ucfirst(str_replace('-', ' ', $wig->target_color)) }}</strong></p>
                         <p>Availability: In Stock</p>
                         <p class="compat-score">Compatibility Score: <span data-score>0%</span></p>
                         <p class="score-breakdown" data-score-breakdown>Calculating...</p>
-                        <button class="soft-btn" type="button">Choose this wig</button>
+                        <button class="soft-btn" type="button" data-match-btn data-wig-id="{{ $wig->id }}">Choose this wig</button>
                     </article>
                 @empty
                     <p>No wigs currently in stock.</p>

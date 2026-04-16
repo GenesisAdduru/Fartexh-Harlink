@@ -187,6 +187,18 @@ a {
     }
 }
 
+/* Loading State Utilities */
+.loading-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.reveal-after-load {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transition: opacity 0.4s ease-in-out !important;
+}
+
 @media (max-width: 900px) {
     .dash-burger {
         display: inline-flex;

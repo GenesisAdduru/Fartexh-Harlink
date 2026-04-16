@@ -49,6 +49,14 @@ class HairRequestController extends Controller
             $validated['additional_photo'] = $request->file('additional_photo')->store('requests/photos', 'public');
         }
 
+        if ($request->hasFile('documents')) {
+            $docs = [];
+            foreach ($request->file('documents') as $file) {
+                $docs[] = $file->store('requests/documents', 'public');
+            }
+            $validated['documents'] = $docs;
+        }
+
         $hairRequest = Auth::user()->hairRequests()->create($validated);
 
         // Record initial status in history

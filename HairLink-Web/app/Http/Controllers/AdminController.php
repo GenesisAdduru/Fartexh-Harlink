@@ -18,7 +18,7 @@ class AdminController extends Controller
         $usersCount = User::count();
         $donationsCount = Donation::count();
         $requestsCount = HairRequest::count();
-        $pendingVerifications = Donation::where('status', 'Received')->count() + HairRequest::where('status', 'Submitted')->count();
+        $pendingVerifications = Donation::where('status', 'Received Hair')->count() + HairRequest::where('status', 'Submitted')->count();
 
         $recentUsers = User::orderBy('created_at', 'desc')->take(5)->get();
         $recentDonations = Donation::with('user')->orderBy('created_at', 'desc')->take(5)->get();
@@ -26,7 +26,7 @@ class AdminController extends Controller
 
         // Dynamic counts for priority queue cards
         $approvedDonations = Donation::where('status', 'Completed')->count();
-        $pendingDonationsCount = Donation::whereIn('status', ['Submitted', 'Received'])->count();
+        $pendingDonationsCount = Donation::whereIn('status', ['Submitted', 'Received Hair'])->count();
         $rejectedDonations = Donation::where('status', 'Rejected')->count();
 
         $approvedRequests = HairRequest::where('status', 'Validated')->count();
@@ -47,7 +47,7 @@ class AdminController extends Controller
 
     public function verification()
     {
-        $pendingDonations = Donation::with('user')->whereIn('status', ['Received', 'Submitted'])->get();
+        $pendingDonations = Donation::with('user')->whereIn('status', ['Received Hair', 'Submitted'])->get();
         $pendingRequests = HairRequest::with('user')->whereIn('status', ['Submitted'])->get();
         $approvedTodayCount = Donation::where('status', 'Completed')
             ->whereDate('updated_at', today())
@@ -113,7 +113,7 @@ class AdminController extends Controller
         $transitCount = WigProduction::where('status', 'processing')->count();
         $completedCount = WigProduction::where('status', 'completed')->count();
         
-        $pendingDonationsCount = Donation::where('status', 'Received')->count();
+        $pendingDonationsCount = Donation::where('status', 'Received Hair')->count();
         $pendingRequestsCount = HairRequest::where('status', 'Submitted')->count();
 
         // Real operations monitor data

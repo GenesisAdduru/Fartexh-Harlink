@@ -68,7 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/donor/donate', 'pages.donate-dashboard')->name('donor.donate');
     Route::get('/donor/tracking', [App\Http\Controllers\DonorController::class, 'tracking'])->name('donor.tracking');
     Route::get('/donor/tracking/{reference}', [App\Http\Controllers\DonorController::class, 'trackingDetail'])->name('donor.tracking.detail');
-    Route::view('/donor/confirmation', 'pages.donor-confirmation')->name('donor.confirmation');
+    Route::get('/donor/confirmation', [App\Http\Controllers\DonorController::class, 'confirmation'])->name('donor.confirmation');
     Route::get('/donor/certificate', [App\Http\Controllers\DonorController::class, 'certificate'])->name('donor.certificate');
     Route::view('/donor/profile', 'pages.donor-profile')->name('donor.profile');
     Route::view('/donor/community', 'pages.donor-community')->name('donor.community');
@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/recipient/request', 'pages.recipient-request')->name('recipient.request');
     Route::get('/recipient/tracking', [App\Http\Controllers\RecipientController::class, 'tracking'])->name('recipient.tracking');
     Route::get('/recipient/tracking/{reference}', [App\Http\Controllers\RecipientController::class, 'trackingDetail'])->name('recipient.tracking.detail');
-    Route::view('/recipient/confirmation', 'pages.recipient-confirmation')->name('recipient.confirmation');
+    Route::get('/recipient/confirmation', [App\Http\Controllers\RecipientController::class, 'confirmation'])->name('recipient.confirmation');
     Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
     Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
     Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
@@ -134,11 +134,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/staff/verification/{type}/{reference}', [App\Http\Controllers\StaffController::class, 'verificationDetail'])->whereIn('type', ['donor', 'recipient'])->name('staff.verification.detail');
     Route::post('/staff/verification/{type}/{reference}/status', [App\Http\Controllers\StaffController::class, 'updateVerificationStatus'])->whereIn('type', ['donor', 'recipient'])->name('staff.verification.status');
     Route::get('/staff/realtime-tracking', [App\Http\Controllers\StaffController::class, 'realtimeTracking'])->name('staff.realtime-tracking');
+    Route::post('/staff/tracking/{reference}/assign-wigmaker', [App\Http\Controllers\StaffController::class, 'assignWigmaker'])->name('staff.tracking.assign-wigmaker');
+    Route::post('/staff/tracking/{reference}/update-status', [App\Http\Controllers\StaffController::class, 'updateTrackingStatus'])->name('staff.tracking.update-status');
     Route::get('/staff/delivery-batches', [App\Http\Controllers\StaffController::class, 'deliveryBatches'])->name('staff.delivery-batches');
     Route::get('/staff/hair-stock', [App\Http\Controllers\StaffController::class, 'hairStock'])->name('staff.hair-stock');
     Route::get('/staff/wig-stock', [App\Http\Controllers\StaffController::class, 'wigStock'])->name('staff.wig-stock');
     Route::get('/staff/recipient-matching-list', [App\Http\Controllers\StaffController::class, 'recipientMatchingList'])->name('staff.recipient-matching-list');
     Route::get('/staff/rule-matching', [App\Http\Controllers\StaffController::class, 'ruleMatching'])->name('staff.rule-matching');
+    Route::post('/staff/matching/match', [App\Http\Controllers\StaffController::class, 'matchWigToRequest'])->name('staff.matching.match');
 
     Route::get('/admin/dashboard', [App\Http\Controllers\AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/admin/verification', [App\Http\Controllers\AdminController::class, 'verification'])->name('admin.verification');
