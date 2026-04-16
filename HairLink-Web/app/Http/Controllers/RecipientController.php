@@ -23,7 +23,12 @@ class RecipientController extends Controller
             ->where('status', 'Completed')
             ->sum('amount');
         
-        $points = floor($monetaryDonations / 100);
+        $monetaryPoints = floor($monetaryDonations / 100);
+
+        // 5 points for utilizing a referral code
+        $referralPoints = $user->referred_by ? 5 : 0;
+        
+        $points = $monetaryPoints + $referralPoints;
 
         return view('pages.recipient-dashboard', compact('requests', 'points'));
     }

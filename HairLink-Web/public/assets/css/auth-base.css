@@ -154,41 +154,48 @@ body {
 
 .form-box h1 {
     font-family: 'Outfit', sans-serif;
-    font-size: clamp(1.05rem, 1.35vw, 1.35rem);
-    line-height: 1.05;
-    margin-bottom: 0.35rem;
+    font-size: clamp(1.2rem, 1.5vw, 1.5rem);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+    font-weight: 700;
 }
 
 .form-subtitle {
     color: var(--muted);
-    margin-bottom: 0.45rem;
-    line-height: 1.4;
-    font-size: 0.76rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.85rem;
 }
 
 .demo-account-card {
-    margin-bottom: 0.4rem;
-    padding: 0.4rem;
-    border: 1px solid #ecd2e3;
-    border-radius: 14px;
-    background: #fff4fa;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #f0e6f0;
+    border-radius: 12px;
+    background: #faf8fb;
 }
 
 .demo-account-title {
-    font-weight: 800;
-    color: #9e1e66;
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 0.85rem;
 }
 
 .demo-account-copy {
-    margin-top: 0.2rem;
-    font-size: 0.68rem;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
     color: var(--muted);
 }
 
 .demo-account-credentials {
-    margin-top: 0.3rem;
-    font-size: 0.68rem;
-    color: #5c4c62;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--ink);
+    background: rgba(255,255,255,0.6);
+    padding: 0.4rem;
+    border-radius: 6px;
+    border: 1px solid #eee;
 }
 
 .demo-fill-btn {
@@ -222,7 +229,7 @@ body {
 
 .input-box {
     position: relative;
-    margin: 0.2rem 0;
+    margin: 0.6rem 0;
 }
 
 .input-box input,
@@ -264,19 +271,21 @@ body {
 }
 
 .user-type-group {
-    border: 1px solid #ead9e8;
-    border-radius: 9px;
-    padding: 0.42rem;
-    background: #fff;
-    margin-bottom: 0.4rem;
+    border: 1px solid #e8d8e8;
+    border-radius: 10px;
+    padding: 0.6rem;
+    background: #faf8fb;
+    margin-bottom: 1rem;
 }
 
 .user-type-label {
     display: block;
-    margin-bottom: 0.25rem;
-    font-size: 0.68rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .user-type-options {
@@ -459,88 +468,113 @@ body {
     }
 
     .container {
-        min-height: 1050px;
-        border-radius: 22px;
-    }
-
-    .form-box.login,
-    .form-box.register,
-    .toggle-box,
-    .container.active .toggle-box {
-        width: 100%;
-        inset: auto;
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+        height: auto;
+        width: min(100%, 540px);
+        border-radius: 20px;
+        overflow: visible; /* Allow scrolling on shell */
     }
 
     .toggle-box {
-        top: 0;
-        height: 34%;
-        border-radius: 0 0 22px 22px;
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
+        padding: 2.5rem 1rem;
+        order: -1; /* Keep at top */
+        border-radius: 0;
+        transition: none;
     }
 
-    .form-box.login,
-    .form-box.register {
-        bottom: 0;
-        min-height: 66%;
-        padding: 1.25rem;
-        transform: translateY(0);
-    }
-
-    .form-box.register form {
+    .container.active .toggle-box {
+        inset: auto;
         width: 100%;
     }
 
-    .form-box.login {
+    .toggle-panel {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
         opacity: 1;
         pointer-events: auto;
+        transform: none;
+        display: none; /* Controlled by active class */
     }
 
-    .form-box.register {
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(8%);
-    }
-
-    .container.active .form-box.login {
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(8%);
-    }
-
-    .container.active .form-box.register {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0);
-    }
-
-    .toggle-left,
-    .toggle-right,
-    .container.active .toggle-left,
-    .container.active .toggle-right {
-        position: absolute;
-        inset: 0;
-        display: grid;
-        place-items: center;
-        transform: translateX(0);
-    }
-
-    .toggle-left {
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .toggle-right {
-        opacity: 1;
-        pointer-events: auto;
+    /* Show correct toggle panel based on mode */
+    .container:not(.active) .toggle-right {
+        display: flex;
     }
 
     .container.active .toggle-left {
-        opacity: 1;
-        pointer-events: auto;
+        display: flex;
     }
 
-    .container.active .toggle-right {
-        opacity: 0;
-        pointer-events: none;
+    .form-box h1,
+    .form-subtitle,
+    .demo-account-title,
+    .demo-account-copy,
+    .user-type-label,
+    .forgot-link {
+        text-align: left; /* Keep text left-aligned inside the centered column */
+    }
+
+    .form-box {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        height: auto;
+        padding: 1.5rem 1.25rem 2.5rem;
+        display: none; /* Controlled by active class */
+        flex-direction: column;
+        align-items: center; /* Center children horizontally */
+        transform: none !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transition: none;
+    }
+
+    .form-box form {
+        width: 100%;
+        max-width: 440px; /* Professional column width */
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Ensure internal blocks align to the left of the column */
+    }
+
+    .input-wrapper,
+    .demo-account-card,
+    .user-type-group {
+        width: 100%;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .demo-account-credentials {
+        text-align: left;
+    }
+
+    .demo-fill-btn {
+        margin-left: 0;
+        margin-right: auto;
+        display: inline-block;
+    }
+
+    .demo-switch-row {
+        justify-content: flex-start;
+    }
+
+    /* Show correct form based on mode */
+    .container:not(.active) .form-box.login {
+        display: flex;
+    }
+
+    .container.active .form-box.register {
+        display: flex;
     }
 
     .grid-two-cols {
@@ -550,46 +584,21 @@ body {
 
 @media (max-width: 640px) {
     .auth-shell {
-        padding: 0.7rem;
-    }
-
-    .auth-navbar-inner {
-        min-height: 58px;
-    }
-
-    .auth-brand span {
-        font-size: 0.95rem;
-    }
-
-    .auth-nav-links {
-        gap: 0.35rem;
-    }
-
-    .auth-nav-links a {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.56rem;
+        padding: 1rem 0.5rem;
+        align-items: flex-start; /* Start from top for scrolling */
     }
 
     .container {
-        min-height: 1020px;
-        border-radius: 18px;
-    }
-
-    .toggle-box {
-        border-radius: 0 0 18px 18px;
-    }
-
-    .form-box.login,
-    .form-box.register {
-        padding: 1rem;
-    }
-
-    .toggle-panel {
-        padding: 1rem;
+        width: 100%;
+        border-radius: 12px;
     }
 
     .toggle-panel h2 {
-        font-size: 1.65rem;
+        font-size: 1.4rem;
+    }
+
+    .form-box h1 {
+        font-size: 1.25rem;
     }
 }
 

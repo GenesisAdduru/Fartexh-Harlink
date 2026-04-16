@@ -41,6 +41,7 @@
 }
 
 .progress-fill {
+    display: block;
     height: 100%;
     width: 0;
     border-radius: inherit;
@@ -63,7 +64,7 @@
     margin-top: 0.65rem;
     display: flex;
     justify-content: space-between;
-    color: #f2ae2e;
+    color: #e5d5e1; /* Inactive star color */
     opacity: 0.9;
 }
 

@@ -5,7 +5,7 @@
 <style>
     .input-wrapper {
         width: 100%;
-        margin-bottom: 5px;
+        margin-bottom: 12px;
         position: relative;
     }
     .ajax-error {
@@ -17,6 +17,60 @@
         line-height: 1.2;
         width: 100%;
         padding-left: 20px;
+    }
+    .phone-prefix-box {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        border: 1px solid #e8d8e8;
+        border-radius: 8px;
+        background: #fff;
+        margin: 0.6rem 0;
+        padding-left: 0.58rem;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
+        position: relative;
+    }
+    .phone-prefix-box:focus-within {
+        border-color: #d574aa;
+        box-shadow: 0 0 0 3px rgba(213, 116, 170, 0.15);
+    }
+    .phone-prefix {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #9f8ba8; /* Matches the color of other icons in the form */
+        white-space: nowrap;
+        flex-shrink: 0;
+        margin-right: 5px;
+        line-height: 1;
+    }
+    .phone-prefix .flag {
+        font-size: 14px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .phone-prefix-box .inner-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+    .phone-prefix-box input {
+        width: 100%;
+        border: none !important;
+        background: transparent !important;
+        padding: 0.42rem 1.75rem 0.42rem 0 !important;
+        outline: none !important;
+        font: inherit;
+        color: var(--ink);
+    }
+    .phone-prefix-box i {
+        position: absolute;
+        right: 0.7rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9f8ba8;
+        font-size: 0.9rem;
     }
 </style>
 
@@ -167,10 +221,17 @@
                 </div>
 
                 <div class="input-wrapper">
-                    <div class="input-box input-box--medium" style="margin-bottom: 0;">
-                        <input type="tel" name="phone" placeholder="Phone Number" required>
-                        <i class='bx bxs-phone'></i>
+                    <div class="phone-prefix-box">
+                        <div class="phone-prefix">
+                            <span class="flag">🇵🇭</span>
+                            <span>+63</span>
+                        </div>
+                        <div class="inner-input-wrapper">
+                            <input type="tel" id="phoneDisplay" placeholder="9171234567" maxlength="10" required>
+                            <i class='bx bxs-phone'></i>
+                        </div>
                     </div>
+                    <input type="hidden" name="phone" id="phoneHidden">
                     <div class="ajax-error" id="error-register-phone"></div>
                 </div>
             </div>

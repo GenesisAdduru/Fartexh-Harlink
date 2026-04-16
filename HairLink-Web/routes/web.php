@@ -111,6 +111,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Partnerships
         // Remaining sections...
 
+        Route::post('/referral/submit', [App\Http\Controllers\ReferralController::class, 'submitCode'])->name('api.referral.submit');
+
     });
 
     Route::get('/donor/monetary-donation', function () {

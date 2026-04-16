@@ -55,22 +55,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Referral code submit (Simulation)
     if (submitCodeBtn && referralCode) {
-        submitCodeBtn.addEventListener('click', () => {
+        submitCodeBtn.addEventListener('click', async () => {
             const code = referralCode.value.trim();
             if (!code) {
                 referralCode.focus();
+                referralCode.style.outline = '2px solid #e74c3c';
+                setTimeout(() => { referralCode.style.outline = ''; }, 1500);
                 return;
             }
-            // 5 pts for referral code submission as per requirement
-            points = Math.min(points + 5, goal);
-            renderPoints(points);
-            referralCode.value = '';
-            submitCodeBtn.textContent = '✓ Applied';
+            
+            // Disable button during req
             submitCodeBtn.disabled = true;
-            setTimeout(() => {
-                submitCodeBtn.textContent = 'Submit Code';
+            submitCodeBtn.textContent = 'Verifying...';
+
+            try {
+                const response = await fetch('/api/referral/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ referral_code: code })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.message || 'Invalid code');
+                    submitCodeBtn.disabled = false;
+                    submitCodeBtn.textContent = 'Submit Code';
+                    return;
+                }
+
+                // 5 pts for referral code submission as per requirement
+                points = Math.min(points + 5, goal);
+                renderPoints(points);
+                referralCode.value = '';
+                submitCodeBtn.textContent = '✓ Code Applied';
+                // Remain disabled since it can only be used once
+            } catch (error) {
+                console.error('Referral error:', error);
+                alert('Something went wrong. Please try again.');
                 submitCodeBtn.disabled = false;
-            }, 2500);
+                submitCodeBtn.textContent = 'Submit Code';
+            }
         });
     }
 });

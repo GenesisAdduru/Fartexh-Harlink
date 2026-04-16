@@ -26,11 +26,14 @@ class DonorController extends Controller
             ->sum('amount');
         
         $monetaryPoints = floor($monetaryDonations / 100);
-        // Only count hair points for donations where staff has actually received the hair
+        // 10 stars for hair donations where staff has actually received the hair
         $receivedStatuses = ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received'];
         $hairPoints = $donations->whereIn('status', $receivedStatuses)->count() * 10;
         
-        $points = $monetaryPoints + $hairPoints;
+        // 5 stars for utilizing a referral code
+        $referralPoints = $user->referred_by ? 5 : 0;
+        
+        $points = $monetaryPoints + $hairPoints + $referralPoints;
 
         return view('pages.donor-dashboard', compact('donations', 'points'));
     }

@@ -68,7 +68,7 @@ class AuthController extends Controller
             'postal_code' => ['required', 'string', 'max:255'],
             'age' => ['required', 'integer', 'min:1', 'max:120'],
             'gender' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'regex:/^\+63[0-9]{10}$/', 'max:13'],
         ]);
 
         $user = User::create([

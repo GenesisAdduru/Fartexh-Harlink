@@ -75,7 +75,11 @@ function handleAjaxSubmit(form, formType) {
             const response = await fetch(url, {
                 method: 'POST',
                 body: formData,
-                headers: { 'Accept': 'application/json' }
+                credentials: 'same-origin',
+                headers: { 
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
             });
 
             const data = await response.json();
@@ -161,7 +165,6 @@ function setupRegisterFlow() {
     // Enforce digits-only for age and postal_code inputs
     const ageInput    = document.querySelector('input[name="age"]');
     const postalInput = document.querySelector('input[name="postal_code"]');
-    const phoneInput  = document.querySelector('input[name="phone"]');
 
     [ageInput, postalInput].forEach(input => {
         if (!input) return;
@@ -177,10 +180,40 @@ function setupRegisterFlow() {
         });
     });
 
-    if (phoneInput) {
-        phoneInput.setAttribute('inputmode', 'tel');
-        phoneInput.addEventListener('input', () => {
-            phoneInput.value = phoneInput.value.replace(/[^0-9\-\+\s\(\)]/g, '');
+    // Phone number with +63 prefix
+    const phoneDisplay = document.getElementById('phoneDisplay');
+    const phoneHidden  = document.getElementById('phoneHidden');
+
+    if (phoneDisplay && phoneHidden) {
+        phoneDisplay.setAttribute('inputmode', 'numeric');
+
+        const syncPhone = () => {
+            // Strip anything that isn't a digit
+            let digits = phoneDisplay.value.replace(/[^0-9]/g, '');
+
+            // If user accidentally typed a leading 0, remove it (e.g. 09171234567 → 9171234567)
+            if (digits.startsWith('0')) digits = digits.slice(1);
+
+            // Cap at 10 digits (Philippine mobile numbers after +63 are 10 digits)
+            digits = digits.slice(0, 10);
+
+            phoneDisplay.value = digits;
+            phoneHidden.value  = digits.length > 0 ? '+63' + digits : '';
+        };
+
+        phoneDisplay.addEventListener('input', syncPhone);
+
+        // Validate on blur — show error if not 10 digits
+        phoneDisplay.addEventListener('blur', () => {
+            const errorEl = document.getElementById('error-register-phone');
+            if (errorEl) {
+                if (phoneDisplay.value.length > 0 && phoneDisplay.value.length < 10) {
+                    errorEl.innerText = 'Please enter a valid 10-digit Philippine mobile number.';
+                    errorEl.style.display = 'block';
+                } else {
+                    errorEl.style.display = 'none';
+                }
+            }
         });
     }
 }
