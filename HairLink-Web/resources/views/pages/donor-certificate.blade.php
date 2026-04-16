@@ -22,16 +22,40 @@
         <article class="module-card certificate-shell">
             @if($donation)
             <div class="certificate-paper" id="certificatePaper">
-                <p class="certificate-title">Certificate of Hair Donation</p>
-                <p class="certificate-copy">This certifies that</p>
-                <p class="certificate-name" id="certName">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</p>
-                <p class="certificate-copy">has generously donated hair to support patients experiencing medical hair loss.</p>
+                <div class="certificate-inner">
+                    <div class="cert-header">
+                        <div class="cert-logos">
+                            <img src="{{ asset('assets/images/landing/pink-ribbon.png') }}" class="cert-logo-main" alt="HairLink Logo">
+                            <img src="{{ asset('assets/images/landing/logo.jpg') }}" class="cert-logo-sufc" alt="Strand Up For Cancer Logo">
+                        </div>
+                        <h2 class="certificate-title">CERTIFICATE OF RECOGNITION</h2>
+                        <p class="certificate-subtitle">This certificate is proudly presented to</p>
+                    </div>
 
-                <div class="certificate-meta">
-                    <p>Donation Reference: <strong id="certReference">{{ $donation->reference }}</strong></p>
-                    <p>Certificate Number: <strong id="certNumber">{{ $donation->certificate_no ?? 'Pending' }}</strong></p>
-                    <p>Date Issued: <strong id="certIssued">{{ in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']) ? $donation->updated_at->format('M d, Y') : 'Pending receipt' }}</strong></p>
-                    <p>Donation Status: <strong id="certStatus">{{ $donation->status }}</strong></p>
+                    <h1 class="certificate-name" id="certName">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</h1>
+
+                    <div class="cert-body">
+                        <p class="certificate-copy">In deep appreciation for your selfless and generous hair donation.</p>
+                        <p class="certificate-copy-sub">Your contribution provides hope, confidence, and strength to patients experiencing medical hair loss. Thank you for making a beautiful difference.</p>
+                    </div>
+
+                    <div class="cert-footer">
+                        <div class="cert-meta-wrap">
+                            <p>Reference: <strong id="certReference">{{ $donation->reference }}</strong></p>
+                            <p>Status: <strong id="certStatus">{{ $donation->status }}</strong></p>
+                        </div>
+                        
+                        <div class="cert-signature">
+                            <div class="signature-line"></div>
+                            <p>HairLink Foundation</p>
+                            <span>Authorized Signature</span>
+                        </div>
+
+                        <div class="cert-meta-wrap right-meta">
+                            <p>Cert. No: <strong id="certNumber">{{ $donation->certificate_no ?? 'Pending' }}</strong></p>
+                            <p>Date: <strong id="certIssued">{{ in_array($donation->status, ['Received Hair', 'In Queue', 'In Progress', 'Completed', 'Wig Received']) ? $donation->updated_at->format('M d, Y') : 'Pending receipt' }}</strong></p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
