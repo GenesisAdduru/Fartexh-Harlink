@@ -83,11 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
 
             <div class="post-interactions">
-                <button class="like-btn" data-post-id="${post.id}">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="like-btn ${post.is_liked ? 'active' : ''}" data-post-id="${post.id}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="${post.is_liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
-                    Like
+                    ${post.is_liked ? 'Liked' : 'Like'}
                 </button>
                 <button class="comment-toggle-btn" data-post-id="${post.id}">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -117,10 +117,29 @@ document.addEventListener('DOMContentLoaded', () => {
         // Like button
         postElement.querySelector('.like-btn')?.addEventListener('click', async (e) => {
             e.preventDefault();
+            const btn = e.currentTarget;
             try {
-                const newLikes = await CommunityModule.toggleLike(postId);
+                const data = await CommunityModule.toggleLike(postId);
                 const likesCount = postElement.querySelector('.likes-count .count');
-                if (likesCount) likesCount.textContent = newLikes;
+                if (likesCount) likesCount.textContent = data.likes;
+                
+                if (data.is_liked) {
+                    btn.classList.add('active');
+                    btn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        Liked
+                    `;
+                } else {
+                    btn.classList.remove('active');
+                    btn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                        Like
+                    `;
+                }
             } catch (error) {
                 console.error('Error liking post:', error);
             }

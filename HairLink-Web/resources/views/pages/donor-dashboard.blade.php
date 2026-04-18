@@ -29,7 +29,7 @@
 
             <div class="star-row" aria-hidden="true">
                 <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
             </div>
 
             <p class="reward-line" id="rewardLine">Free wig for every 100 star points</p>
@@ -38,8 +38,11 @@
         <section class="quick-actions">
             <div class="referral-box">
                 <label for="referralCode">Referral Code</label>
-                <input id="referralCode" type="text" placeholder="Enter code here">
-                <button id="submitCodeBtn" class="soft-btn" type="button">Submit Code</button>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <input id="referralCode" type="text" placeholder="Enter code here" style="flex: 1;">
+                    <button type="button" class="demo-fill-btn" id="fillReferralDemo" style="margin-top: 0; padding: 0.5rem 0.8rem;">Demo Fill</button>
+                    <button id="submitCodeBtn" class="soft-btn" type="button" style="margin-top: 0;">Submit Code</button>
+                </div>
             </div>
 
             <div class="action-buttons">

@@ -8,6 +8,7 @@
         margin-bottom: 12px;
         position: relative;
     }
+
     .ajax-error {
         display: none;
         color: #e74c3c;
@@ -18,6 +19,7 @@
         width: 100%;
         padding-left: 20px;
     }
+
     .phone-prefix-box {
         display: flex;
         align-items: center;
@@ -30,31 +32,37 @@
         transition: border-color 160ms ease, box-shadow 160ms ease;
         position: relative;
     }
+
     .phone-prefix-box:focus-within {
         border-color: #d574aa;
         box-shadow: 0 0 0 3px rgba(213, 116, 170, 0.15);
     }
+
     .phone-prefix {
         display: flex;
         align-items: center;
         gap: 5px;
         font-size: 0.8rem;
         font-weight: 500;
-        color: #9f8ba8; /* Matches the color of other icons in the form */
+        color: #9f8ba8;
+        /* Matches the color of other icons in the form */
         white-space: nowrap;
         flex-shrink: 0;
         margin-right: 5px;
         line-height: 1;
     }
+
     .phone-prefix .flag {
         font-size: 14px;
         display: inline-flex;
         align-items: center;
     }
+
     .phone-prefix-box .inner-input-wrapper {
         flex: 1;
         position: relative;
     }
+
     .phone-prefix-box input {
         width: 100%;
         border: none !important;
@@ -64,6 +72,7 @@
         font: inherit;
         color: var(--ink);
     }
+
     .phone-prefix-box i {
         position: absolute;
         right: 0.7rem;
@@ -72,15 +81,44 @@
         color: #9f8ba8;
         font-size: 0.9rem;
     }
+
+    .password-toggle {
+        right: 0.7rem !important;
+        cursor: pointer;
+        transition: color 160ms ease;
+        z-index: 10;
+    }
+
+    .password-toggle:hover {
+        color: #d574aa !important;
+    }
+
+    .input-box .lock-icon {
+        right: 2.2rem !important;
+    }
 </style>
 
-<div id="fullScreenLoader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
-    <div style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #ff6b81; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+<div id="fullScreenLoader"
+    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column;">
+    <div
+        style="width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #ff6b81; border-radius: 50%; animation: spin 1s linear infinite;">
+    </div>
     <h2 style="margin-top: 15px; color: #333; font-family: 'Manrope', sans-serif;" id="loaderText">Processing...</h2>
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    <style>
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </div>
 
-<div class="container {{ $initialMode === 'register' ? 'active' : '' }}" id="authContainer" data-initial-mode="{{ $initialMode }}">
+<div class="container {{ $initialMode === 'register' ? 'active' : '' }}" id="authContainer"
+    data-initial-mode="{{ $initialMode }}">
     <div class="form-box login">
         <form id="loginForm" action="{{ route('login.post') }}" method="POST">
             @csrf
@@ -113,7 +151,8 @@
             <div class="input-wrapper">
                 <div class="input-box" style="margin-bottom: 0;">
                     <input id="loginPassword" name="password" type="password" placeholder="Password" required>
-                    <i class='bx bxs-lock-alt'></i>
+                    <i class='bx bxs-lock-alt lock-icon'></i>
+                    <i class='bx bx-show password-toggle'></i>
                 </div>
                 <div class="ajax-error" id="error-login-password"></div>
             </div>
@@ -170,7 +209,8 @@
                 <div class="input-wrapper">
                     <div class="input-box select-wrapper" style="margin-bottom: 0;">
                         <input type="hidden" name="country" value="ph">
-                        <select disabled style="background:#f5f3f7; cursor:not-allowed; -webkit-appearance:none; -moz-appearance:none; appearance:none;">
+                        <select disabled
+                            style="background:#f5f3f7; cursor:not-allowed; -webkit-appearance:none; -moz-appearance:none; appearance:none;">
                             <option value="ph" selected>Philippines</option>
                         </select>
                         <i class='bx bx-world'></i>
@@ -238,7 +278,8 @@
 
             <div class="input-wrapper">
                 <div class="input-box input-box--long" style="margin-bottom: 0;">
-                    <input id="registerEmail" type="email" name="email" placeholder="Email Address" autocomplete="email" inputmode="email" required>
+                    <input id="registerEmail" type="email" name="email" placeholder="Email Address" autocomplete="email"
+                        inputmode="email" required>
                     <i class='bx bxs-envelope'></i>
                 </div>
                 <div class="ajax-error" id="error-register-email"></div>
@@ -248,15 +289,18 @@
                 <div class="input-wrapper">
                     <div class="input-box input-box--medium" style="margin-bottom: 0;">
                         <input id="registerPassword" name="password" type="password" placeholder="Password" required>
-                        <i class='bx bxs-lock-alt'></i>
+                        <i class='bx bxs-lock-alt lock-icon'></i>
+                        <i class='bx bx-show password-toggle'></i>
                     </div>
                     <div class="ajax-error" id="error-register-password"></div>
                 </div>
 
                 <div class="input-wrapper">
                     <div class="input-box input-box--medium" style="margin-bottom: 0;">
-                        <input id="registerConfirmPassword" name="password_confirmation" type="password" placeholder="Confirm Password" required>
-                        <i class='bx bxs-lock-alt'></i>
+                        <input id="registerConfirmPassword" name="password_confirmation" type="password"
+                            placeholder="Confirm Password" required>
+                        <i class='bx bxs-lock-alt lock-icon'></i>
+                        <i class='bx bx-show password-toggle'></i>
                     </div>
                     <div class="ajax-error" id="error-register-password_confirmation"></div>
                 </div>

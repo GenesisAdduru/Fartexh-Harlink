@@ -61,7 +61,7 @@ function handleAjaxSubmit(form, formType) {
         const loader = document.getElementById('fullScreenLoader');
         const loaderText = document.getElementById('loaderText');
         const originalText = btn ? btn.innerText : '';
-        
+
         if (btn) btn.disabled = true;
         if (loader) {
             loaderText.innerText = formType === 'login' ? 'Logging in...' : 'Creating your account...';
@@ -76,7 +76,7 @@ function handleAjaxSubmit(form, formType) {
                 method: 'POST',
                 body: formData,
                 credentials: 'same-origin',
-                headers: { 
+                headers: {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 }
@@ -120,8 +120,8 @@ function setupRegisterFlow() {
     handleAjaxSubmit(registerForm, 'register');
 
     const passwordInput = document.getElementById('registerPassword');
-    const confirmInput  = document.getElementById('registerConfirmPassword');
-    const emailInput    = document.getElementById('registerEmail');
+    const confirmInput = document.getElementById('registerConfirmPassword');
+    const emailInput = document.getElementById('registerEmail');
 
     if (passwordInput && confirmInput) {
         const validatePassword = () => {
@@ -163,7 +163,7 @@ function setupRegisterFlow() {
     }
 
     // Enforce digits-only for age and postal_code inputs
-    const ageInput    = document.querySelector('input[name="age"]');
+    const ageInput = document.querySelector('input[name="age"]');
     const postalInput = document.querySelector('input[name="postal_code"]');
 
     [ageInput, postalInput].forEach(input => {
@@ -173,7 +173,7 @@ function setupRegisterFlow() {
             input.value = input.value.replace(/[^0-9]/g, '');
         });
         input.addEventListener('keydown', e => {
-            const allowed = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+            const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
             if (!allowed.includes(e.key) && !/^[0-9]$/.test(e.key)) {
                 e.preventDefault();
             }
@@ -182,7 +182,7 @@ function setupRegisterFlow() {
 
     // Phone number with +63 prefix
     const phoneDisplay = document.getElementById('phoneDisplay');
-    const phoneHidden  = document.getElementById('phoneHidden');
+    const phoneHidden = document.getElementById('phoneHidden');
 
     if (phoneDisplay && phoneHidden) {
         phoneDisplay.setAttribute('inputmode', 'numeric');
@@ -198,7 +198,7 @@ function setupRegisterFlow() {
             digits = digits.slice(0, 10);
 
             phoneDisplay.value = digits;
-            phoneHidden.value  = digits.length > 0 ? '+63' + digits : '';
+            phoneHidden.value = digits.length > 0 ? '+63' + digits : '';
         };
 
         phoneDisplay.addEventListener('input', syncPhone);
@@ -222,27 +222,27 @@ function setupLoginFlow() {
     // Demo fill buttons — fill fields only, no redirects
     if (adminDemoButton) {
         adminDemoButton.addEventListener('click', () => {
-            const emailField    = document.getElementById('loginEmail');
+            const emailField = document.getElementById('loginEmail');
             const passwordField = document.getElementById('loginPassword');
-            if (emailField)    emailField.value    = 'admin@hairlink.local';
+            if (emailField) emailField.value = 'admin@hairlink.local';
             if (passwordField) passwordField.value = 'admin12345';
         });
     }
-    if (donorDemoButton)     donorDemoButton.addEventListener('click', () => fillDemo('donor'));
+    if (donorDemoButton) donorDemoButton.addEventListener('click', () => fillDemo('donor'));
     if (recipientDemoButton) recipientDemoButton.addEventListener('click', () => fillDemo('recipient'));
     if (staffDemoButton) {
         staffDemoButton.addEventListener('click', () => {
-            const emailField    = document.getElementById('loginEmail');
+            const emailField = document.getElementById('loginEmail');
             const passwordField = document.getElementById('loginPassword');
-            if (emailField)    emailField.value    = 'staff.demo@hairlink.local';
+            if (emailField) emailField.value = 'staff.demo@hairlink.local';
             if (passwordField) passwordField.value = 'password123';
         });
     }
     if (wigmakerDemoButton) {
         wigmakerDemoButton.addEventListener('click', () => {
-            const emailField    = document.getElementById('loginEmail');
+            const emailField = document.getElementById('loginEmail');
             const passwordField = document.getElementById('loginPassword');
-            if (emailField)    emailField.value    = 'wigmaker.demo@hairlink.local';
+            if (emailField) emailField.value = 'wigmaker.demo@hairlink.local';
             if (passwordField) passwordField.value = 'password123';
         });
     }
@@ -250,6 +250,25 @@ function setupLoginFlow() {
     // SINGLE AJAX submit listener for login form — no duplicate
     const loginForm = document.getElementById('loginForm');
     handleAjaxSubmit(loginForm, 'login');
+}
+
+function setupPasswordToggles() {
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('password-toggle')) {
+            const icon = e.target;
+            const input = icon.parentElement.querySelector('input');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bx-show');
+                icon.classList.add('bx-hide');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bx-hide');
+                icon.classList.add('bx-show');
+            }
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -267,4 +286,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setupRegisterFlow();
     setupLoginFlow();
+    setupPasswordToggles();
 });

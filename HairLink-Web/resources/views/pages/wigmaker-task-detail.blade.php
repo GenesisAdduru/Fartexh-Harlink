@@ -18,68 +18,108 @@
         </div>
 
         <article class="task-detail-shell">
-            <div class="task-detail-grid">
-                <div class="assignment-snapshot-pane">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;">
-                        <i class='bx bxs-info-circle' style="color: #ad246d; font-size: 1.4rem;"></i>
-                        <h2 style="margin: 0;">Assignment Snapshot</h2>
+            <div class="task-detail-grid mb-6">
+                <div class="assignment-snapshot-pane bg-white p-6 rounded-2xl border border-[#f2ebf4] shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class='bx bxs-info-circle text-[#ad246d] text-2xl'></i>
+                        <h2 class="text-xl font-bold m-0">Assignment Snapshot</h2>
                     </div>
                     
-                    <ul class="task-meta-list" style="background: #fdf7fb; padding: 1rem; border-radius: 12px; border: 1px solid #f2ebf4;">
+                    @php
+                        $len = $task->target_length;
+                        if (str_contains(strtolower($len), '10 to 14')) $len = 'Short';
+                        if (str_contains(strtolower($len), '15 to 20')) $len = 'Medium';
+                        if (str_contains(strtolower($len), 'more than 20')) $len = 'Long';
+                    @endphp
+                    <ul class="task-meta-list">
                         <li>
-                            <i class='bx bx-hash' style="color: #ad246d;"></i>
                             <strong>Hair Inventory Ref:</strong> 
-                            <span style="color: #ad246d; font-weight: 800;">{{ $task->donation ? $task->donation->reference : 'N/A' }}</span>
+                            <span class="text-[#ad246d] font-extrabold">{{ $task->donation ? $task->donation->reference : 'N/A' }}</span>
                         </li>
-                        @php
-                            $len = $task->target_length;
-                            if (str_contains(strtolower($len), '10 to 14')) $len = 'Short';
-                            if (str_contains(strtolower($len), '15 to 20')) $len = 'Medium';
-                            if (str_contains(strtolower($len), 'more than 20')) $len = 'Long';
-                        @endphp
                         <li>
-                            <i class='bx bx-cut' style="color: #ad246d;"></i>
                             <strong>Wig Specification:</strong> 
                             <span>{{ ucfirst($len) }} / {{ ucfirst(str_replace('-', ' ', $task->target_color)) }}</span>
                         </li>
                         <li>
-                            <i class='bx bx-user-check' style="color: #ad246d;"></i>
                             <strong>Assigned By:</strong> <span>Staff Operations</span>
                         </li>
                         <li>
-                            <i class='bx bx-calendar-event' style="color: #ad246d;"></i>
                             <strong>Production Window:</strong> 
-                            <span style="font-size: 0.8rem;">{{ $task->created_at->format('M d, Y') }} — {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('M d, Y') : 'TBD' }}</span>
+                            <span class="text-xs text-[#8c7895]">{{ $task->created_at->format('M d, Y') }} — {{ $task->due_date ? \Carbon\Carbon::parse($task->due_date)->format('M d, Y') : 'TBD' }}</span>
                         </li>
                     </ul>
                 </div>
 
-                <div class="timeline-pane">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;">
-                        <i class='bx bx-git-commit' style="color: #ad246d; font-size: 1.4rem;"></i>
-                        <h2 style="margin: 0;">Task Roadmap</h2>
+                <div class="material-snapshot-pane bg-white p-6 rounded-2xl border border-[#f2ebf4] shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class='bx bx-images text-[#ad246d] text-2xl'></i>
+                        <h2 class="text-xl font-bold m-0">Original Hair Material</h2>
                     </div>
-                    <ol class="timeline-list" style="background: #fff; padding: 1rem 1rem 1rem 2.2rem; border-radius: 12px; border: 1px solid #f2ebf4;">
+
+                    <div class="flex flex-wrap gap-3 bg-gray-50 p-3 rounded-xl border border-[#f2ebf4]">
+                        @php $donation = $task->donation; @endphp
+                        @if($donation)
+                            @if($donation->photo_front_url)
+                                <div class="file-preview-item group relative" style="width: 140px;">
+                                    <a href="{{ $donation->photo_front_url }}" target="_blank" class="block rounded-xl border border-[#ead7e8] overflow-hidden bg-white hover:border-[#ad246d] transition-colors shadow-sm" style="width: 140px; height: 140px;">
+                                        <img src="{{ $donation->photo_front_url }}" alt="Material Front" class="object-contain p-1" style="width: 100%; height: 100%; display: block;">
+                                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class='bx bx-search text-white text-3xl'></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif
+                            @if($donation->photo_side_url)
+                                <div class="file-preview-item group relative" style="width: 140px;">
+                                    <a href="{{ $donation->photo_side_url }}" target="_blank" class="block rounded-xl border border-[#ead7e8] overflow-hidden bg-white hover:border-[#ad246d] transition-colors shadow-sm" style="width: 140px; height: 140px;">
+                                        <img src="{{ $donation->photo_side_url }}" alt="Material Side" class="object-contain p-1" style="width: 100%; height: 100%; display: block;">
+                                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i class='bx bx-search text-white text-3xl'></i>
+                                        </div>
+                                    </a>
+                                </div>
+                            @endif
+                            
+                            @if(!$donation->photo_front_url && !$donation->photo_side_url)
+                                <div class="col-span-2 p-8 text-center text-[#8c7895]">
+                                    <i class='bx bx-hide text-3xl mb-2 opacity-50'></i>
+                                    <p class="text-sm font-medium">No material photos available.</p>
+                                </div>
+                            @endif
+                        @else
+                            <div class="col-span-2 p-8 text-center text-[#8c7895] font-medium italic">
+                                No donor record linked.
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="timeline-pane bg-white p-6 rounded-2xl border border-[#f2ebf4] shadow-sm">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class='bx bx-git-commit text-[#ad246d] text-2xl'></i>
+                        <h2 class="text-xl font-bold m-0">Task Roadmap</h2>
+                    </div>
+                    <ol class="timeline-list space-y-4 bg-white p-4 pl-8 rounded-xl border border-[#f2ebf4]">
                         @php $stat = strtolower(trim($task->status)); @endphp
-                        <li class="{{ in_array($stat, ['assigned', 'processing', 'completed']) ? 'done' : 'active' }}">
-                            <div style="font-weight: 700;">Stage 1: Assigned</div>
-                            <small>Material delivery confirmed</small>
+                        <li class="{{ in_array($stat, ['assigned', 'processing', 'completed']) ? 'done' : 'active' }} relative">
+                            <div class="font-bold text-sm">Stage 1: Assigned</div>
+                            <small class="text-[#8c7895]">Material delivery confirmed</small>
                         </li>
-                        <li class="{{ $stat === 'processing' ? 'active' : ($stat === 'completed' ? 'done' : '') }}">
-                            <div style="font-weight: 700;">Stage 2: In Progress</div>
-                            <small>Wig construction & styling</small>
+                        <li class="{{ $stat === 'processing' ? 'active' : ($stat === 'completed' ? 'done' : '') }} relative">
+                            <div class="font-bold text-sm">Stage 2: In Progress</div>
+                            <small class="text-[#8c7895]">Wig construction & styling</small>
                         </li>
-                        <li class="{{ $stat === 'completed' ? 'active' : '' }}">
-                            <div style="font-weight: 700;">Stage 3: Completed</div>
-                            <small>Quality check & delivery</small>
+                        <li class="{{ $stat === 'completed' ? 'active' : '' }} relative border-none">
+                            <div class="font-bold text-sm">Stage 3: Completed</div>
+                            <small class="text-[#8c7895]">Quality check & delivery</small>
                         </li>
                     </ol>
                 </div>
             </div>
 
-            <div class="conversion-note" style="background: linear-gradient(to right, #fdf7fb, #fff); border-left: 4px solid #ad246d;">
-                <i class='bx bx-bulb' style="color: #ad246d;"></i>
-                When this task is marked <strong>Completed</strong>, the assigned hair inventory record is automatically flagged for conversion into an available wig entry for recipient matching.
+            <div class="conversion-note bg-gradient-to-r from-[#fdf7fb] to-white border-l-4 border-[#ad246d] p-4 flex items-center gap-4 rounded-r-xl mt-6 shadow-sm">
+                <i class='bx bx-bulb text-[#ad246d] text-2xl animate-pulse'></i>
+                <p class="text-sm m-0">When this task is marked <strong>Completed</strong>, the assigned hair inventory record is automatically flagged for conversion into an available wig entry for recipient matching.</p>
             </div>
         </article>
 
@@ -181,21 +221,19 @@
                         <tr>
                             <td style="vertical-align: middle;">{{ $history->created_at->format('Y-m-d h:i A') }}</td>
                             <td style="text-align: center; vertical-align: middle;">
-                                @if(isset($history->metadata['preview_photo']))
-                                    <a href="{{ asset('storage/' . $history->metadata['preview_photo']) }}" target="_blank" class="file-thumbnail">
-                                        <img src="{{ asset('storage/' . $history->metadata['preview_photo']) }}" alt="Preview">
+                                @if($history->preview_photo_url)
+                                    <a href="{{ $history->preview_photo_url }}" target="_blank" class="file-thumbnail">
+                                        <img src="{{ $history->preview_photo_url }}" alt="Preview" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                                         <div class="preview-overlay"><i class='bx bx-search'></i></div>
                                     </a>
                                 @else
                                     <span style="color: #ccc;">---</span>
                                 @endif
                             </td>
-                            <td style="vertical-align: middle;">
-                                <span class="status-pill status-{{ $history->status === 'processing' ? 'in-progress' : $history->status }}">
-                                    {{ $history->status === 'processing' ? 'In Progress' : str_replace('-', ' ', ucfirst($history->status)) }}
-                                </span>
+                            <td class="align-middle">
+                                <x-dashboard.status-pill :status="$history->status" />
                             </td>
-                            <td style="vertical-align: middle;">{{ $history->notes ?? '—' }}</td>
+                            <td class="align-middle text-sm text-[#5d4d62]">{{ $history->notes ?? '—' }}</td>
                         </tr>
                         @empty
                         <tr>

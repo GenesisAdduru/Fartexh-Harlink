@@ -34,46 +34,38 @@
         </aside>
     </header>
 
-    <section class="admin-stat-grid">
-        <article class="admin-stat admin-stat-donor">
-            <span class="admin-stat-accent"></span>
-            <div class="admin-stat-label">
-                <i class='bx bx-transfer-alt'></i>
-                <span>Donor Submissions</span>
-            </div>
-            <h2>{{ $donationsCount }}</h2>
-            <p>Total hair donations recorded</p>
-        </article>
+    <section class="admin-stat-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <x-dashboard.stat-card 
+            title="Donor Submissions" 
+            :value="$donationsCount" 
+            subtitle="Total hair donations recorded"
+            icon="bx-transfer-alt"
+            type="donor"
+        />
 
-        <article class="admin-stat admin-stat-approved">
-            <span class="admin-stat-accent"></span>
-            <div class="admin-stat-label">
-                <i class='bx bx-check-circle'></i>
-                <span>Registered Users</span>
-            </div>
-            <h2>{{ $usersCount }}</h2>
-            <p>Total users in the system</p>
-        </article>
+        <x-dashboard.stat-card 
+            title="Registered Users" 
+            :value="$usersCount" 
+            subtitle="Total users in the system"
+            icon="bx-check-circle"
+            type="approved"
+        />
 
-        <article class="admin-stat admin-stat-recipient">
-            <span class="admin-stat-accent"></span>
-            <div class="admin-stat-label">
-                <i class='bx bx-user-check'></i>
-                <span>Recipient Requests</span>
-            </div>
-            <h2>{{ $requestsCount }}</h2>
-            <p>Requests submitted through the portal</p>
-        </article>
+        <x-dashboard.stat-card 
+            title="Recipient Requests" 
+            :value="$requestsCount" 
+            subtitle="Requests submitted through the portal"
+            icon="bx-user-check"
+            type="recipient"
+        />
 
-        <article class="admin-stat admin-stat-pending">
-            <span class="admin-stat-accent"></span>
-            <div class="admin-stat-label">
-                <i class='bx bx-time-five'></i>
-                <span>Pending Review</span>
-            </div>
-            <h2>{{ $pendingVerifications }}</h2>
-            <p>Requires immediate admin decision</p>
-        </article>
+        <x-dashboard.stat-card 
+            title="Pending Review" 
+            :value="$pendingVerifications" 
+            subtitle="Requires immediate admin decision"
+            icon="bx-time-five"
+            type="pending"
+        />
     </section>
 
     <div class="admin-toolbar admin-surface">
@@ -128,14 +120,7 @@
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
                             <strong>{{ $donation->reference }} · {{ $donation->user->first_name ?? '' }} {{ $donation->user->last_name ?? '' }}</strong>
-                            @php
-                                $chipClass = match($donation->status) {
-                                    'Completed' => 'approved',
-                                    'Rejected' => 'rejected',
-                                    default => 'pending',
-                                };
-                            @endphp
-                            <span class="admin-chip {{ $chipClass }}">{{ $donation->status }}</span>
+                            <x-dashboard.status-pill :status="$donation->status" />
                         </div>
                         <p>{{ $donation->hair_length }} hair · {{ $donation->hair_color }} · Submitted {{ $donation->created_at->format('M d, Y') }}</p>
                     </div>
@@ -177,14 +162,7 @@
                     <div class="admin-queue-main">
                         <div class="admin-queue-title-row">
                             <strong>{{ $request->reference }} · {{ $request->user->first_name ?? '' }} {{ $request->user->last_name ?? '' }}</strong>
-                            @php
-                                $chipClass = match($request->status) {
-                                    'Validated' => 'approved',
-                                    'Rejected' => 'rejected',
-                                    default => 'pending',
-                                };
-                            @endphp
-                            <span class="admin-chip {{ $chipClass }}">{{ $request->status }}</span>
+                            <x-dashboard.status-pill :status="$request->status" />
                         </div>
                         <p>Request submitted {{ $request->created_at->format('M d, Y') }}</p>
                     </div>
@@ -276,32 +254,20 @@
         </div>
 
         <div class="admin-optional-body" data-optional-body hidden>
-            <div class="table-wrap">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Date and Time</th>
-                            <th>Email</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($monetaryDonations as $md)
-                        <tr>
-                            <td>{{ $md->name }}</td>
-                            <td>{{ $md->created_at->format('M d, Y · h:i A') }}</td>
-                            <td>{{ $md->email }}</td>
-                            <td>₱{{ number_format($md->amount, 2) }}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="4" style="text-align:center;color:#7a687f;">No monetary donations recorded.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+            <x-dashboard.data-table :headers="['Donor Name', 'Date & Time', 'Email Address', 'Amount Paid']">
+                @forelse($monetaryDonations as $md)
+                <tr class="hover:bg-[#fdf7fb] transition-colors">
+                    <td class="px-6 py-4 font-bold text-gray-800">{{ $md->name }}</td>
+                    <td class="px-6 py-4 text-gray-600 text-sm">{{ $md->created_at?->format('M d, Y · h:i A') ?? 'N/A' }}</td>
+                    <td class="px-6 py-4 text-gray-600 font-medium">{{ $md->email }}</td>
+                    <td class="px-6 py-4 font-black text-[#ad246d]">₱{{ number_format($md->amount, 2) }}</td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-400 italic">No monetary donations recorded yet.</td>
+                </tr>
+                @endforelse
+            </x-dashboard.data-table>
         </div>
     </div>
 

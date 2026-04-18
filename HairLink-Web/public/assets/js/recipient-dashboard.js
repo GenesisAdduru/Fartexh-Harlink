@@ -24,6 +24,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const rewardLine   = document.getElementById('rewardLine');
     const submitCodeBtn = document.getElementById('submitCodeBtn');
     const referralCode  = document.getElementById('referralCode');
+    const fillReferralBtn = document.getElementById('fillReferralDemo');
+
+    if (fillReferralBtn && referralCode) {
+        fillReferralBtn.addEventListener('click', () => {
+            referralCode.value = 'HL-GALA-2026';
+        });
+    }
 
     function renderPoints(pts) {
         const percent = Math.min((pts / goal) * 100, 100);
@@ -69,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitCodeBtn.textContent = 'Verifying...';
 
             try {
-                const response = await fetch('/api/referral/submit', {
+                const response = await fetch('/internal-api/referral/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

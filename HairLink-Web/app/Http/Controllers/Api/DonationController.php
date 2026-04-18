@@ -31,11 +31,11 @@ class DonationController extends Controller
         ]);
 
         if ($request->hasFile('photo_front')) {
-            $validated['photo_front'] = $request->file('photo_front')->store('donations/photos', 'public');
+            $validated['photo_front'] = $request->file('photo_front')->store('donations/photos', 's3');
         }
 
         if ($request->hasFile('photo_side')) {
-            $validated['photo_side'] = $request->file('photo_side')->store('donations/photos', 'public');
+            $validated['photo_side'] = $request->file('photo_side')->store('donations/photos', 's3');
         }
 
         $donation = Auth::user()->donations()->create($validated);

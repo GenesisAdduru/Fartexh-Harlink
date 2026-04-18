@@ -245,11 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         const statusClass = savedStatus === 'processing' ? 'in-progress' : savedStatus;
                         
                         let photoHtml = '<span style="color: #ccc;">---</span>';
-                        if (data.history.metadata && data.history.metadata.preview_photo) {
-                            const photoPath = `/storage/${data.history.metadata.preview_photo}`;
+                        if (data.history.preview_photo_url) {
                             photoHtml = `
-                                <a href="${photoPath}" target="_blank" class="file-thumbnail">
-                                    <img src="${photoPath}" alt="Preview">
+                                <a href="${data.history.preview_photo_url}" target="_blank" class="file-thumbnail">
+                                    <img src="${data.history.preview_photo_url}" alt="Preview">
                                     <div class="preview-overlay"><i class='bx bx-search'></i></div>
                                 </a>
                             `;
@@ -272,7 +271,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     const notesField = document.getElementById('progress-notes');
                     const photoField = document.getElementById('preview-photo');
                     if (notesField) notesField.value = '';
-                    if (photoField) photoField.value = '';
+                    if (photoField) {
+                        photoField.value = '';
+                        // Trigger change event to reset preview
+                        photoField.dispatchEvent(new Event('change'));
+                    }
 
                 } else {
                     alert(data.message || 'Failed to update task');
@@ -283,6 +286,55 @@ document.addEventListener('DOMContentLoaded', () => {
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Save Update';
+            }
+        });
+    }
+
+    // Photo Preview Handler
+    const previewPhotoInput = document.getElementById('preview-photo');
+    if (previewPhotoInput) {
+        previewPhotoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            const container = this.parentElement;
+            const icon = container.querySelector('.bx-image-add');
+            const label = container.querySelector('span');
+            
+            // Remove existing preview if any
+            let existingPreview = container.querySelector('.file-preview-img');
+            if (existingPreview) existingPreview.remove();
+
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('file-preview-img');
+                    img.style.cssText = 'max-width: 100%; max-height: 200px; border-radius: 12px; margin-bottom: 0.8rem; object-fit: contain; background: #fff; border: 1px solid #ead7e8;';
+                    
+                    // Hide icon and update text
+                    if (icon) icon.style.display = 'none';
+                    if (label) {
+                        label.textContent = `File selected: ${file.name}`;
+                        label.style.color = '#ad246d';
+                        label.style.fontWeight = '700';
+                    }
+                    
+                    // Insert before the input
+                    container.insertBefore(img, previewPhotoInput);
+                    container.style.borderColor = '#ad246d';
+                    container.style.background = '#fdf7fb';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Reset to default state
+                if (icon) icon.style.display = 'block';
+                if (label) {
+                    label.textContent = 'Click to upload or drag and drop';
+                    label.style.color = '#7f6b88';
+                    label.style.fontWeight = '400';
+                }
+                container.style.borderColor = '#ead7e8';
+                container.style.background = '#fafafa';
             }
         });
     }

@@ -34,25 +34,25 @@ class HairRequestController extends Controller
         ]);
 
         if ($request->hasFile('medical_certificate')) {
-            $validated['medical_certificate'] = $request->file('medical_certificate')->store('requests/verification', 'public');
+            $validated['medical_certificate'] = $request->file('medical_certificate')->store('requests/verification', 's3');
         }
 
         if ($request->hasFile('diagnosis_photo')) {
-            $validated['diagnosis_photo'] = $request->file('diagnosis_photo')->store('requests/verification', 'public');
+            $validated['diagnosis_photo'] = $request->file('diagnosis_photo')->store('requests/verification', 's3');
         }
 
         if ($request->hasFile('recipient_photo')) {
-            $validated['recipient_photo'] = $request->file('recipient_photo')->store('requests/verification', 'public');
+            $validated['recipient_photo'] = $request->file('recipient_photo')->store('requests/verification', 's3');
         }
 
         if ($request->hasFile('additional_photo')) {
-            $validated['additional_photo'] = $request->file('additional_photo')->store('requests/photos', 'public');
+            $validated['additional_photo'] = $request->file('additional_photo')->store('requests/photos', 's3');
         }
 
         if ($request->hasFile('documents')) {
             $docs = [];
             foreach ($request->file('documents') as $file) {
-                $docs[] = $file->store('requests/documents', 'public');
+                $docs[] = $file->store('requests/documents', 's3');
             }
             $validated['documents'] = $docs;
         }

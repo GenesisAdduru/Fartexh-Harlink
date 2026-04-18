@@ -67,7 +67,7 @@ class WigmakerController extends Controller
         // 2. Handle metadata (photo)
         $metadata = [];
         if ($request->hasFile('previewPhoto')) {
-            $path = $request->file('previewPhoto')->store('production/previews', 'public');
+            $path = $request->file('previewPhoto')->store('production/previews', 's3');
             $metadata['preview_photo'] = $path;
         }
 
@@ -103,7 +103,7 @@ class WigmakerController extends Controller
 
                         // NEW: Trigger Donor Notification on Completion
                         if ($newDonationStatus === 'Completed') {
-                            $donation->user->notify(new DonationCompletedNotification($donation));
+                            // $donation->user->notify(new DonationCompletedNotification($donation));
                         }
                     }
                 }
@@ -117,7 +117,8 @@ class WigmakerController extends Controller
                 'at' => $history->created_at ? $history->created_at->format('Y-m-d h:i A') : now()->format('Y-m-d h:i A'),
                 'status' => str_replace('-', ' ', ucfirst($history->status)),
                 'notes' => $history->notes,
-                'metadata' => $history->metadata
+                'metadata' => $history->metadata,
+                'preview_photo_url' => $history->preview_photo_url
             ]
         ]);
     }

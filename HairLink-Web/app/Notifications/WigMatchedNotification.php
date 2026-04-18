@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class WigMatchedNotification extends Notification
 {
@@ -28,7 +28,7 @@ class WigMatchedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail'/*, OneSignalChannel::class*/];
     }
 
     /**
@@ -43,6 +43,18 @@ class WigMatchedNotification extends Notification
             ->line('Our team is now preparing the wig for shipment.')
             ->action('Track Your Request', url('/recipient/tracking/' . $this->hairRequest->reference))
             ->line('Thank you for being part of the HairLink community!');
+    }
+
+    /**
+     * Send OneSignal Push Notification.
+     */
+    public function toOneSignal($notifiable)
+    {
+        return OneSignalMessage::create()
+            ->setSubject("Wig Matched! 🎉")
+            ->setBody("Good news! A wig has been matched to your request #{$this->hairRequest->reference}. Tap to track delivery.")
+            ->setData('reference', $this->hairRequest->reference)
+            ->setData('type', 'request_update');
     }
 
     /**

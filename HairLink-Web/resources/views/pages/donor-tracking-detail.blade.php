@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1rem; align-items: start;">
+        <div style="display: grid; grid-template-columns: 1fr 260px; gap: 1rem; align-items: start;">
             <!-- Status Timeline -->
             <div class="module-card" style="background: #fff; border: 1px solid #ead7e8; border-radius: 16px; padding: 1.25rem;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
@@ -121,10 +121,10 @@
 
                 <div style="background: #fff; border: 1px solid #ead7e8; border-radius: 16px; padding: 1rem; text-align: center;">
                     <small style="display: block; margin-bottom: 0.5rem; color: #ad246d; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem;">Donation Reference Photo</small>
-                    <div id="photoPreview" style="aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #fff5fa; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(173, 36, 109, 0.05); border: 1px solid #ead7e8;">
+                    <div id="photoPreview" style="width: 200px; height: 200px; margin: 0 auto; border-radius: 12px; overflow: hidden; background: #fff5fa; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(173, 36, 109, 0.05); border: 1px solid #ead7e8;">
                         @if($donation->photo_front)
-                            <a href="{{ asset('storage/' . $donation->photo_front) }}" target="_blank" class="file-thumbnail" style="width: 100%; height: 100%; display: block; position: relative;">
-                                <img src="{{ asset('storage/' . $donation->photo_front) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <a href="{{ $donation->photo_front_url }}" target="_blank" class="file-thumbnail" style="width: 100%; height: 100%; display: block; position: relative;">
+                                <img src="{{ $donation->photo_front_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="preview-overlay" style="position: absolute; inset: 0; background: rgba(173, 36, 109, 0.4); opacity: 0; display: flex; align-items: center; justify-content: center; color: #fff; transition: opacity 0.2s;"><i class='bx bx-search'></i></div>
                             </a>
                         @else

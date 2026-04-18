@@ -227,3 +227,21 @@ a {
     }
 }
 
+
+/* Demo Fill Buttons */
+.demo-fill-btn {
+    border: 1px solid #d88db8;
+    border-radius: 999px;
+    background: #fff;
+    color: #ab266f;
+    font-weight: 800;
+    padding: 0.36rem 0.62rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.demo-fill-btn:hover {
+    background: #ffe7f3;
+}

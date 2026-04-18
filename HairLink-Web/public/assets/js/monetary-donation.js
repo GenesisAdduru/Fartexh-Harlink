@@ -83,6 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const fillBtn = document.getElementById('fillMonetaryDemo');
+    if (fillBtn) {
+        fillBtn.addEventListener('click', () => {
+            if (customInput) customInput.value = '1000';
+            if (amountNumber) amountNumber.value = '1,000.00';
+            document.getElementById('amount-words').value = 'One thousand pesos';
+            pills.forEach(p => p.classList.remove('active'));
+        });
+    }
+
     // ── Form submit ──
     const form = document.getElementById('monetary-form');
     if (form) {

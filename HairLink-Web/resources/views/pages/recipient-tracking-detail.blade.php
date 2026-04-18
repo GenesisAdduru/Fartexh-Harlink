@@ -49,7 +49,7 @@
         </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 1rem; align-items: start;">
+    <div style="display: grid; grid-template-columns: 1fr 260px; gap: 1rem; align-items: start;">
         <!-- Status Timeline -->
         <div class="timeline-section" style="background: #fff; border: 1px solid #ead7e8; border-radius: 16px; padding: 1.25rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
@@ -108,43 +108,48 @@
                     <i class='bx bx-paperclip' style="color: #ad246d;"></i>
                     <h3 style="margin: 0; font-size: 1rem;">Attachments</h3>
                 </div>
-                <div class="file-preview-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem;">
+                <div class="file-preview-grid" style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
                     @php
                         $docs = is_array($requestData->documents) ? $requestData->documents : (is_string($requestData->documents) ? json_decode($requestData->documents, true) : []);
                         $photo = $requestData->additional_photo;
                         $hasAny = false;
                     @endphp
 
-                    @if($requestData->diagnosis_photo)
+                    @if($requestData->diagnosis_photo_url)
                         @php $hasAny = true; @endphp
-                        <div class="file-preview-item">
-                            <a href="{{ Storage::url($requestData->diagnosis_photo) }}" target="_blank" class="file-thumbnail" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
-                                <img src="{{ Storage::url($requestData->diagnosis_photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="file-preview-item" style="width: 100px;">
+                            <a href="{{ $requestData->diagnosis_photo_url }}" target="_blank" class="file-thumbnail" style="width: 100px; height: 100px; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
+                                <img src="{{ $requestData->diagnosis_photo_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="preview-overlay" style="position: absolute; inset: 0; background: rgba(173, 36, 109, 0.4); opacity: 0; display: flex; align-items: center; justify-content: center; color: #fff; transition: opacity 0.2s;"><i class='bx bx-search'></i></div>
                             </a>
                             <span style="display: block; text-align: center; font-size: 0.65rem; font-weight: 700; color: #8c7895; margin-top: 0.25rem;">Medical Photo</span>
                         </div>
                     @endif
 
-                    @if($photo)
+                    @if($requestData->additional_photo_url)
                         @php $hasAny = true; @endphp
-                        <div class="file-preview-item">
-                            <a href="{{ Storage::url($photo) }}" target="_blank" class="file-thumbnail" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
-                                <img src="{{ Storage::url($photo) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="file-preview-item" style="width: 100px;">
+                            <a href="{{ $requestData->additional_photo_url }}" target="_blank" class="file-thumbnail" style="width: 100px; height: 100px; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
+                                <img src="{{ $requestData->additional_photo_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="preview-overlay" style="position: absolute; inset: 0; background: rgba(173, 36, 109, 0.4); opacity: 0; display: flex; align-items: center; justify-content: center; color: #fff; transition: opacity 0.2s;"><i class='bx bx-plus'></i></div>
                             </a>
                             <span style="display: block; text-align: center; font-size: 0.65rem; font-weight: 700; color: #8c7895; margin-top: 0.25rem;">Reference</span>
                         </div>
                     @endif
 
-                    @if(count($docs) > 0)
-                        @foreach($docs as $index => $doc)
+                    @if(count($requestData->documents_urls) > 0)
+                        @foreach($requestData->documents_urls as $index => $url)
                             @php $hasAny = true; @endphp
-                            <div class="file-preview-item">
-                                @php $isImg = in_array(pathinfo($doc, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp','gif','svg']); @endphp
-                                <a href="{{ Storage::url($doc) }}" target="_blank" class="file-thumbnail" style="width: 100%; aspect-ratio: 1; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
+                                <div class="file-preview-item" style="width: 100px;">
+                                    @php 
+                                        $ext = pathinfo($url, PATHINFO_EXTENSION);
+                                        // Strip query params if any
+                                        $ext = explode('?', $ext)[0];
+                                        $isImg = in_array(strtolower($ext), ['jpg','jpeg','png','webp','gif','svg']); 
+                                    @endphp
+                                    <a href="{{ $url }}" target="_blank" class="file-thumbnail" style="width: 100px; height: 100px; border-radius: 10px; border: 1px solid #ead7e8; overflow: hidden; display: block; position: relative;">
                                     @if($isImg)
-                                        <img src="{{ Storage::url($doc) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <img src="{{ $url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                     @else
                                         <div style="background: #fdf7fb; width: 100%; height: 100%; display: grid; place-items: center;"><i class='bx bxs-file-blank' style="color: #ad246d; font-size: 1.5rem;"></i></div>
                                     @endif

@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(contactForm);
             
             try {
-                const url = '/api/partnership';
+                const url = '/internal-api/partnership';
                 const response = await fetch(url, {
                     method: 'POST',
                     body: formData,

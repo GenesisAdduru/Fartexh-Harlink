@@ -60,7 +60,12 @@
             statusHistory: (data.status_histories || []).map(sh => ({
                 status: sh.status,
                 timestamp: sh.created_at
-            }))
+            })),
+            medicalCertificateUrl: data.medical_certificate_url,
+            diagnosisPhotoUrl: data.diagnosis_photo_url,
+            recipientPhotoUrl: data.recipient_photo_url,
+            additionalPhotoUrl: data.additional_photo_url,
+            documentsUrls: data.documents_urls || []
         };
     }
 
@@ -93,12 +98,12 @@
         formatDateTime,
 
         async getRequests() {
-            const data = await apiCall('/api/requests');
+            const data = await apiCall('/internal-api/requests');
             return data.map(mapRequest);
         },
 
         async getRequest(reference) {
-            const data = await apiCall(`/api/requests/${reference}`);
+            const data = await apiCall(`/internal-api/requests/${reference}`);
             return mapRequest(data);
         },
 
@@ -142,13 +147,13 @@
                 });
             }
 
-            const data = await apiCall('/api/requests', 'POST', formData);
+            const data = await apiCall('/internal-api/requests', 'POST', formData);
             return mapRequest(data);
         },
 
         async updateRequestStatus(reference, status) {
             if (!STATUS_FLOW.includes(status)) return null;
-            const data = await apiCall(`/api/requests/${reference}/status`, 'POST', { status });
+            const data = await apiCall(`/internal-api/requests/${reference}/status`, 'POST', { status });
             return mapRequest(data);
         },
 

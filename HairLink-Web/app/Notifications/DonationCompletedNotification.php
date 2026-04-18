@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+use NotificationChannels\OneSignal\OneSignalChannel;
+use NotificationChannels\OneSignal\OneSignalMessage;
 
 class DonationCompletedNotification extends Notification
 {
@@ -28,7 +28,7 @@ class DonationCompletedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail'/*, OneSignalChannel::class*/];
     }
 
     /**
@@ -43,6 +43,18 @@ class DonationCompletedNotification extends Notification
             ->line('Your hair has now been transformed into a beautiful wig, ready to be matched with a recipient in need.')
             ->action('View My Impact', url('/donor/tracking/' . $this->donation->reference))
             ->line('Thank you for your incredible contribution to the HairLink community!');
+    }
+
+    /**
+     * Send OneSignal Push Notification.
+     */
+    public function toOneSignal($notifiable)
+    {
+        return OneSignalMessage::create()
+            ->setSubject("Impact Alert! ✨")
+            ->setBody("Your hair has been transformed into a beautiful wig! Tap to see your impact.")
+            ->setData('reference', $this->donation->reference)
+            ->setData('type', 'donation_complete');
     }
 
     /**

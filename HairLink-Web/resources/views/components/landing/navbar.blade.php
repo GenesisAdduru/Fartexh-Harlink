@@ -22,11 +22,7 @@
 
     <div class="auth-actions">
         @auth
-            <a class="btn btn-outline" href="{{ route('dashboard') }}">Dashboard</a>
-            <a class="btn btn-primary" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('landing-logout-form').submit();">Logout</a>
-            <form id="landing-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
+            <a class="btn btn-primary" href="{{ route('dashboard') }}">My Dashboard</a>
         @else
             @if (Route::has('login'))
                 <a class="btn btn-outline" href="{{ route('login') }}">Login</a>

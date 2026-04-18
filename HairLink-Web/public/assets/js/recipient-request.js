@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const requestForm = document.getElementById('request-form');
     const documentsInput = document.getElementById('documents');
     const additionalPhotoInput = document.getElementById('additional-photo');
@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         } else {
-            const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 
-                              'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             if (!validTypes.includes(file.type)) {
                 alert(`File "${file.name}" is not a valid document format`);
                 return false;

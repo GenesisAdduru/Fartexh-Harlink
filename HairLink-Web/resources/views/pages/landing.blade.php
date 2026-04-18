@@ -10,6 +10,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('assets/css/landing.css') }}?v={{ time() }}">
+
+    @auth
+        @if(auth()->user()->role == 'donor' || auth()->user()->role == 'recipient')
+            <link rel="stylesheet" href="{{ asset('assets/css/dashboard-base.css') }}">
+        @endif
+    @endauth
 </head>
 <body>
     <x-landing.header />
@@ -20,6 +26,11 @@
     <x-landing.footer />
 
     <script src="{{ asset('assets/js/landing.js') }}" defer></script>
+    @auth
+        @if(auth()->user()->role == 'donor' || auth()->user()->role == 'recipient')
+            <script src="{{ asset('assets/js/dashboard.js') }}" defer></script>
+        @endif
+    @endauth
 </body>
 </html>
 

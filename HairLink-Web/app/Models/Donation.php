@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Donation extends Model
 {
@@ -26,6 +27,11 @@ class Donation extends Model
         'photo_side'
     ];
 
+    protected $appends = [
+        'photo_front_url',
+        'photo_side_url'
+    ];
+
     protected $casts = [
         'treated_hair' => 'boolean',
         'appointment_at' => 'datetime',
@@ -40,5 +46,15 @@ class Donation extends Model
     public function statusHistories()
     {
         return $this->morphMany(StatusHistory::class, 'trackable');
+    }
+
+    public function getPhotoFrontUrlAttribute()
+    {
+        return ($this->photo_front && $this->photo_front !== '0') ? Storage::disk('s3')->url($this->photo_front) : null;
+    }
+
+    public function getPhotoSideUrlAttribute()
+    {
+        return ($this->photo_side && $this->photo_side !== '0') ? Storage::disk('s3')->url($this->photo_side) : null;
     }
 }

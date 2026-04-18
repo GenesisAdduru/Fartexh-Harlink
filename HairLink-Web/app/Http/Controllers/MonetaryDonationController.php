@@ -16,9 +16,15 @@ class MonetaryDonationController extends Controller
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'payment_method' => 'required|string',
+            'proofDonation' => 'required|file|mimes:pdf,jpg,jpeg,png,doc,docx|max:10240',
         ]);
 
         $reference = 'MD-' . strtoupper(Str::random(10));
+        $proofPath = null;
+
+        if ($request->hasFile('proofDonation')) {
+            $proofPath = $request->file('proofDonation')->store('monetary-donations', 'supabase');
+        }
 
         $donation = MonetaryDonation::create([
             'user_id' => Auth::check() ? Auth::id() : null,
@@ -28,7 +34,8 @@ class MonetaryDonationController extends Controller
             'currency' => $request->input('currency', 'PHP'),
             'payment_method' => $validated['payment_method'],
             'reference_number' => $reference,
-            'status' => 'Completed', // Simulating instant completion for the prototype
+            'proof_path' => $proofPath,
+            'status' => 'Submitted', // Changed from Completed to allow staff review
         ]);
 
         if ($request->expectsJson()) {

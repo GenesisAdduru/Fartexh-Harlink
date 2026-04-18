@@ -42,7 +42,16 @@ return new class extends Migration
                 DB::statement("ALTER TABLE {$table} ALTER COLUMN user_id DROP NOT NULL");
 
                 // Change type - UUID to BigInt conversion
-                DB::statement("ALTER TABLE {$table} ALTER COLUMN user_id TYPE bigint USING NULL");
+                // WARNING: USING NULL was used which wipes existing data. 
+                // Changed to try and be safer for repeated runs.
+                DB::statement("
+                    DO $$ 
+                    BEGIN 
+                        IF (SELECT data_type FROM information_schema.columns WHERE tablename = '{$table}' AND column_name = 'user_id') != 'bigint' THEN
+                            ALTER TABLE {$table} ALTER COLUMN user_id TYPE bigint USING NULL;
+                        END IF;
+                    END $$;
+                ");
 
                 // Re-add foreign key
                 DB::statement("ALTER TABLE {$table} ADD CONSTRAINT {$table}_user_id_foreign FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL");

@@ -75,14 +75,10 @@
             <h2>Matching and Allocation</h2>
             <span>Recipient pairing and release preparation</span>
         </div>
-        <div class="staff-actions two-col">
+        <div class="staff-actions" style="grid-template-columns: 1fr;">
             <a class="staff-action-link" href="{{ route('staff.recipient-matching-list') }}">
                 <h3>Recipient Matching List</h3>
                 <p>Review matched wigs and release scheduling progress.</p>
-            </a>
-            <a class="staff-action-link" href="{{ route('staff.rule-matching') }}">
-                <h3>Rule-based Matching</h3>
-                <p>Select recipients and assign best-fit wigs by compatibility.</p>
             </a>
         </div>
     </article>

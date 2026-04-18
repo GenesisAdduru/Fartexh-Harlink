@@ -88,19 +88,19 @@
                 
                 <div class="file-preview-grid">
                     @if($isDonor)
-                        @if($record->photo_front)
+                        @if($record->photo_front_url)
                             <div class="file-preview-item">
-                                <a href="{{ Storage::url($record->photo_front) }}" target="_blank" class="file-thumbnail">
-                                    <img src="{{ Storage::url($record->photo_front) }}" alt="Reference Photo">
+                                <a href="{{ $record->photo_front_url }}" target="_blank" class="file-thumbnail" style="width: 80px; height: 80px;">
+                                    <img src="{{ $record->photo_front_url }}" alt="Reference Photo" style="width: 100%; height: 100%; object-fit: cover;">
                                     <div class="preview-overlay"><i class='bx bx-search-alt' style="font-size: 1.5rem;"></i></div>
                                 </a>
                                 <span class="file-label-small">Reference Photo</span>
                             </div>
                         @endif
-                        @if($record->photo_side)
+                        @if($record->photo_side_url)
                             <div class="file-preview-item">
-                                <a href="{{ Storage::url($record->photo_side) }}" target="_blank" class="file-thumbnail">
-                                    <img src="{{ Storage::url($record->photo_side) }}" alt="Hair Side">
+                                <a href="{{ $record->photo_side_url }}" target="_blank" class="file-thumbnail" style="width: 80px; height: 80px;">
+                                    <img src="{{ $record->photo_side_url }}" alt="Hair Side" style="width: 100%; height: 100%; object-fit: cover;">
                                     <div class="preview-overlay"><i class='bx bx-search-alt' style="font-size: 1.5rem;"></i></div>
                                 </a>
                                 <span class="file-label-small">Hair Side</span>
@@ -112,23 +112,23 @@
                             $photo = $record->additional_photo;
                         @endphp
 
-                        @if($photo)
+                        @if($record->additional_photo_url)
                             <div class="file-preview-item">
-                                <a href="{{ Storage::url($photo) }}" target="_blank" class="file-thumbnail">
-                                    <img src="{{ Storage::url($photo) }}" alt="Reference Photo">
+                                <a href="{{ $record->additional_photo_url }}" target="_blank" class="file-thumbnail" style="width: 80px; height: 80px;">
+                                    <img src="{{ $record->additional_photo_url }}" alt="Reference Photo" style="width: 100%; height: 100%; object-fit: cover;">
                                     <div class="preview-overlay"><i class='bx bx-search-alt' style="font-size: 1.5rem;"></i></div>
                                 </a>
                                 <span class="file-label-small">Reference Photo</span>
                             </div>
                         @endif
 
-                        @if(count($docs) > 0)
-                            @foreach($docs as $index => $doc)
+                        @if(count($record->documents_urls) > 0)
+                            @foreach($record->documents_urls as $index => $url)
                                 <div class="file-preview-item">
-                                    @php $isImg = in_array(pathinfo($doc, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp','gif','svg']); @endphp
-                                    <a href="{{ Storage::url($doc) }}" target="_blank" class="file-thumbnail">
+                                    @php $isImg = in_array(strtolower(pathinfo(explode('?', $url)[0], PATHINFO_EXTENSION)), ['jpg','jpeg','png','webp','gif','svg']); @endphp
+                                    <a href="{{ $url }}" target="_blank" class="file-thumbnail">
                                         @if($isImg)
-                                            <img src="{{ Storage::url($doc) }}" alt="Document {{ $index + 1 }}">
+                                            <img src="{{ $url }}" alt="Document {{ $index + 1 }}">
                                         @else
                                             <div style="background: #fdf7fb; width: 100%; height: 100%; display: grid; place-items: center;">
                                                 <i class='bx bxs-file-blank' style="font-size: 2.5rem; color: #ad246d;"></i>
@@ -143,7 +143,13 @@
                     @endif
                 </div>
 
-                @if(!$record->photo_front && !$record->photo_side && !$record->additional_photo && (empty($record->documents) || count((array)$record->documents) === 0))
+                @php
+                    $hasAttachments = $isDonor 
+                        ? ($record->photo_front_url || $record->photo_side_url)
+                        : ($record->additional_photo_url || count($record->documents_urls) > 0);
+                @endphp
+
+                @if(!$hasAttachments)
                     <div style="padding: 2rem; border: 2px dashed #f2ebf4; border-radius: 12px; text-align: center; color: #8c7895;">
                         <i class='bx bx-file-find' style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>
                         <p style="margin: 0; font-size: 0.9rem;">No documents or photos attached to this submission.</p>

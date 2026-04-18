@@ -125,37 +125,35 @@
 
                         {{-- Wigmaker Progress UI --}}
                         @php
-                            $latestPhoto = null;
-                            $latestNote = null;
+                            $latestUpdate = null;
                             if ($wigProd && $wigProd->statusHistories) {
-                                $historyWithPhoto = $wigProd->statusHistories->whereNotNull('metadata')->sortByDesc('created_at')->filter(function($hist) {
-                                    return isset($hist->metadata['preview_photo']);
-                                })->first();
+                                // Find the latest history entry that has a preview photo
+                                $latestUpdate = $wigProd->statusHistories->sortByDesc('created_at')->first(function($hist) {
+                                    return !empty($hist->preview_photo_url);
+                                });
                                 
-                                if ($historyWithPhoto) {
-                                    $latestPhoto = $historyWithPhoto->metadata['preview_photo'];
-                                    $latestNote = $historyWithPhoto->notes;
-                                } else {
-                                    $latestNote = $wigProd->statusHistories->sortByDesc('created_at')->first()->notes ?? null;
+                                // Fallback to just the latest note if no photo found
+                                if (!$latestUpdate) {
+                                    $latestUpdate = $wigProd->statusHistories->sortByDesc('created_at')->first();
                                 }
                             }
                         @endphp
-                        @if($latestPhoto || $latestNote)
+                        @if($latestUpdate && ($latestUpdate->preview_photo_url || $latestUpdate->notes))
                             <div class="wigmaker-update-card" style="width: 160px; flex-shrink: 0; background: #fff; border: 1px solid #f2ebf4; border-radius: 14px; padding: 0.75rem; display: flex; flex-direction: column; gap: 0.6rem; box-shadow: 0 4px 15px rgba(173, 36, 109, 0.05);">
                                 <div style="display: flex; align-items: center; gap: 0.4rem; color: #ad246d; font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">
                                     <i class='bx bxs-camera'></i> Latest Update
                                 </div>
                                 
-                                @if($latestPhoto)
-                                    <a href="{{ asset('storage/' . $latestPhoto) }}" target="_blank" class="file-thumbnail" style="width: 100%; aspect-ratio: 1.2; border-radius: 8px; margin: 0; border: 1px solid #f2ebf4;">
-                                        <img src="{{ asset('storage/' . $latestPhoto) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                @if($latestUpdate->preview_photo_url)
+                                    <a href="{{ $latestUpdate->preview_photo_url }}" target="_blank" class="file-thumbnail" style="width: 100%; aspect-ratio: 1.2; border-radius: 8px; margin: 0; border: 1px solid #f2ebf4;">
+                                        <img src="{{ $latestUpdate->preview_photo_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                         <div class="preview-overlay" style="background: rgba(173, 36, 109, 0.4);"><i class='bx bx-zoom-in'></i></div>
                                     </a>
                                 @endif
 
-                                @if($latestNote)
+                                @if($latestUpdate->notes)
                                     <div style="position: relative; background: #fdf7fb; border: 1px solid #f9daeb; border-radius: 8px; padding: 0.5rem; font-size: 0.74rem; color: #4d3f56; line-height: 1.35; font-style: italic;">
-                                        {{ Str::limit($latestNote, 80) }}
+                                        {{ Str::limit($latestUpdate->notes, 80) }}
                                         <div style="position: absolute; top: -6px; left: 15px; width: 10px; height: 10px; background: #fdf7fb; border-left: 1px solid #f9daeb; border-top: 1px solid #f9daeb; transform: rotate(45deg);"></div>
                                     </div>
                                 @endif

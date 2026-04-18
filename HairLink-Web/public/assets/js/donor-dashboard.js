@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     const rewardLine   = document.getElementById('rewardLine');
     const submitCodeBtn = document.getElementById('submitCodeBtn');
     const referralCode  = document.getElementById('referralCode');
+    const fillReferralBtn = document.getElementById('fillReferralDemo');
+
+    if (fillReferralBtn && referralCode) {
+        fillReferralBtn.addEventListener('click', () => {
+            referralCode.value = 'HL-GALA-2026';
+        });
+    }
 
     // Set greeting immediately (no flash)
     function getGreeting() {
@@ -48,7 +55,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             progressFill.style.transition = 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
         }
         if (progressStar) {
-            progressStar.style.left = `calc(${percent}% - 12px)`;
+            // Star is 1.6rem (~24px). To center it on the percentage point:
+            const offset = 12; // Half of star width
+            progressStar.style.left = `calc(${percent}% + 0.8rem - ${offset}px)`;
             progressStar.style.transition = 'left 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
             // Light up star when at goal
             progressStar.style.color = pts >= goal ? '#f59e0b' : '';
@@ -85,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             submitCodeBtn.textContent = 'Verifying...';
 
             try {
-                const response = await fetch('/api/referral/submit', {
+                const response = await fetch('/internal-api/referral/submit', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

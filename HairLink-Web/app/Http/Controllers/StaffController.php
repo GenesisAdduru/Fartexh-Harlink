@@ -88,7 +88,7 @@ class StaffController extends Controller
 
         // NEW: Trigger Donor Notification on Approval
         if ($type === 'donor' && $validated['status'] === 'Verified') {
-            $record->user->notify(new DonationApprovedNotification($record));
+            // $record->user->notify(new DonationApprovedNotification($record));
         }
 
         return response()->json(['message' => 'Status updated successfully', 'success' => true]);
@@ -191,7 +191,7 @@ class StaffController extends Controller
         ]);
 
         // 3. Notify Recipient
-        $hairRequest->user->notify(new WigMatchedNotification($hairRequest));
+        // $hairRequest->user->notify(new WigMatchedNotification($hairRequest));
 
         return response()->json([
             'message' => "Request #{$hairRequest->reference} successfully matched with Wig #{$wig->task_code}. Notification sent.",
@@ -267,7 +267,7 @@ class StaffController extends Controller
 
         // NEW: Trigger Donor Notification on Receipt
         if ($record instanceof Donation && $newStatus === 'Received Hair') {
-            $record->user->notify(new DonationReceivedNotification($record));
+            // $record->user->notify(new DonationReceivedNotification($record));
         }
 
         return response()->json([

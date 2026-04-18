@@ -13,6 +13,10 @@ class CommunityController extends Controller
     public function index()
     {
         $posts = CommunityPost::with(['user', 'comments.user'])
+            ->withCount('likedByUsers as likes')
+            ->withExists(['likedByUsers as is_liked' => function($query) {
+                $query->where('user_id', Auth::id());
+            }])
             ->orderBy('created_at', 'desc')
             ->get();
         return response()->json($posts);
@@ -24,7 +28,13 @@ class CommunityController extends Controller
             'content' => 'required|string'
         ]);
 
-        $post = Auth::user()->communityPosts()->create($validated);
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+        $post = $user->communityPosts()->create($validated);
+        
+        $post->setAttribute('likes', 0);
 
         return response()->json($post->load('user'), 201);
     }
@@ -46,22 +56,25 @@ class CommunityController extends Controller
     public function toggleLike(CommunityPost $post)
     {
         $user = Auth::user();
+        $isLiked = false;
         
         if ($user->likedPosts()->where('community_post_id', $post->id)->exists()) {
             $user->likedPosts()->detach($post->id);
-            $post->decrement('likes');
         } else {
             $user->likedPosts()->attach($post->id);
-            $post->increment('likes');
+            $isLiked = true;
         }
 
-        return response()->json(['likes' => $post->fresh()->likes]);
+        return response()->json([
+            'likes' => $post->likedByUsers()->count(),
+            'is_liked' => $isLiked
+        ]);
     }
 
     public function destroyPost(CommunityPost $post)
     {
         if ($post->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized delection'], 403);
+            return response()->json(['message' => 'Unauthorized deletion'], 403);
         }
 
         $post->delete();
@@ -71,7 +84,7 @@ class CommunityController extends Controller
     public function destroyComment(CommunityComment $comment)
     {
         if ($comment->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized delection'], 403);
+            return response()->json(['message' => 'Unauthorized deletion'], 403);
         }
 
         $comment->delete();

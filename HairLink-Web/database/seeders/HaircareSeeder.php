@@ -48,34 +48,34 @@ class HaircareSeeder extends Seeder
         // Videos
         $videos = [
             [
-                'title' => 'How to Properly Wash Your Wig - Step by Step',
+                'title' => 'How to Wear a Wig for Beginners',
                 'category' => 'Tutorial',
                 'source' => 'youtube',
-                'video_id' => 'dQw4w9WgXcQ',
+                'video_id' => '2RGeLiC0oeg',
                 'author' => 'HairLink Channel',
-                'duration' => '8:32',
+                'duration' => '5:14',
                 'views' => 1250,
-                'description' => 'Learn the proper technique for washing your wig to keep it looking fresh and beautiful.'
+                'description' => 'A complete guide on how to wear your wig properly for the first time.'
             ],
             [
-                'title' => 'Wig Styling Transformations - Before & After',
+                'title' => 'Wig Maintenance Tips & Tricks',
                 'category' => 'Inspiration',
                 'source' => 'youtube',
-                'video_id' => 'jNQXAC9IVRw',
+                'video_id' => '2EA-nTXU0Qc',
                 'author' => 'Beauty Experts',
-                'duration' => '12:45',
+                'duration' => '8:22',
                 'views' => 3540,
-                'description' => 'See amazing transformations and get inspired by different styling options.'
+                'description' => 'Essential tips for maintaining your wig and making it last longer.'
             ],
             [
-                'title' => 'Wig Maintenance | Extended Care Tips',
+                'title' => 'Natural Looking Wig Styling',
                 'category' => 'Care',
                 'source' => 'youtube',
-                'video_id' => 'kffacxfA7G4',
+                'video_id' => '9sCvlAaiTQc',
                 'author' => 'Professional Stylists',
-                'duration' => '15:20',
+                'duration' => '10:45',
                 'views' => 2100,
-                'description' => 'Advanced tips for maintaining your wig and extending its lifespan.'
+                'description' => 'Learn how to style your wig to make it look as natural as possible.'
             ]
         ];
 

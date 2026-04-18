@@ -13,27 +13,7 @@
             <p>Your impact snapshots and reward progress are shown below.</p>
         </div>
 
-        <article class="points-card">
-            <p class="points-info" id="pointsInfo">
-                <i class='bx bx-info-circle'></i>
-                5 points for referral and 1 star for every 100 pesos donated monetary.
-                Star Points <span class="star-inline">★</span> <span id="pointValue">0</span>
-            </p>
 
-            <div class="progress-wrap" aria-label="Reward progress">
-                <div class="progress-bar">
-                    <span class="progress-fill" id="progressFill"></span>
-                </div>
-                <span class="progress-star" id="progressStar" title="Your progress">★</span>
-            </div>
-
-            <div class="star-row" aria-hidden="true">
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-            </div>
-
-            <p class="reward-line" id="rewardLine">Free gift for every 100 star points</p>
-        </article>
 
         <!-- Active Requests Card -->
         <div class="active-requests-card">
@@ -52,8 +32,11 @@
         <section class="quick-actions">
             <div class="referral-box">
                 <label for="referralCode">Referral Code</label>
-                <input id="referralCode" type="text" placeholder="Enter code here">
-                <button id="submitCodeBtn" class="soft-btn" type="button">Submit Code</button>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                    <input id="referralCode" type="text" placeholder="Enter code here" style="flex: 1;">
+                    <button type="button" class="demo-fill-btn" id="fillReferralDemo" style="margin-top: 0; padding: 0.5rem 0.8rem;">Demo Fill</button>
+                    <button id="submitCodeBtn" class="soft-btn" type="button" style="margin-top: 0;">Submit Code</button>
+                </div>
             </div>
         </section>
 

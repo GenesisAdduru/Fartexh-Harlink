@@ -54,7 +54,7 @@ const CommunityModule = {
 
     // Get all posts
     async getPosts() {
-        const data = await this.apiCall('/api/community/posts');
+        const data = await this.apiCall('/internal-api/community/posts');
         return data.map(post => this.mapPost(post));
     },
 
@@ -66,13 +66,13 @@ const CommunityModule = {
 
     // Create new post
     async createPost(content) {
-        const data = await this.apiCall('/api/community/posts', 'POST', { content });
+        const data = await this.apiCall('/internal-api/community/posts', 'POST', { content });
         return this.mapPost(data);
     },
 
     // Add comment to post
     async addComment(postId, content) {
-        const data = await this.apiCall(`/api/community/posts/${postId}/comments`, 'POST', { content });
+        const data = await this.apiCall(`/internal-api/community/posts/${postId}/comments`, 'POST', { content });
         return {
             ...data,
             author: data.user?.name || 'Anonymous',
@@ -84,8 +84,8 @@ const CommunityModule = {
 
     // Like post
     async toggleLike(postId) {
-        const data = await this.apiCall(`/api/community/posts/${postId}/like`, 'POST');
-        return data.likes;
+        const data = await this.apiCall(`/internal-api/community/posts/${postId}/like`, 'POST');
+        return data;
     },
 
     // Generate avatar from name

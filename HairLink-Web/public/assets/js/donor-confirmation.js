@@ -65,8 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Populate Photo Preview
     const photoPreview = document.getElementById('photoPreview');
-    if (photoPreview && donation.photo_front) {
-        const url = `/storage/${donation.photo_front}`;
-        photoPreview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+    if (photoPreview && donation.photoFrontUrl) {
+        photoPreview.innerHTML = `<img src="${donation.photoFrontUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
     }
 });

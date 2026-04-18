@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+use Laravel\Sanctum\HasApiTokens;
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -32,7 +34,20 @@ class User extends Authenticatable implements MustVerifyEmail
         'gender',
         'phone',
         'is_active',
+        'onesignal_id',
+        'profile_photo_path',
+        'bio',
     ];
+
+    /**
+     * Get the profile photo URL from Supabase.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path 
+            ? config('services.supabase.storage_url') . '/profile-photos/' . $this->profile_photo_path 
+            : null;
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -92,7 +107,7 @@ class User extends Authenticatable implements MustVerifyEmail
         try {
             $otp = rand(100000, 999999);
             \Illuminate\Support\Facades\Cache::put('email_otp_' . $this->id, $otp, now()->addMinutes(10));
-            $this->notify(new \App\Notifications\VerifyEmailOtp($otp));
+            // $this->notify(new \App\Notifications\VerifyEmailOtp($otp));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Email verification could not be sent: ' . $e->getMessage());
         }
@@ -104,9 +119,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendPasswordResetNotification($token)
     {
         try {
-            $this->notify(new \Illuminate\Auth\Notifications\ResetPassword($token));
+            // $this->notify(new \Illuminate\Auth\Notifications\ResetPassword($token));
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::warning('Password reset email could not be sent: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Route notifications for OneSignal.
+     */
+    public function routeNotificationForOneSignal()
+    {
+        return $this->onesignal_id;
     }
 }

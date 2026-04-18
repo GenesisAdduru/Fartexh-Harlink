@@ -20,7 +20,7 @@ Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->n
 Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
-Route::post('/api/partnership', [App\Http\Controllers\PartnershipController::class, 'store'])->name('partnership.store');
+Route::post('/internal-api/partnership', [App\Http\Controllers\PartnershipController::class, 'store'])->name('partnership.store');
 Route::get('/dashboard', function () {
     $role = Illuminate\Support\Facades\Auth::user()->role;
     return redirect()->route($role . '.dashboard');
@@ -71,6 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/donor/confirmation', [App\Http\Controllers\DonorController::class, 'confirmation'])->name('donor.confirmation');
     Route::get('/donor/certificate', [App\Http\Controllers\DonorController::class, 'certificate'])->name('donor.certificate');
     Route::view('/donor/profile', 'pages.donor-profile')->name('donor.profile');
+    Route::post('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::view('/donor/community', 'pages.donor-community')->name('donor.community');
 
     Route::get('/recipient/dashboard', [App\Http\Controllers\RecipientController::class, 'dashboard'])->name('recipient.dashboard');
@@ -82,8 +83,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
     Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
 
-    // API Routes for AJAX interaction
-    Route::prefix('api')->group(function () {
+    // Internal API Routes for AJAX interaction
+    Route::prefix('internal-api')->group(function () {
         // Donations
         Route::get('/donations', [App\Http\Controllers\Api\DonationController::class, 'index']);
         Route::post('/donations', [App\Http\Controllers\Api\DonationController::class, 'store']);

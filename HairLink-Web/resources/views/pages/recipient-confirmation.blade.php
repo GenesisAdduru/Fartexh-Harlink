@@ -58,22 +58,20 @@
                 <span class="detail-value">{{ $requestData->story }}</span>
             </div>
             
-            @php
-                $docs = is_array($requestData->documents) ? $requestData->documents : (is_string($requestData->documents) ? json_decode($requestData->documents, true) : []);
-                $photo = $requestData->additional_photo;
-            @endphp
-            
-            @if(count($docs) > 0 || $photo)
+            @if(count($requestData->documents_urls) > 0 || $requestData->additional_photo_url)
                 <div class="detail-item">
                     <span class="detail-label">Attached Files & Photos</span>
                     <div class="detail-value">
                         <div class="file-preview-grid">
-                            @foreach($docs as $index => $doc)
-                                @php $isImg = in_array(pathinfo($doc, PATHINFO_EXTENSION), ['jpg','jpeg','png','webp','gif','svg']); @endphp
+                            @foreach($requestData->documents_urls as $index => $url)
+                                @php 
+                                    $ext = pathinfo(explode('?', $url)[0], PATHINFO_EXTENSION);
+                                    $isImg = in_array(strtolower($ext), ['jpg','jpeg','png','webp','gif','svg']); 
+                                @endphp
                                 <div class="file-preview-item">
-                                    <a href="{{ Storage::url($doc) }}" target="_blank" class="file-thumbnail">
+                                    <a href="{{ $url }}" target="_blank" class="file-thumbnail">
                                         @if($isImg)
-                                            <img src="{{ Storage::url($doc) }}" alt="Doc {{ $index + 1 }}">
+                                            <img src="{{ $url }}" alt="Doc {{ $index + 1 }}">
                                         @else
                                             <i class='bx bxs-file-pdf'></i>
                                         @endif
@@ -83,10 +81,10 @@
                                 </div>
                             @endforeach
 
-                            @if($photo)
+                            @if($requestData->additional_photo_url)
                                 <div class="file-preview-item">
-                                    <a href="{{ Storage::url($photo) }}" target="_blank" class="file-thumbnail">
-                                        <img src="{{ Storage::url($photo) }}" alt="Reference Photo">
+                                    <a href="{{ $requestData->additional_photo_url }}" target="_blank" class="file-thumbnail">
+                                        <img src="{{ $requestData->additional_photo_url }}" alt="Reference Photo">
                                         <div class="preview-overlay">View Full</div>
                                     </a>
                                     <span class="file-label-small">Reference Photo</span>

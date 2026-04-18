@@ -5,12 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 class CommunityComment extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'community_post_id',
+        'post_id',
         'user_id',
         'content'
     ];
@@ -22,6 +27,6 @@ class CommunityComment extends Model
 
     public function post()
     {
-        return $this->belongsTo(CommunityPost::class);
+        return $this->belongsTo(CommunityPost::class, 'post_id');
     }
 }

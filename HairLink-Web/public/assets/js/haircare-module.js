@@ -45,19 +45,19 @@ const HairCareModule = {
 
     // Get all articles
     async getArticles() {
-        const data = await this.apiCall('/api/haircare/articles');
+        const data = await this.apiCall('/internal-api/haircare/articles');
         return data.map(article => this.mapArticle(article));
     },
 
     // Get single article
     async getArticle(articleId) {
-        const data = await this.apiCall(`/api/haircare/articles/${articleId}`);
+        const data = await this.apiCall(`/internal-api/haircare/articles/${articleId}`);
         return this.mapArticle(data);
     },
 
     // Get all videos
     async getVideos() {
-        const data = await this.apiCall('/api/haircare/videos');
+        const data = await this.apiCall('/internal-api/haircare/videos');
         return data.map(video => ({
             ...video,
             date: video.created_at,

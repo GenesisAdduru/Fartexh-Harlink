@@ -5,9 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 class CommunityPost extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'user_id',
@@ -22,7 +27,7 @@ class CommunityPost extends Model
 
     public function comments()
     {
-        return $this->hasMany(CommunityComment::class);
+        return $this->hasMany(CommunityComment::class, 'post_id');
     }
 
     public function likedByUsers()

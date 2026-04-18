@@ -55,7 +55,9 @@
             dropOff: {
                 location: data.dropoff_location,
                 appointmentAt: data.appointment_at
-            }
+            },
+            photoFrontUrl: data.photo_front_url,
+            photoSideUrl: data.photo_side_url
         };
     }
 
@@ -77,12 +79,12 @@
         formatDateTime,
 
         async getAllDonations() {
-            const data = await apiCall('/api/donations');
+            const data = await apiCall('/internal-api/donations');
             return data.map(mapDonation);
         },
 
         async getDonation(reference) {
-            const data = await apiCall(`/api/donations/${reference}`);
+            const data = await apiCall(`/internal-api/donations/${reference}`);
             return mapDonation(data);
         },
 
@@ -106,7 +108,7 @@
                 formData.append('photo_side', payload.photoSide);
             }
 
-            const data = await apiCall('/api/donations', 'POST', formData);
+            const data = await apiCall('/internal-api/donations', 'POST', formData);
             return mapDonation(data);
         },
 
@@ -117,7 +119,7 @@
 
         async setStatus(reference, status) {
             if (!STATUS_FLOW.includes(status)) return null;
-            const data = await apiCall(`/api/donations/${reference}/status`, 'POST', { status });
+            const data = await apiCall(`/internal-api/donations/${reference}/status`, 'POST', { status });
             return mapDonation(data);
         },
 

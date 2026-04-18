@@ -50,8 +50,8 @@
                     <small style="display: block; margin-bottom: 0.5rem; color: #ad246d; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Donation Photo</small>
                     <div id="photoPreview" style="aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #fff5fa; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(173, 36, 109, 0.05);">
                         @if($donation->photo_front)
-                            <a href="{{ asset('storage/' . $donation->photo_front) }}" target="_blank" class="file-thumbnail">
-                                <img src="{{ asset('storage/' . $donation->photo_front) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <a href="{{ $donation->photo_front_url }}" target="_blank" class="file-thumbnail">
+                                <img src="{{ $donation->photo_front_url }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div class="preview-overlay">View Full</div>
                             </a>
                         @else
