@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="app-base-url" content="{{ url('/') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-id" content="{{ Auth::id() }}">
     <title>@yield('title', config('app.name', 'HairLink'))</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,6 +39,13 @@
         @yield('content')
     </main>
 
+    <script>
+        window.User = {
+            id: {{ Auth::id() }},
+            name: "{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}",
+            role: "{{ Auth::user()->role }}"
+        };
+    </script>
     <script src="{{ asset('assets/js/dashboard.js') }}" defer></script>
     <script src="{{ asset('assets/js/recipient-module.js') }}" defer></script>
     @stack('scripts')

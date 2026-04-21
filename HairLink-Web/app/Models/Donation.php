@@ -48,6 +48,11 @@ class Donation extends Model
         return $this->morphMany(StatusHistory::class, 'trackable');
     }
 
+    public function latestStatusHistory()
+    {
+        return $this->morphOne(StatusHistory::class, 'trackable')->latestOfMany();
+    }
+
     public function getPhotoFrontUrlAttribute()
     {
         return ($this->photo_front && $this->photo_front !== '0') ? Storage::disk('s3')->url($this->photo_front) : null;

@@ -11,13 +11,25 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
+        if (!$user) return redirect('/login');
+        
         $role = $user->role;
+        $fullName = ($user->first_name && $user->last_name) 
+            ? "{$user->first_name} {$user->last_name}" 
+            : $user->name;
+            
+        $initials = '';
+        if ($user->first_name && $user->last_name) {
+            $initials = strtoupper(substr($user->first_name, 0, 1) . substr($user->last_name, 0, 1));
+        } else {
+            $initials = strtoupper(substr($user->name, 0, 2));
+        }
 
         // Redirect to the appropriate profile view based on role
         if ($role === 'donor') {
-            return view('pages.donor-profile');
+            return view('pages.donor-profile', compact('user', 'fullName', 'initials'));
         } elseif ($role === 'recipient') {
-            return view('pages.recipient-profile'); // Assuming this exists or will be created
+            return view('pages.recipient-profile', compact('user', 'fullName', 'initials')); 
         }
 
         return redirect()->back();

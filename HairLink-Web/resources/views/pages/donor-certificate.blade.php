@@ -42,7 +42,7 @@
                     <div class="cert-footer">
                         <div class="cert-meta-wrap">
                             <p>Reference: <strong id="certReference">{{ $donation->reference }}</strong></p>
-                            <p>Status: <strong id="certStatus">{{ $donation->status }}</strong></p>
+
                         </div>
                         
                         <div class="cert-signature">

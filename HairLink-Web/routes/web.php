@@ -14,6 +14,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::view('/register', 'pages.register')->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout.get');
 
 // Password Reset Routes
 Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
@@ -70,7 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/donor/tracking/{reference}', [App\Http\Controllers\DonorController::class, 'trackingDetail'])->name('donor.tracking.detail');
     Route::get('/donor/confirmation', [App\Http\Controllers\DonorController::class, 'confirmation'])->name('donor.confirmation');
     Route::get('/donor/certificate', [App\Http\Controllers\DonorController::class, 'certificate'])->name('donor.certificate');
-    Route::view('/donor/profile', 'pages.donor-profile')->name('donor.profile');
+    Route::get('/donor/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('donor.profile');
     Route::post('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::view('/donor/community', 'pages.donor-community')->name('donor.community');
 
@@ -79,7 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recipient/tracking', [App\Http\Controllers\RecipientController::class, 'tracking'])->name('recipient.tracking');
     Route::get('/recipient/tracking/{reference}', [App\Http\Controllers\RecipientController::class, 'trackingDetail'])->name('recipient.tracking.detail');
     Route::get('/recipient/confirmation', [App\Http\Controllers\RecipientController::class, 'confirmation'])->name('recipient.confirmation');
-    Route::view('/recipient/profile', 'pages.recipient-profile')->name('recipient.profile');
+    Route::get('/recipient/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('recipient.profile');
     Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
     Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
 

@@ -169,22 +169,18 @@
                         <label for="wig-length">Preferred Wig Length <span class="required">*</span></label>
                         <select id="wig-length" name="wigLength" required>
                             <option value="">Select Wig Length</option>
-                            <option value="short">Short</option>
-                            <option value="medium">Medium</option>
-                            <option value="long">Long</option>
+                            <option value="Short (10-14 inches)">Short (10-14 inches)</option>
+                            <option value="Medium (15-19 inches)">Medium (15-19 inches)</option>
+                            <option value="Long (20+ inches)">Long (20+ inches)</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="wig-color">Preferred Hair Color <span class="required">*</span></label>
                         <select id="wig-color" name="wigColor" required>
                             <option value="">Select Hair Color</option>
-                            <option value="black">Black</option>
-                            <option value="dark-brown">Dark Brown</option>
-                            <option value="light-brown">Light Brown</option>
-                            <option value="blonde">Blonde</option>
-                            <option value="auburn">Auburn / Red</option>
-                            <option value="gray">Gray / White</option>
-                            <option value="no-preference">No Preference</option>
+                            <option value="Black">Black</option>
+                            <option value="Brown">Brown</option>
+                            <option value="Light">Light</option>
                         </select>
                     </div>
                 </div>

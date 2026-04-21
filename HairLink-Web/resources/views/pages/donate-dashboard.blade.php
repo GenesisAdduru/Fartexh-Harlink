@@ -51,19 +51,18 @@
                         Hair Length <span>*</span>
                         <select id="hairLength" name="hairLength" required>
                             <option value="" selected disabled>Select hair length</option>
-                            <option>10 to 14 inches</option>
-                            <option>15 to 20 inches</option>
-                            <option>More than 20 inches</option>
+                            <option value="Short (10-14 inches)">Short (10-14 inches)</option>
+                            <option value="Medium (15-19 inches)">Medium (15-19 inches)</option>
+                            <option value="Long (20+ inches)">Long (20+ inches)</option>
                         </select>
                     </label>
                     <label>
                         Natural Hair Color <span>*</span>
                         <select id="hairColor" name="hairColor" required>
                             <option value="" selected disabled>Select hair color</option>
-                            <option>Black</option>
-                            <option>Brown</option>
-                            <option>Light</option>
-                            <option>Other</option>
+                            <option value="Black">Black</option>
+                            <option value="Brown">Brown</option>
+                            <option value="Light">Light</option>
                         </select>
                     </label>
                     <label class="checkbox-wrap">

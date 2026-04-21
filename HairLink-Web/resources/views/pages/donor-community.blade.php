@@ -19,9 +19,17 @@
                 <h3>Share Your Story</h3>
                 <p>Tell others about your donation experience or offer support to community members.</p>
             </div>
-            <form id="create-post-form" class="post-form">
+            <form id="create-post-form" class="post-form" enctype="multipart/form-data">
                 <textarea name="content" placeholder="What's on your mind? Share your experience, tips, or words of encouragement..." rows="4" required></textarea>
                 <div class="form-actions">
+                    <div class="upload-actions">
+                        <label for="post-image" class="image-upload-label" title="Attach Image">
+                            <i class='bx bx-image-add'></i>
+                            <span>Attach Image</span>
+                        </label>
+                        <input type="file" id="post-image" name="image" accept="image/*" style="display: none;">
+                        <div id="image-preview" class="image-preview-container"></div>
+                    </div>
                     <button type="submit" class="soft-btn">Post</button>
                 </div>
             </form>

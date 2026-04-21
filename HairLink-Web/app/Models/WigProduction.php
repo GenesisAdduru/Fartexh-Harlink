@@ -39,4 +39,9 @@ class WigProduction extends Model
     {
         return $this->morphMany(StatusHistory::class, 'trackable');
     }
+
+    public function latestStatusHistory()
+    {
+        return $this->morphOne(StatusHistory::class, 'trackable')->latestOfMany();
+    }
 }

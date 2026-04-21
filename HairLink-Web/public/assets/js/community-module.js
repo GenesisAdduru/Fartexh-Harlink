@@ -21,8 +21,12 @@ const CommunityModule = {
         };
 
         if (body) {
-            options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(body);
+            if (body instanceof FormData) {
+                options.body = body;
+            } else {
+                options.headers['Content-Type'] = 'application/json';
+                options.body = JSON.stringify(body);
+            }
         }
 
         const response = await fetch(url, options);
@@ -38,18 +42,33 @@ const CommunityModule = {
     mapPost(post) {
         return {
             ...post,
-            author: post.user?.name || 'Anonymous',
+            author: this.formatAuthorName(post.user),
             userType: post.user?.role || 'user',
-            avatar: this.generateAvatar(post.user?.name || 'Anonymous'),
+            avatar: this.generateAvatar(this.formatAuthorName(post.user)),
             timestamp: post.created_at,
-            comments: (post.comments || []).map(comment => ({
-                ...comment,
-                author: comment.user?.name || 'Anonymous',
-                userType: comment.user?.role || 'user',
-                avatar: this.generateAvatar(comment.user?.name || 'Anonymous'),
-                timestamp: comment.created_at
-            }))
+            image: post.image_url,
+            comments: (post.comments || []).map(comment => this.mapComment(comment))
         };
+    },
+
+    mapComment(comment) {
+        return {
+            ...comment,
+            author: this.formatAuthorName(comment.user),
+            userType: comment.user?.role || 'user',
+            avatar: this.generateAvatar(this.formatAuthorName(comment.user)),
+            timestamp: comment.created_at,
+            image: comment.image_url,
+            replies: (comment.replies || []).map(reply => this.mapComment(reply))
+        };
+    },
+
+    formatAuthorName(user) {
+        if (!user) return 'Anonymous';
+        if (user.first_name) {
+            return `${user.first_name} ${user.last_name || ''}`.trim();
+        }
+        return user.name || 'Anonymous';
     },
 
     // Get all posts
@@ -65,21 +84,38 @@ const CommunityModule = {
     },
 
     // Create new post
-    async createPost(content) {
-        const data = await this.apiCall('/internal-api/community/posts', 'POST', { content });
+    async createPost(content, imageFile = null) {
+        const formData = new FormData();
+        formData.append('content', content);
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+        const data = await this.apiCall('/internal-api/community/posts', 'POST', formData);
         return this.mapPost(data);
     },
 
     // Add comment to post
-    async addComment(postId, content) {
-        const data = await this.apiCall(`/internal-api/community/posts/${postId}/comments`, 'POST', { content });
-        return {
-            ...data,
-            author: data.user?.name || 'Anonymous',
-            userType: data.user?.role || 'user',
-            avatar: this.generateAvatar(data.user?.name || 'Anonymous'),
-            timestamp: data.created_at
-        };
+    async addComment(postId, content, parentId = null, imageFile = null) {
+        const formData = new FormData();
+        formData.append('content', content);
+        if (parentId) {
+            formData.append('parent_id', parentId);
+        }
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+        const data = await this.apiCall(`/internal-api/community/posts/${postId}/comments`, 'POST', formData);
+        return this.mapComment(data);
+    },
+
+    // Delete post
+    async deletePost(postId) {
+        return await this.apiCall(`/internal-api/community/posts/${postId}`, 'DELETE');
+    },
+
+    // Delete comment
+    async deleteComment(commentId) {
+        return await this.apiCall(`/internal-api/community/comments/${commentId}`, 'DELETE');
     },
 
     // Like post

@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
 
 .donor-module-page {
-    max-width: 1200px;
+    max-width: 1380px;
     margin-inline: auto;
     display: grid;
     gap: 0.75rem;
@@ -487,5 +487,5 @@
     opacity: 1;
 }
 
-.donor-module-page { max-width: 1200px !important; margin-inline: auto; }
+.donor-module-page { max-width: 1380px !important; margin-inline: auto; }
 .module-card { margin-bottom: 0.5rem !important; }

@@ -106,7 +106,7 @@ class StaffController extends Controller
         $wigmakers = User::where('role', 'wigmaker')->where('is_active', true)->get();
 
         // Load wig production records keyed by donation_id for status sync
-        $wigProductions = WigProduction::with(['wigmaker', 'statusHistories'])
+        $wigProductions = WigProduction::with(['wigmaker', 'latestStatusHistory'])
             ->whereIn('donation_id', $donations->pluck('id'))
             ->get()
             ->keyBy('donation_id');

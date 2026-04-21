@@ -5,7 +5,7 @@
     --line: #ea91bb;
     --pink: #e66da9;
     --pink-strong: #ce3d88;
-    --container: min(980px, 100%);
+    --container: min(1280px, 94vw);
 }
 
 * {

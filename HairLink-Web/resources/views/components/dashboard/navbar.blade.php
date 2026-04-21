@@ -35,9 +35,15 @@
                 <a href="{{ route('wigmaker.production-tasks') }}" class="{{ request()->routeIs('wigmaker.production-tasks') ? 'active' : '' }}">Production Tasks</a>
             @elseif(request()->routeIs('staff.*') || ($isLanding && $role === 'staff'))
                 <a href="{{ route('staff.dashboard') }}" class="{{ request()->routeIs('staff.dashboard') ? 'active' : '' }}">Overview</a>
-                <a href="{{ route('staff.donor-verification') }}" class="{{ request()->routeIs('staff.donor-verification') ? 'active' : '' }}">Donor</a>
-                <a href="{{ route('staff.recipient-verification') }}" class="{{ request()->routeIs('staff.recipient-verification') ? 'active' : '' }}">Recipient</a>
-                <a href="{{ route('staff.realtime-tracking') }}" class="{{ request()->routeIs('staff.realtime-tracking') ? 'active' : '' }}">Tracking</a>
+                <a href="{{ route('staff.donor-verification') }}" class="{{ request()->routeIs('staff.donor-verification') ? 'active' : '' }}">Donations</a>
+                <a href="{{ route('staff.recipient-verification') }}" class="{{ request()->routeIs('staff.recipient-verification') ? 'active' : '' }}">Requests</a>
+                <div class="dash-dropdown">
+                    <a href="{{ route('staff.realtime-tracking') }}" class="{{ request()->routeIs('staff.realtime-tracking') ? 'active' : '' }}">Tracking</a>
+                    <div class="dropdown-content">
+                        <a href="{{ route('staff.realtime-tracking') }}?tab=donations"><i class='bx bx-package'></i> Donations Tracking</a>
+                        <a href="{{ route('staff.realtime-tracking') }}?tab=requests"><i class='bx bx-user-check'></i> Requests Tracking</a>
+                    </div>
+                </div>
                 <a href="{{ route('staff.wig-stock') }}" class="{{ request()->routeIs('staff.hair-stock') || request()->routeIs('staff.wig-stock') ? 'active' : '' }}">Stock</a>
                 <a href="{{ route('staff.recipient-matching-list') }}" class="{{ request()->routeIs('staff.recipient-matching-list') ? 'active' : '' }}">Matching</a>
             @elseif(request()->routeIs('admin.*') || ($isLanding && $role === 'admin'))
@@ -54,10 +60,7 @@
                 <a href="{{ route('wigmaker.dashboard') }}">Wigmaker</a>
                 <a href="{{ route('staff.dashboard') }}">Staff</a>
             @endif
-            <a href="{{ route('logout') }}" class="logout-btn" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
+            <a href="{{ route('logout') }}" class="logout-btn">Logout</a>
         </div>
     </nav>
 </header>

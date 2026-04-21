@@ -37,7 +37,7 @@ body {
 }
 
 .auth-navbar-inner {
-    width: min(820px, 86vw);
+    width: min(1380px, 96vw);
     margin: 0 auto;
     min-height: 52px;
     display: flex;
@@ -97,7 +97,7 @@ body {
 
 .container {
     position: relative;
-    width: min(780px, 84vw);
+    width: min(940px, 90vw);
     min-height: 570px;
     background: var(--panel);
     border: 1px solid var(--line);

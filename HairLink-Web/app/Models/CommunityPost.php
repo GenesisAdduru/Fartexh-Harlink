@@ -17,6 +17,7 @@ class CommunityPost extends Model
     protected $fillable = [
         'user_id',
         'content',
+        'image_url',
         'likes'
     ];
 
