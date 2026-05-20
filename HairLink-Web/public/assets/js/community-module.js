@@ -31,15 +31,30 @@ const CommunityModule = {
 
         const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            let errorMessage = `API Error: ${response.status} ${response.statusText}`;
+            try {
+                const errorData = await response.json();
+                if (errorData.message) errorMessage = errorData.message;
+            } catch (e) {
+                // Not JSON, use default error message
+            }
+            throw new Error(errorMessage);
         }
-        return await response.json();
+        
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        }
+        return await response.text();
     },
 
     /**
      * Map backend post to frontend expectations
      */
     mapPost(post) {
+        // Ensure comments is an array even if returned as an object from Laravel
+        const comments = Array.isArray(post.comments) ? post.comments : Object.values(post.comments || {});
+        
         return {
             ...post,
             author: this.formatAuthorName(post.user),
@@ -47,11 +62,14 @@ const CommunityModule = {
             avatar: this.generateAvatar(this.formatAuthorName(post.user)),
             timestamp: post.created_at,
             image: post.image_url,
-            comments: (post.comments || []).map(comment => this.mapComment(comment))
+            comments: comments.map(comment => this.mapComment(comment))
         };
     },
 
     mapComment(comment) {
+        // Ensure replies is an array even if returned as an object from Laravel
+        const replies = Array.isArray(comment.replies) ? comment.replies : Object.values(comment.replies || {});
+
         return {
             ...comment,
             author: this.formatAuthorName(comment.user),
@@ -59,7 +77,7 @@ const CommunityModule = {
             avatar: this.generateAvatar(this.formatAuthorName(comment.user)),
             timestamp: comment.created_at,
             image: comment.image_url,
-            replies: (comment.replies || []).map(reply => this.mapComment(reply))
+            replies: replies.map(reply => this.mapComment(reply))
         };
     },
 

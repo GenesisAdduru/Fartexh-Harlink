@@ -175,6 +175,24 @@
                         </div>
                     </div>
 
+                    @if($nextStatus === 'completed')
+                        <div class="form-group" id="deliveryLinkGroup">
+                            <label for="delivery-link">
+                                <i class='bx bx-link-alt' style="color: #ad246d; vertical-align: middle;"></i>
+                                Delivery / Shipping Tracking Link <span class="required">*</span>
+                            </label>
+                            <p style="margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #8c7895;">Provide the courier tracking URL so the shipment can be monitored.</p>
+                            <div style="position: relative;">
+                                <i class='bx bx-package' style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ad246d; font-size: 1.2rem;"></i>
+                                <input type="url" id="delivery-link" name="deliveryLink" 
+                                    placeholder="https://tracking.courier.com/your-tracking-id" 
+                                    required
+                                    style="padding-left: 40px; background: #fdf7fb; border: 1px solid #ead7e8; border-radius: 10px; width: 100%; padding-top: 0.7rem; padding-bottom: 0.7rem; font-size: 0.95rem; transition: border-color 0.2s ease;"
+                                    onfocus="this.style.borderColor='#ad246d'" onblur="this.style.borderColor='#ead7e8'">
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="form-actions" id="formActions" style="margin-top: 1rem;">
                         <button type="submit" class="soft-btn" style="padding: 0.8rem 2rem; font-weight: 800; background: linear-gradient(135deg, #ad246d 0%, #cf2f84 100%); color: #fff; border: none;">Save Production Update</button>
                         <a class="ghost-btn" href="{{ route('wigmaker.dashboard') }}">Cancel</a>
@@ -189,6 +207,36 @@
                             <p style="margin: 0; font-size: 1rem; color: #166534; opacity: 0.9;">This task has been finalized and synced with the inventory system. No further updates are required of you.</p>
                         </div>
                     </div>
+
+                    @if($task->delivery_link)
+                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: #dbeafe; padding: 0.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class='bx bx-package' style="font-size: 1.5rem; color: #2563eb;"></i>
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <strong style="font-size: 0.85rem; color: #1e40af; display: block; margin-bottom: 0.2rem;">Delivery Tracking Link</strong>
+                                <a href="{{ $task->delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                                   style="font-size: 0.9rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                    {{ $task->delivery_link }}
+                                </a>
+                            </div>
+                            <a href="{{ $task->delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                               style="background: #2563eb; color: #fff; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background 0.2s ease;"
+                               onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                                <i class='bx bx-link-external' style="vertical-align: middle; margin-right: 3px;"></i> Track
+                            </a>
+                        </div>
+                    @else
+                        <div style="background: #fffbeb; border: 1px solid #fed7aa; border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                            <div style="background: #fef3c7; padding: 0.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class='bx bx-info-circle' style="font-size: 1.5rem; color: #d97706;"></i>
+                            </div>
+                            <div style="flex: 1;">
+                                <strong style="font-size: 0.85rem; color: #92400e; display: block; margin-bottom: 0.2rem;">No Delivery Link Provided</strong>
+                                <p style="margin: 0; font-size: 0.85rem; color: #a16207;">A shipping tracking link was not submitted with this completion.</p>
+                            </div>
+                        </div>
+                    @endif
 
                     <div class="form-actions" style="margin-top: 2rem;">
                         <a class="soft-btn" href="{{ route('wigmaker.dashboard') }}" style="min-width: 200px; text-align: center;">Back to Workspace Dashboard</a>

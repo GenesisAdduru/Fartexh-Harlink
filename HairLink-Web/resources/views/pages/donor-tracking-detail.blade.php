@@ -100,6 +100,41 @@
                             <i class='bx bx-award'></i> Download Certificate
                         </a>
                     @endif
+
+                    @if($donation->status === 'Verified')
+                        <div style="width: 100%; margin-top: 1rem;">
+                            @if(!$donation->donor_delivery_link)
+                                <div style="background: #fdf7fb; border: 1px solid #ead7e8; border-radius: 14px; padding: 1.25rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem;">
+                                        <i class='bx bx-send' style="color: #ad246d; font-size: 1.2rem;"></i>
+                                        <strong style="font-size: 0.9rem; color: #4d3f56;">Delivery / Shipping Tracking Link</strong>
+                                    </div>
+                                    <p style="font-size: 0.82rem; color: #8c7895; margin-bottom: 1rem;">Provide the courier tracking URL so the shipment can be monitored.</p>
+                                    <form id="deliveryLinkForm" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                                        <div style="position: relative;">
+                                            <i class='bx bx-link-alt' style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ad246d; font-size: 1.1rem;"></i>
+                                            <input type="text" id="donorDeliveryLink" placeholder="https://tracking.courier.com/your-tracking-id" required 
+                                                style="width: 100%; padding: 0.7rem 0.7rem 0.7rem 2.5rem; border: 1px solid #ead7e8; border-radius: 10px; font-size: 0.85rem; background: #fff;">
+                                        </div>
+                                        <button type="submit" class="soft-btn" style="background: #ad246d; color: #fff; border: none; padding: 0.7rem; font-weight: 700; width: 100%; border-radius: 10px;">Submit Tracking Link</button>
+                                    </form>
+                                </div>
+                            @else
+                                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; padding: 1rem; display: flex; align-items: center; gap: 1rem;">
+                                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 50%; color: #2563eb; display: flex;">
+                                        <i class='bx bx-package' style="font-size: 1.3rem;"></i>
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <small style="display: block; color: #1e40af; font-weight: 800; text-transform: uppercase; font-size: 0.65rem;">In Transit to Facility</small>
+                                        <a href="{{ $donation->donor_delivery_link }}" target="_blank" style="font-size: 0.85rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                            {{ $donation->donor_delivery_link }}
+                                        </a>
+                                    </div>
+                                    <a href="{{ $donation->donor_delivery_link }}" target="_blank" class="soft-btn" style="padding: 0.4rem 0.8rem; background: #2563eb; color: #fff; font-size: 0.75rem; border-radius: 8px; text-decoration: none;">Track</a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             </div>
 

@@ -98,4 +98,25 @@ class DonationController extends Controller
 
         return response()->json($donation->load(['statusHistories', 'user']));
     }
+
+    public function updateDeliveryLink(Request $request, $reference)
+    {
+        $user = Auth::user();
+        $donation = Donation::where('reference', $reference)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'donor_delivery_link' => 'required|string',
+        ]);
+
+        $donation->update([
+            'donor_delivery_link' => $validated['donor_delivery_link']
+        ]);
+
+        // Optional: Record this in history as well? 
+        // For now just update the field as per logic.
+        
+        return response()->json($donation->load(['statusHistories', 'user']));
+    }
 }

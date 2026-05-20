@@ -16,7 +16,9 @@ class CommunityController extends Controller
                 'user', 
                 'comments' => function($query) {
                     $query->whereNull('parent_id')
-                        ->with(['user', 'replies.user'])
+                        ->with(['user', 'replies' => function($q) {
+                            $q->with('user')->orderBy('created_at', 'asc');
+                        }])
                         ->orderBy('created_at', 'asc');
                 }
             ])
@@ -43,8 +45,8 @@ class CommunityController extends Controller
 
         $imageUrl = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('community/posts', 's3');
-            $imageUrl = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+            $path = $request->file('image')->store('community/posts', 'public');
+            $imageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         }
 
         $post = $user->communityPosts()->create([
@@ -60,15 +62,15 @@ class CommunityController extends Controller
     public function storeComment(Request $request, CommunityPost $post)
     {
         $validated = $request->validate([
-            'content' => 'required|string',
+            'content' => 'required_without:image|string|nullable',
             'parent_id' => 'nullable|uuid|exists:community_comments,id',
             'image' => 'nullable|image|max:5120'
         ]);
 
         $imageUrl = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('community/comments', 's3');
-            $imageUrl = \Illuminate\Support\Facades\Storage::disk('s3')->url($path);
+            $path = $request->file('image')->store('community/comments', 'public');
+            $imageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         }
 
         $comment = $post->comments()->create([

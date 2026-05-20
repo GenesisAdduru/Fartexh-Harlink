@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             form.reset();
             if (fileName) fileName.textContent = 'No file selected';
-            window.location.href = `/donor/confirmation?ref=${encodeURIComponent(donation.reference)}`;
+            window.location.href = `/donor/tracking/${encodeURIComponent(donation.reference)}`;
         } catch (error) {
             console.error('Donation error:', error);
             alert('There was an error submitting your donation. Please try again.');

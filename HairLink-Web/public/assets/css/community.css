@@ -527,6 +527,47 @@
     box-shadow: 0 0 0 2px rgba(207, 47, 132, 0.1);
 }
 
+.reply-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fdf5fb;
+    border: 1px solid #f1a8cf;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #ad246d;
+    animation: fadeIn 0.3s ease;
+}
+
+.reply-target-name {
+    font-weight: 700;
+}
+
+.cancel-reply-btn {
+    background: none;
+    border: none;
+    color: #ad246d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.cancel-reply-btn:hover {
+    background: #fceef6;
+    color: #cf2f84;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .submit-comment-btn {
     background: #cf2f84;
     color: #fff;

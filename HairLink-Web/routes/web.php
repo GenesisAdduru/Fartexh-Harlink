@@ -69,7 +69,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/donor/donate', 'pages.donate-dashboard')->name('donor.donate');
     Route::get('/donor/tracking', [App\Http\Controllers\DonorController::class, 'tracking'])->name('donor.tracking');
     Route::get('/donor/tracking/{reference}', [App\Http\Controllers\DonorController::class, 'trackingDetail'])->name('donor.tracking.detail');
-    Route::get('/donor/confirmation', [App\Http\Controllers\DonorController::class, 'confirmation'])->name('donor.confirmation');
     Route::get('/donor/certificate', [App\Http\Controllers\DonorController::class, 'certificate'])->name('donor.certificate');
     Route::get('/donor/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('donor.profile');
     Route::post('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -79,10 +78,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('/recipient/request', 'pages.recipient-request')->name('recipient.request');
     Route::get('/recipient/tracking', [App\Http\Controllers\RecipientController::class, 'tracking'])->name('recipient.tracking');
     Route::get('/recipient/tracking/{reference}', [App\Http\Controllers\RecipientController::class, 'trackingDetail'])->name('recipient.tracking.detail');
-    Route::get('/recipient/confirmation', [App\Http\Controllers\RecipientController::class, 'confirmation'])->name('recipient.confirmation');
     Route::get('/recipient/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('recipient.profile');
     Route::view('/recipient/community', 'pages.recipient-community')->name('recipient.community');
     Route::view('/recipient/haircare', 'pages.recipient-haircare')->name('recipient.haircare');
+    Route::post('/recipient/tracking/{reference}/confirm-received', [App\Http\Controllers\RecipientController::class, 'confirmWigReceived'])->name('recipient.tracking.confirm-received');
 
     // Internal API Routes for AJAX interaction
     Route::prefix('internal-api')->group(function () {
@@ -91,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/donations', [App\Http\Controllers\Api\DonationController::class, 'store']);
         Route::get('/donations/{reference}', [App\Http\Controllers\Api\DonationController::class, 'show']);
         Route::post('/donations/{reference}/status', [App\Http\Controllers\Api\DonationController::class, 'updateStatus']);
+        Route::post('/donations/{reference}/delivery-link', [App\Http\Controllers\Api\DonationController::class, 'updateDeliveryLink']);
 
         // Hair Requests
         Route::get('/requests', [App\Http\Controllers\Api\HairRequestController::class, 'index']);

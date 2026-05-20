@@ -209,7 +209,42 @@ document.addEventListener('DOMContentLoaded', () => {
                     // 2. Update the "Next Stage" fields for sequential flow
                     if (savedStatus === 'completed') {
                         // If we just saved 'completed', we are done!
-                        // Hide fields and show completion banner
+                        // Hide fields and show completion banner + delivery link
+                        const deliveryLink = data.delivery_link || '';
+                        let deliveryHtml = '';
+                        if (deliveryLink) {
+                            deliveryHtml = `
+                                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                                    <div style="background: #dbeafe; padding: 0.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class='bx bx-package' style="font-size: 1.5rem; color: #2563eb;"></i>
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <strong style="font-size: 0.85rem; color: #1e40af; display: block; margin-bottom: 0.2rem;">Delivery Tracking Link</strong>
+                                        <a href="${deliveryLink}" target="_blank" rel="noopener noreferrer" 
+                                           style="font-size: 0.9rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                            ${deliveryLink}
+                                        </a>
+                                    </div>
+                                    <a href="${deliveryLink}" target="_blank" rel="noopener noreferrer" 
+                                       style="background: #2563eb; color: #fff; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; text-decoration: none; white-space: nowrap;">
+                                        <i class='bx bx-link-external' style="vertical-align: middle; margin-right: 3px;"></i> Track
+                                    </a>
+                                </div>
+                            `;
+                        } else {
+                            deliveryHtml = `
+                                <div style="background: #fffbeb; border: 1px solid #fed7aa; border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                                    <div style="background: #fef3c7; padding: 0.6rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <i class='bx bx-info-circle' style="font-size: 1.5rem; color: #d97706;"></i>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <strong style="font-size: 0.85rem; color: #92400e; display: block; margin-bottom: 0.2rem;">No Delivery Link Provided</strong>
+                                        <p style="margin: 0; font-size: 0.85rem; color: #a16207;">A shipping tracking link was not submitted with this completion.</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+
                         taskUpdateForm.innerHTML = `
                             <div class="completion-banner" style="background: #f0fdf4; color: #166534; padding: 1.5rem; border-radius: 12px; border: 1px solid #bbf7d0; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
                                 <i class='bx bxs-check-circle' style="font-size: 2rem;"></i>
@@ -218,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <p style="margin: 0; font-size: 0.9rem;">This task has been finalized and synced with the inventory system.</p>
                                 </div>
                             </div>
+                            ${deliveryHtml}
                             <div class="form-actions">
                                 <a class="soft-btn" href="/wigmaker/dashboard">Back to Dashboard</a>
                             </div>
@@ -236,6 +272,31 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         if (displayInput) displayInput.value = nextLabel;
                         if (hiddenInput) hiddenInput.value = nextStatus;
+
+                        // Dynamically add delivery link field when next status is 'completed'
+                        if (nextStatus === 'completed' && !document.getElementById('deliveryLinkGroup')) {
+                            const formActions = document.getElementById('formActions');
+                            if (formActions) {
+                                const deliveryGroup = document.createElement('div');
+                                deliveryGroup.className = 'form-group';
+                                deliveryGroup.id = 'deliveryLinkGroup';
+                                deliveryGroup.innerHTML = `
+                                    <label for="delivery-link">
+                                        <i class='bx bx-link-alt' style="color: #ad246d; vertical-align: middle;"></i>
+                                        Delivery / Shipping Tracking Link <span class="required">*</span>
+                                    </label>
+                                    <p style="margin: 0 0 0.5rem 0; font-size: 0.8rem; color: #8c7895;">Provide the courier tracking URL so the shipment can be monitored.</p>
+                                    <div style="position: relative;">
+                                        <i class='bx bx-package' style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ad246d; font-size: 1.2rem;"></i>
+                                        <input type="url" id="delivery-link" name="deliveryLink" 
+                                            placeholder="https://tracking.courier.com/your-tracking-id" 
+                                            required
+                                            style="padding-left: 40px; background: #fdf7fb; border: 1px solid #ead7e8; border-radius: 10px; width: 100%; padding-top: 0.7rem; padding-bottom: 0.7rem; font-size: 0.95rem; transition: border-color 0.2s ease;">
+                                    </div>
+                                `;
+                                formActions.parentNode.insertBefore(deliveryGroup, formActions);
+                            }
+                        }
                     }
 
                     // 3. Add to history table

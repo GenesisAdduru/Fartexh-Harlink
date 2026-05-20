@@ -65,6 +65,30 @@
                         <div class="track-actions" data-donor-actions style="display: flex; gap: 1.25rem; align-items: stretch; margin-top: 1.25rem;">
                             <div class="action-left-pane" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                                 @if($donation->status === 'Verified')
+                                    @if($donation->donor_delivery_link)
+                                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem; width: 100%;">
+                                            <div style="background: #dbeafe; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <i class='bx bx-package' style="font-size: 1.2rem; color: #2563eb;"></i>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <strong style="font-size: 0.72rem; color: #1e40af; display: block; margin-bottom: 0.15rem;">Delivery / Shipping Tracking Link</strong>
+                                                <a href="{{ $donation->donor_delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                                                   style="font-size: 0.82rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                                    {{ Str::limit($donation->donor_delivery_link, 50) }}
+                                                </a>
+                                            </div>
+                                            <a href="{{ $donation->donor_delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                                               style="background: #2563eb; color: #fff; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap;">
+                                                <i class='bx bx-link-external' style="vertical-align: middle; margin-right: 2px;"></i> Track
+                                            </a>
+                                        </div>
+                                    @else
+                                        <div style="background: #fffbeb; border: 1px solid #fed7aa; border-radius: 12px; padding: 0.6rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; width: 100%;">
+                                            <i class='bx bx-info-circle' style="color: #d97706; font-size: 1.1rem;"></i>
+                                            <small style="color: #92400e; font-weight: 600; font-size: 0.75rem;">Awaiting donor shipping details.</small>
+                                        </div>
+                                    @endif
+
                                     <button type="button" class="soft-btn" data-confirm-received style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
                                         <i class='bx bx-package'></i> Confirm Hair Received from Donor
                                     </button>
@@ -100,6 +124,25 @@
                                 @endif
 
                                 @if($isCompleted)
+                                    @if($wigProd && $wigProd->delivery_link)
+                                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.8rem; width: 100%;">
+                                            <div style="background: #dbeafe; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <i class='bx bx-package' style="font-size: 1.2rem; color: #2563eb;"></i>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <strong style="font-size: 0.72rem; color: #1e40af; display: block; margin-bottom: 0.15rem;">Delivery / Shipping Tracking Link (from Wigmaker)</strong>
+                                                <a href="{{ $wigProd->delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                                                   style="font-size: 0.82rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                                    {{ Str::limit($wigProd->delivery_link, 50) }}
+                                                </a>
+                                            </div>
+                                            <a href="{{ $wigProd->delivery_link }}" target="_blank" rel="noopener noreferrer" 
+                                               style="background: #2563eb; color: #fff; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap;"
+                                               onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                                                <i class='bx bx-link-external' style="vertical-align: middle; margin-right: 2px;"></i> Track
+                                            </a>
+                                        </div>
+                                    @endif
                                     <button type="button" class="soft-btn" data-confirm-wig-received style="padding: 0.5rem 1.25rem; font-weight: 800; width: fit-content; margin-inline: auto;">
                                         <i class='bx bx-gift'></i> Confirm Wig Received from Wigmaker
                                     </button>
@@ -178,17 +221,58 @@
                         <div class="track-actions" style="display: flex; gap: 1.25rem; align-items: stretch; margin-top: 1.25rem;">
                             <div class="action-left-pane" style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                                 @if($request->status === 'Validated')
-                                    <button type="button" class="soft-btn" onclick="window.location.href='{{ route('staff.rule-matching') }}'" style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
-                                        <i class='bx bx-user-check'></i> Go to Matching Page
+                                    <button type="button" class="soft-btn" onclick="window.location.href='{{ route('staff.rule-matching') }}?ref={{ $request->reference }}'" style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
+                                        <i class='bx bx-user-check'></i> Match This Recipient
                                     </button>
                                 @elseif($request->status === 'Matched')
-                                    <button type="button" class="soft-btn" data-ship-wig style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
-                                        <i class='bx bx-bus'></i> Confirm Shipment / In Transit
-                                    </button>
+                                    <div class="shipment-section" style="width: 100%;">
+                                        <div class="form-group" style="margin-bottom: 0.8rem;">
+                                            <label style="font-size: 0.78rem; color: #8c7895; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.4rem;">
+                                                <i class='bx bx-link-alt' style="color: #ad246d;"></i> Delivery / Shipping Tracking Link <span style="color: #e74c3c;">*</span>
+                                            </label>
+                                            <p style="margin: 0 0 0.4rem 0; font-size: 0.75rem; color: #8c7895;">Provide the courier tracking URL so the shipment can be monitored.</p>
+                                            <div style="position: relative;">
+                                                <i class='bx bx-package' style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #ad246d; font-size: 1.1rem;"></i>
+                                                <input type="url" data-delivery-link-input
+                                                    placeholder="https://tracking.courier.com/your-tracking-id" 
+                                                    required
+                                                    style="padding-left: 36px; background: #fdf7fb; border: 1px solid #ead7e8; border-radius: 10px; width: 100%; padding-top: 0.6rem; padding-bottom: 0.6rem; font-size: 0.88rem; transition: border-color 0.2s ease;"
+                                                    onfocus="this.style.borderColor='#ad246d'" onblur="this.style.borderColor='#ead7e8'">
+                                            </div>
+                                        </div>
+                                        <button type="button" class="soft-btn" data-ship-wig style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
+                                            <i class='bx bx-bus'></i> Confirm Shipment / In Transit
+                                        </button>
+                                    </div>
                                 @elseif($request->status === 'In Transit')
-                                    <button type="button" class="soft-btn" data-complete-delivery style="padding: 0.5rem 1.25rem; font-weight: 700; width: fit-content; margin-inline: auto;">
-                                        <i class='bx bx-check-double'></i> Confirm Delivery / Completed
-                                    </button>
+                                    @if($request->delivery_tracking_link)
+                                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 0.8rem 1rem; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.8rem; width: 100%;">
+                                            <div style="background: #dbeafe; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <i class='bx bx-package' style="font-size: 1.2rem; color: #2563eb;"></i>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <strong style="font-size: 0.72rem; color: #1e40af; display: block; margin-bottom: 0.15rem;">Delivery / Shipping Tracking Link</strong>
+                                                <a href="{{ $request->delivery_tracking_link }}" target="_blank" rel="noopener noreferrer" 
+                                                   style="font-size: 0.82rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">
+                                                    {{ Str::limit($request->delivery_tracking_link, 50) }}
+                                                </a>
+                                            </div>
+                                            <a href="{{ $request->delivery_tracking_link }}" target="_blank" rel="noopener noreferrer" 
+                                               style="background: #2563eb; color: #fff; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.72rem; font-weight: 700; text-decoration: none; white-space: nowrap;"
+                                               onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                                                <i class='bx bx-link-external' style="vertical-align: middle; margin-right: 2px;"></i> Track
+                                            </a>
+                                        </div>
+                                    @endif
+                                    <div class="sync-notice" style="background: #fdf7fb; border: 1px solid #f3e6f0; border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.8rem; width: 100%;">
+                                        <div style="width: 38px; height: 38px; background: #fceef6; border-radius: 50%; display: grid; place-items: center; color: #ad246d; flex-shrink: 0;">
+                                            <i class='bx bx-bus bx-tada' style="font-size: 1.3rem;"></i>
+                                        </div>
+                                        <div style="font-size: 0.82rem; line-height: 1.4; color: #5f5068;">
+                                            <div style="font-weight: 800; color: #3b2e43;">In Transit — Awaiting Recipient Confirmation</div>
+                                            Wig has been shipped. Waiting for the recipient to confirm receipt.
+                                        </div>
+                                    </div>
                                 @elseif($request->status === 'Completed')
                                     <div class="final-state-info" style="background: #f8fff9; border: 1px solid #d4edda; border-radius: 12px; padding: 1rem; display: flex; align-items: center; gap: 0.8rem;">
                                         <div style="width: 38px; height: 38px; background: #e9f7ec; border-radius: 50%; display: grid; place-items: center; color: #28a745; flex-shrink: 0;">
@@ -196,9 +280,20 @@
                                         </div>
                                         <div style="font-size: 0.82rem; line-height: 1.4; color: #155724;">
                                             <div style="font-weight: 800;">Workflow Complete</div>
-                                            Request fulfilled. Wig delivered to recipient.
+                                            Recipient confirmed wig received{{ $request->wig_received_at ? ' on ' . $request->wig_received_at->format('M d, Y') : '' }}.
                                         </div>
                                     </div>
+                                    @if($request->delivery_tracking_link)
+                                        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 0.8rem 1rem; margin-top: 0.6rem; display: flex; align-items: center; gap: 0.8rem; width: 100%;">
+                                            <div style="background: #dbeafe; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                <i class='bx bx-package' style="font-size: 1.2rem; color: #2563eb;"></i>
+                                            </div>
+                                            <div style="flex: 1; min-width: 0;">
+                                                <strong style="font-size: 0.72rem; color: #1e40af; display: block;">Delivery Link</strong>
+                                                <a href="{{ $request->delivery_tracking_link }}" target="_blank" style="font-size: 0.82rem; color: #2563eb; word-break: break-all; text-decoration: underline; font-weight: 600;">{{ Str::limit($request->delivery_tracking_link, 50) }}</a>
+                                            </div>
+                                        </div>
+                                    @endif
                                 @endif
                             </div>
                         </div>

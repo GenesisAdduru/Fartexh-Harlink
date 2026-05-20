@@ -207,6 +207,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'status' => 'required|string',
             'notes' => 'nullable|string',
+            'delivery_tracking_link' => 'nullable|url|max:2048',
         ]);
 
         $record = Donation::where('reference', $reference)->first();
@@ -254,6 +255,11 @@ class StaffController extends Controller
             $updateData['received_wig_at'] = now();
         }
 
+        // Save delivery tracking link when shipping to recipient
+        if ($newStatus === 'In Transit' && !empty($validated['delivery_tracking_link'])) {
+            $updateData['delivery_tracking_link'] = $validated['delivery_tracking_link'];
+        }
+
         // 1. If Donation status becomes 'Received Hair', generate Certificate
         if ($newStatus === 'Received Hair' && $record instanceof Donation && !$record->certificate_no) {
             $updateData['certificate_no'] = 'CERT-' . date('Y') . '-' . substr($record->reference, -6);
@@ -273,6 +279,7 @@ class StaffController extends Controller
         return response()->json([
             'message' => "Status updated to {$newStatus}.",
             'success' => true,
+            'delivery_tracking_link' => ($record instanceof HairRequest) ? $record->delivery_tracking_link : null,
             'received_wig_at' => ($record instanceof Donation && $record->received_wig_at) ? $record->received_wig_at->format('M d, Y h:i A') : null,
         ]);
     }
@@ -348,10 +355,87 @@ class StaffController extends Controller
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        // Get completed wigs to find assigned wig codes
-        $wigs = WigProduction::where('status', 'completed')->get()->keyBy('id');
+        // Get completed wigs that are available (not yet assigned to a request)
+        $availableWigs = WigProduction::where('status', 'completed')
+            ->whereNull('hair_request_id')
+            ->get();
 
-        return view('pages.staff-recipient-matching-list', compact('requests', 'wigs'));
+        // Calculate best match for each Validated request
+        foreach ($requests as $request) {
+            if ($request->status !== 'Validated') {
+                $request->best_match = null;
+                continue;
+            }
+
+            $bestWig = null;
+            $maxScore = -1;
+
+            foreach ($availableWigs as $wig) {
+                $score = $this->calculateCompatibility($request, $wig);
+                if ($score > $maxScore) {
+                    $maxScore = $score;
+                    $bestWig = $wig;
+                }
+            }
+
+            $request->best_match = $maxScore > 0 ? $bestWig : null;
+            $request->match_score = $maxScore;
+        }
+
+        return view('pages.staff-recipient-matching-list', compact('requests'));
+    }
+
+    private function calculateCompatibility($request, $wig)
+    {
+        $score = 0;
+        
+        // Normalize sizes
+        $normalizeSize = function($val) {
+            $s = strtolower(trim($val));
+            if (str_contains($s, '10 to 14') || $s === 'short') return 1;
+            if (str_contains($s, '15 to 20') || $s === 'medium') return 2;
+            if (str_contains($s, 'more than 20') || $s === 'long') return 3;
+            return 0;
+        };
+
+        $reqSize = $normalizeSize($request->wig_length);
+        $wigSize = $normalizeSize($wig->target_length);
+
+        if ($reqSize > 0 && $wigSize > 0) {
+            if ($reqSize === $wigSize) {
+                $score += 40;
+            } elseif (abs($reqSize - $wigSize) === 1) {
+                $score += 20;
+            }
+        }
+
+        // Color Match
+        $reqColor = strtolower(trim($request->wig_color));
+        $wigColor = strtolower(trim($wig->target_color));
+
+        if ($reqColor === $wigColor) {
+            $score += 40;
+        } else {
+            // Simple similarity check
+            $similar = [
+                ['black', 'brown'],
+                ['brown', 'red'],
+                ['blonde', 'gray'],
+                ['gray', 'white'],
+            ];
+            foreach ($similar as $pair) {
+                if ((str_contains($reqColor, $pair[0]) && str_contains($wigColor, $pair[1])) ||
+                    (str_contains($reqColor, $pair[1]) && str_contains($wigColor, $pair[0]))) {
+                    $score += 20;
+                    break;
+                }
+            }
+        }
+
+        // Availability (always 20 if in stock)
+        $score += 20;
+
+        return $score;
     }
 
     public function ruleMatching()

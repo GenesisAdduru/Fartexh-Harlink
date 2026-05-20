@@ -18,6 +18,8 @@ class HairRequest extends Model
         'story',
         'additional_photo',
         'status',
+        'delivery_tracking_link',
+        'wig_received_at',
         'appointment_at',
         'notes',
         'documents',
@@ -38,6 +40,7 @@ class HairRequest extends Model
 
     protected $casts = [
         'appointment_at' => 'datetime',
+        'wig_received_at' => 'datetime',
         'documents' => 'array',
     ];
 

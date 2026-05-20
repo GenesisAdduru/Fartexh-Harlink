@@ -120,4 +120,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const deliveryLinkForm = document.getElementById('deliveryLinkForm');
+    if (deliveryLinkForm) {
+        deliveryLinkForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const linkInput = document.getElementById('donorDeliveryLink');
+            const submitBtn = deliveryLinkForm.querySelector('button[type="submit"]');
+
+            if (!linkInput.value.trim()) return;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                const updated = await moduleApi.submitDeliveryLink(ref, linkInput.value.trim());
+                if (updated) {
+                    window.location.reload(); // Simplest way to refresh the Blade view with new data
+                }
+            } catch (error) {
+                console.error('Error submitting delivery link:', error);
+                alert('Failed to submit delivery link. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Tracking Link';
+            }
+        });
+    }
 });

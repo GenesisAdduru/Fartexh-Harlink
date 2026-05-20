@@ -83,26 +83,4 @@ class DonorController extends Controller
         return view('pages.donor-certificate', compact('donation'));
     }
 
-    public function confirmation(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user) return redirect('/login');
-
-        $ref = $request->query('ref');
-        
-        $query = Donation::query();
-        if (!in_array($user->role, ['staff', 'admin'])) {
-            $query->where('user_id', $user->id);
-        }
-
-        if ($ref) {
-            $donation = $query->where('reference', $ref)->first();
-        } else {
-            $donation = $query->orderBy('created_at', 'desc')->first();
-        }
-
-        if (!$donation) return redirect()->route('donor.dashboard');
-
-        return view('pages.donor-confirmation', compact('donation'));
-    }
 }

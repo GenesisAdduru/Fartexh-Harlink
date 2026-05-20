@@ -17,6 +17,7 @@ class WigProduction extends Model
         'target_length',
         'target_color',
         'status',
+        'delivery_link',
         'due_date',
     ];
 

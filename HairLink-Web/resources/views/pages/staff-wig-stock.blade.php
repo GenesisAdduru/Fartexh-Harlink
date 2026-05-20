@@ -35,22 +35,17 @@
                 <tbody>
                     @forelse($wigs as $wig)
                         @php
-                            $latestPhoto = null;
-                            if ($wig->statusHistories) {
-                                $historyWithPhoto = $wig->statusHistories->whereNotNull('metadata')->sortByDesc('created_at')->filter(function($hist) {
-                                    return isset($hist->metadata['preview_photo']);
-                                })->first();
-                                if ($historyWithPhoto) {
-                                    $latestPhoto = $historyWithPhoto->metadata['preview_photo'];
-                                }
-                            }
+                            $historyWithPhoto = $wig->statusHistories->whereNotNull('metadata')->sortByDesc('created_at')->filter(function($hist) {
+                                return isset($hist->metadata['preview_photo']);
+                            })->first();
+                            $latestPhotoUrl = $historyWithPhoto ? $historyWithPhoto->preview_photo_url : null;
                         @endphp
                         <tr data-search-row>
                             <td style="vertical-align: middle;"><strong>{{ $wig->task_code }}</strong></td>
                             <td style="text-align: center; vertical-align: middle; padding: 0.3rem;">
-                                @if($latestPhoto)
-                                    <a href="{{ asset('storage/' . $latestPhoto) }}" target="_blank" class="file-thumbnail" style="width: 42px; height: 42px; display: inline-block; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
-                                        <img src="{{ asset('storage/' . $latestPhoto) }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                @if($latestPhotoUrl)
+                                    <a href="{{ $latestPhotoUrl }}" target="_blank" class="file-thumbnail" style="width: 42px; height: 42px; display: inline-block; margin: 0 auto; box-shadow: 0 2px 5px rgba(0,0,0,0.08);">
+                                        <img src="{{ $latestPhotoUrl }}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
                                         <div class="preview-overlay">
                                             <i class='bx bx-search' style="font-size: 1.1rem;"></i>
                                         </div>

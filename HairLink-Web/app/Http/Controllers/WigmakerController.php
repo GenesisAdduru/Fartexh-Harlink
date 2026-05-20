@@ -57,12 +57,15 @@ class WigmakerController extends Controller
             'progressNotes' => 'required|string',
             'updatedAt' => 'nullable|date',
             'previewPhoto' => 'nullable|image|max:10240',
+            'deliveryLink' => 'nullable|url|max:2048',
         ]);
 
-        // 1. Update Task status
-        $task->update([
-            'status' => $validated['status'],
-        ]);
+        // 1. Update Task status (and delivery link if provided)
+        $updateData = ['status' => $validated['status']];
+        if (!empty($validated['deliveryLink'])) {
+            $updateData['delivery_link'] = $validated['deliveryLink'];
+        }
+        $task->update($updateData);
 
         // 2. Handle metadata (photo)
         $metadata = [];
@@ -113,6 +116,7 @@ class WigmakerController extends Controller
         return response()->json([
             'message' => 'Task updated successfully and synced with tracking.',
             'success' => true,
+            'delivery_link' => $task->delivery_link,
             'history' => [
                 'at' => $history->created_at ? $history->created_at->format('Y-m-d h:i A') : now()->format('Y-m-d h:i A'),
                 'status' => str_replace('-', ' ', ucfirst($history->status)),

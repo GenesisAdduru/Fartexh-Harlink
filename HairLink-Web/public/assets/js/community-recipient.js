@@ -109,6 +109,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         <button class="submit-comment-btn" data-post-id="${post.id}">Post</button>
                     </div>
+                    <div class="reply-indicator" style="display: none;">
+                        <span>Replying to <span class="reply-target-name"></span></span>
+                        <button class="cancel-reply-btn"><i class='bx bx-x'></i></button>
+                    </div>
                     <div class="comment-image-preview"></div>
                 </div>
             </div>
@@ -200,6 +204,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Cancel reply
+        const replyIndicator = postElement.querySelector('.reply-indicator');
+        const replyTargetName = postElement.querySelector('.reply-target-name');
+        const commentInput = postElement.querySelector('.comment-input');
+
+        postElement.querySelector('.cancel-reply-btn')?.addEventListener('click', () => {
+            delete commentInput.dataset.parentId;
+            commentInput.placeholder = "Write a comment...";
+            replyIndicator.style.display = 'none';
+        });
+
         // Submit comment
         postElement.querySelector('.submit-comment-btn')?.addEventListener('click', async (e) => {
             const input = postElement.querySelector('.comment-input');
@@ -211,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const newComment = await CommunityModule.addComment(postId, content, parentId, pendingCommentImage);
                     
                     if (parentId) {
+                        // Find parent recursively if needed, but we only support 2 levels for now
                         const parent = post.comments.find(c => c.id === parentId);
                         if (parent) {
                             if (!parent.replies) parent.replies = [];
@@ -226,15 +242,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     input.value = '';
                     input.placeholder = "Write a comment...";
                     delete input.dataset.parentId;
+                    replyIndicator.style.display = 'none';
                     pendingCommentImage = null;
                     commentPreview.innerHTML = '';
                     
-                    const commentCount = postElement.querySelector('.comments-count');
-                    if (commentCount) {
-                        commentCount.innerHTML = `<i class='bx bxs-comment'></i> ${countAllComments(post.comments)}`;
+                    const commentCountLabel = postElement.querySelector('.comments-count');
+                    if (commentCountLabel) {
+                        commentCountLabel.innerHTML = `<i class='bx bxs-comment'></i> ${countAllComments(post.comments)}`;
                     }
                 } catch (error) {
                     console.error('Error adding comment:', error);
+                    alert('Failed to post comment: ' + error.message);
                 }
             }
         });
@@ -328,8 +346,14 @@ document.addEventListener('DOMContentLoaded', () => {
         commentDiv.querySelector('.reply-btn')?.addEventListener('click', () => {
             const postEl = commentDiv.closest('.community-post');
             const input = postEl.querySelector('.comment-input');
+            const indicator = postEl.querySelector('.reply-indicator');
+            const targetName = postEl.querySelector('.reply-target-name');
+
             input.dataset.parentId = comment.id;
             input.placeholder = `Replying to ${comment.author}...`;
+            if (targetName) targetName.textContent = comment.author;
+            if (indicator) indicator.style.display = 'flex';
+            
             input.focus();
         });
 

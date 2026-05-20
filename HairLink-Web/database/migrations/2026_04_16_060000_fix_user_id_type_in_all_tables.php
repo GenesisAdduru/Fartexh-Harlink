@@ -47,7 +47,7 @@ return new class extends Migration
                 DB::statement("
                     DO $$ 
                     BEGIN 
-                        IF (SELECT data_type FROM information_schema.columns WHERE tablename = '{$table}' AND column_name = 'user_id') != 'bigint' THEN
+                        IF (SELECT data_type FROM information_schema.columns WHERE table_name = '{$table}' AND column_name = 'user_id') != 'bigint' THEN
                             ALTER TABLE {$table} ALTER COLUMN user_id TYPE bigint USING NULL;
                         END IF;
                     END $$;

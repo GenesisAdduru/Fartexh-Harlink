@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Create request and redirect to confirmation
             const newRequest = await window.hairlinkRecipientModule.createRequest(requestData);
-            window.location.href = `/recipient/confirmation?ref=${newRequest.reference}`;
+            window.location.href = `/recipient/tracking/${newRequest.reference}`;
         } catch (error) {
             console.error('Request submission error:', error);
             alert('There was an error submitting your request. Please try again.');

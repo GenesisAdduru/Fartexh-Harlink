@@ -247,24 +247,65 @@ document.addEventListener('DOMContentLoaded', () => {
         const shipBtn = card.querySelector('[data-ship-wig]');
         if (shipBtn) {
             shipBtn.addEventListener('click', async () => {
-                const proceed = window.confirm(`Confirm shipment for Request # ${reference}?\n\nThis will move the status to In Transit.`);
+                // Get the delivery link input from the same card
+                const deliveryLinkInput = card.querySelector('[data-delivery-link-input]');
+                const deliveryLink = deliveryLinkInput ? deliveryLinkInput.value.trim() : '';
+
+                if (!deliveryLink) {
+                    alert('Please provide a delivery tracking link before confirming shipment.');
+                    if (deliveryLinkInput) {
+                        deliveryLinkInput.focus();
+                        deliveryLinkInput.style.borderColor = '#e74c3c';
+                    }
+                    return;
+                }
+
+                // Basic URL validation
+                try {
+                    new URL(deliveryLink);
+                } catch (_) {
+                    alert('Please provide a valid URL (e.g., https://tracking.courier.com/...)');
+                    if (deliveryLinkInput) deliveryLinkInput.focus();
+                    return;
+                }
+
+                const proceed = window.confirm(`Confirm shipment for Request # ${reference}?\n\nDelivery Link: ${deliveryLink}\n\nThis will move the status to In Transit.`);
                 if (!proceed) return;
 
                 shipBtn.disabled = true;
                 shipBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Processing...';
-                await updateBackend('In Transit', 'Staff confirmed wig shipment');
-            });
-        }
 
-        const completeBtn = card.querySelector('[data-complete-delivery]');
-        if (completeBtn) {
-            completeBtn.addEventListener('click', async () => {
-                const proceed = window.confirm(`Confirm delivery for Request # ${reference}?\n\nThis will mark the request as Completed.`);
-                if (!proceed) return;
+                try {
+                    const response = await fetch(`/staff/tracking/${reference}/update-status`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            status: 'In Transit',
+                            notes: 'Staff confirmed wig shipment',
+                            delivery_tracking_link: deliveryLink
+                        })
+                    });
 
-                completeBtn.disabled = true;
-                completeBtn.innerHTML = '<i class="bx bx-loader-alt bx-spin"></i> Processing...';
-                await updateBackend('Completed', 'Staff confirmed wig delivery to recipient');
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        paintStages(card, 'in-transit', steps);
+                        stampUpdate('In Transit');
+                        setTimeout(() => location.reload(), 600);
+                    } else {
+                        alert(data.message || 'Error updating status');
+                        shipBtn.disabled = false;
+                        shipBtn.innerHTML = '<i class="bx bx-bus"></i> Confirm Shipment / In Transit';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Network error updating status');
+                    shipBtn.disabled = false;
+                    shipBtn.innerHTML = '<i class="bx bx-bus"></i> Confirm Shipment / In Transit';
+                }
             });
         }
     }
@@ -433,6 +474,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ranked.forEach(({ card }, index) => {
             card.style.order = String(index + 1);
+            
+            // Handle Best Match Badge
+            const badge = card.querySelector('[data-best-match-badge]');
+            if (badge) {
+                // Show badge only for the first element in the sorted list, if it has a positive score
+                if (index === 0 && ranked[0].score > 0) {
+                    badge.hidden = false;
+                    card.style.border = '2px solid #ad246d';
+                    card.style.transform = 'scale(1.02)';
+                } else {
+                    badge.hidden = true;
+                    card.style.border = '1px solid #f2ebf4';
+                    card.style.transform = 'scale(1)';
+                }
+            }
         });
 
         let shown = 0;
@@ -513,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 if (res.ok && data.success) {
                     alert(data.message);
-                    window.location.href = '/staff/realtime-tracking';
+                    window.location.href = '/staff/realtime-tracking?tab=requests';
                 } else {
                     alert(data.message || 'Matching failed');
                     btn.disabled = false;

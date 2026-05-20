@@ -14,6 +14,39 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    private const DEMO_USERS = [
+        'admin@hairlink.local' => [
+            'password' => 'admin12345',
+            'role' => 'admin',
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+        ],
+        'donor.demo@hairlink.local' => [
+            'password' => 'password123',
+            'role' => 'donor',
+            'first_name' => 'Donor',
+            'last_name' => 'Demo',
+        ],
+        'recipient.demo@hairlink.local' => [
+            'password' => 'password123',
+            'role' => 'recipient',
+            'first_name' => 'Recipient',
+            'last_name' => 'Demo',
+        ],
+        'staff.demo@hairlink.local' => [
+            'password' => 'password123',
+            'role' => 'staff',
+            'first_name' => 'Staff',
+            'last_name' => 'Demo',
+        ],
+        'wigmaker.demo@hairlink.local' => [
+            'password' => 'password123',
+            'role' => 'wigmaker',
+            'first_name' => 'Wigmaker',
+            'last_name' => 'Demo',
+        ],
+    ];
+
     /**
      * Handle an authentication attempt.
      */
@@ -23,6 +56,8 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
+        $this->syncLocalDemoUser($credentials['email'], $credentials['password']);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
@@ -50,6 +85,32 @@ class AuthController extends Controller
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
+    }
+
+    private function syncLocalDemoUser(string $email, string $password): void
+    {
+        if (! app()->environment('local') || ! isset(self::DEMO_USERS[$email])) {
+            return;
+        }
+
+        $demoUser = self::DEMO_USERS[$email];
+
+        if ($password !== $demoUser['password']) {
+            return;
+        }
+
+        User::updateOrCreate(
+            ['email' => $email],
+            [
+                'name' => $demoUser['first_name'] . ' ' . $demoUser['last_name'],
+                'first_name' => $demoUser['first_name'],
+                'last_name' => $demoUser['last_name'],
+                'password' => Hash::make($demoUser['password']),
+                'role' => $demoUser['role'],
+                'email_verified_at' => now(),
+                'is_active' => true,
+            ]
+        );
     }
 
     /**

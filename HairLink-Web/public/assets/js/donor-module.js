@@ -132,6 +132,11 @@
                 return await this.setStatus(reference, STATUS_FLOW[currentIndex + 1]);
             }
             return donation;
+        },
+
+        async submitDeliveryLink(reference, link) {
+            const data = await apiCall(`/internal-api/donations/${reference}/delivery-link`, 'POST', { donor_delivery_link: link });
+            return mapDonation(data);
         }
     };
 
